@@ -163,6 +163,7 @@
 
           <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
             <div class="text-subtitle1 q-mb-sm">Saved foods</div>
+
             <q-table
               :rows="foodRows"
               :columns="foodColumns"
@@ -174,38 +175,54 @@
               :loading="store.loading"
               no-data-label="No food records yet."
             >
-              <template #body-cell-description="props">
-                <q-td :props="props">
-                  <div class="row items-center full-width">
-                    <q-btn
-                      size="sm"
-                      color="secondary"
-                      dense
-                      round
-                      :icon="isExpanded(props.row) ? 'remove' : 'add'"
-                      @click="toggleExpanded(props.row)"
-                    />
-                    <span class="q-ml-lg">{{ props.row.description }}</span>
-                    <div class="row items-center q-gutter-xs q-ml-auto">
+              <template #body="props">
+                <!-- Main row -->
+                <q-tr :props="props">
+                  <q-td key="description" :props="props">
+                    <div class="row items-center full-width">
                       <q-btn
-                        flat
-                        dense
                         size="sm"
-                        color="primary"
-                        label="Edit"
-                        @click="editFood(props.row)"
-                      />
-                      <q-btn
-                        flat
+                        color="secondary"
                         dense
-                        size="sm"
-                        color="primary"
-                        label="Delete"
-                        @click="requestDeleteFood(props.row)"
+                        round
+                        :icon="isExpanded(props.row) ? 'remove' : 'add'"
+                        @click="toggleExpanded(props.row)"
                       />
+
+                      <span class="q-ml-lg">
+                        {{ props.row.description }}
+                      </span>
+
+                      <!-- Push buttons to right -->
+                      <div class="row items-center q-gutter-xs q-ml-auto">
+                        <q-btn
+                          flat
+                          dense
+                          size="sm"
+                          color="primary"
+                          label="Edit"
+                          @click="editFood(props.row)"
+                        />
+
+                        <q-btn
+                          flat
+                          dense
+                          size="sm"
+                          color="primary"
+                          label="Delete"
+                          @click="requestDeleteFood(props.row)"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </q-td>
+                  </q-td>
+                </q-tr>
+
+                <!-- Expanded row -->
+                <q-tr v-if="isExpanded(props.row)" :props="props">
+                  <q-td :colspan="foodColumns.length" class="bg-grey-2">
+                    <div class="q-py-sm text-subtitle2">Hello</div>
+                  </q-td>
+                </q-tr>
               </template>
             </q-table>
           </q-card>
