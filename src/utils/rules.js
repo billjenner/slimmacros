@@ -1,0 +1,63 @@
+const ACTIVITY_LEVEL_MULTIPLIERS = {
+  Low: 1.35,
+  Medium: 1.55,
+  High: 1.75,
+}
+
+function normalizeSex(sex) {
+  return String(sex || '')
+    .trim()
+    .toLowerCase()
+}
+
+function toNumber(value) {
+  if (value === null || value === undefined || value === '') {
+    return null
+  }
+
+  const numericValue = Number(value)
+  return Number.isFinite(numericValue) ? numericValue : null
+}
+
+export function calculateTotalDailyCalories({ weight, height, age, sex, activityLevel }) {
+  const numericWeight = toNumber(weight)
+  const numericHeight = toNumber(height)
+  const numericAge = toNumber(age)
+  const normalizedSex = normalizeSex(sex)
+  const activityMultiplier = ACTIVITY_LEVEL_MULTIPLIERS[activityLevel]
+
+  if (
+    numericWeight === null ||
+    numericHeight === null ||
+    numericAge === null ||
+    !activityMultiplier
+  ) {
+    return null
+  }
+
+  let bmr = null
+
+  if (normalizedSex === 'male' || normalizedSex === 'm') {
+    bmr = 4.536 * numericWeight + 15.875 * numericHeight - 5 * numericAge + 5
+  } else if (normalizedSex === 'female' || normalizedSex === 'f') {
+    bmr = 4.536 * numericWeight + 15.875 * numericHeight - 5 * numericAge - 161
+  }
+
+  if (bmr === null) {
+    return null
+  }
+
+  return Math.round(bmr * activityMultiplier)
+}
+
+export function calculateBodyMassIndex({ weight, height }) {
+  const numericWeight = toNumber(weight)
+  const numericHeight = toNumber(height)
+
+  if (numericWeight === null || numericHeight === null || numericHeight === 0) {
+    return null
+  }
+
+  const bmi = (numericWeight * 703) / (numericHeight * numericHeight)
+  return Math.round(bmi * 100) / 100
+}

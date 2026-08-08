@@ -94,6 +94,20 @@
               <div class="row q-col-gutter-md">
                 <div class="col-12 col-md-6">
                   <q-input
+                    :model-value="totalDailyCalories"
+                    label="Total daily calories"
+                    filled
+                    dense
+                    readonly
+                  />
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <q-input :model-value="bodyMassIndex" label="BMI" filled dense readonly />
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <q-input
                     v-model="profile.daily_calorie_deficit"
                     type="number"
                     label="Daily calorie deficit"
@@ -170,6 +184,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
 import { useProfilesStore } from 'stores/profiles'
+import { calculateBodyMassIndex, calculateTotalDailyCalories } from '../utils/rules'
 
 const usersStore = useUsersStore()
 const store = useProfilesStore()
@@ -289,6 +304,27 @@ const profile = reactive({
 })
 
 const currentUserId = computed(() => usersStore.currentUser?.user_id || null)
+
+const totalDailyCalories = computed(() => {
+  const calories = calculateTotalDailyCalories({
+    weight: profile.weight,
+    height: profile.height,
+    age: usersStore.currentUser?.age,
+    sex: usersStore.currentUser?.sex,
+    activityLevel: profile.activity_level,
+  })
+
+  return calories ?? ''
+})
+
+const bodyMassIndex = computed(() => {
+  const bmi = calculateBodyMassIndex({
+    weight: profile.weight,
+    height: profile.height,
+  })
+
+  return bmi ?? ''
+})
 
 function syncUserDetails() {
   profile.fname = usersStore.currentUser?.fname || ''
