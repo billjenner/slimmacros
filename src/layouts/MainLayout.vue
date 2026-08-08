@@ -10,7 +10,17 @@
           icon="menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
-        <q-toolbar-title>Slim Belly</q-toolbar-title>
+        <q-toolbar-title>
+          <div class="row items-center no-wrap">
+            <q-img
+              src="/icons/icon-192x192.png"
+              alt="Slim Belly"
+              class="q-mr-sm"
+              style="width: 32px; height: 32px; border-radius: 4px"
+            />
+            <span>Slim Belly</span>
+          </div>
+        </q-toolbar-title>
 
         <template v-if="!$q.screen.lt.md">
           <q-btn
