@@ -191,7 +191,7 @@
                         flat
                         dense
                         size="sm"
-                        color="negative"
+                        color="primary"
                         label="Delete"
                         @click="requestDeleteFood(props.row)"
                       />
