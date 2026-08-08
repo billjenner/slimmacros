@@ -22,6 +22,8 @@ export const useProfilesStore = defineStore('Profiles', {
     buildProfilePayload(userId, profile = {}) {
       return {
         user_id: userId,
+        weight: this.toNullableNumber(profile.weight),
+        goal_weight: this.toNullableNumber(profile.goal_weight),
         daily_calorie_deficit: this.toNullableNumber(profile.daily_calorie_deficit) ?? 0,
         diet_type: profile.diet_type || null,
         is_active: true,

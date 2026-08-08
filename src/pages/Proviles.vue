@@ -40,6 +40,30 @@
               <div class="row q-col-gutter-md">
                 <div class="col-12 col-md-6">
                   <q-input
+                    v-model="profile.weight"
+                    type="number"
+                    label="Weight"
+                    min="0"
+                    step="0.01"
+                    filled
+                    dense
+                  />
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <q-input
+                    v-model="profile.goal_weight"
+                    type="number"
+                    label="Goal weight"
+                    min="0"
+                    step="0.01"
+                    filled
+                    dense
+                  />
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <q-input
                     v-model="profile.daily_calorie_deficit"
                     type="number"
                     label="Daily calorie deficit"
@@ -198,6 +222,8 @@ const profile = reactive({
   fname: '',
   lname: '',
   sex: '',
+  weight: null,
+  goal_weight: null,
   daily_calorie_deficit: 0,
   diet_type: null,
   is_active: true,
@@ -237,6 +263,8 @@ async function loadProfile() {
 
   if (!currentUserId.value) {
     store.currentProfile = null
+    profile.weight = null
+    profile.goal_weight = null
     profile.daily_calorie_deficit = 0
     profile.diet_type = null
     dayGroups.forEach((day) => {
@@ -249,6 +277,8 @@ async function loadProfile() {
 
   loading.value = true
   const data = await store.loadCurrentProfile(currentUserId.value)
+  profile.weight = data?.weight ?? null
+  profile.goal_weight = data?.goal_weight ?? null
   profile.daily_calorie_deficit = data?.daily_calorie_deficit ?? 0
   profile.diet_type = data?.diet_type ?? null
   dayGroups.forEach((day) => {
@@ -266,6 +296,8 @@ async function saveProfile() {
 
   loading.value = true
   await store.saveProfile(currentUserId.value, {
+    weight: profile.weight,
+    goal_weight: profile.goal_weight,
     daily_calorie_deficit: profile.daily_calorie_deficit,
     diet_type: profile.diet_type,
     is_active: true,
