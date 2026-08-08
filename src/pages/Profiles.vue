@@ -42,7 +42,7 @@
                   <q-input
                     v-model="profile.weight"
                     type="number"
-                    label="Weight (lbs)"
+                    label="Start weight (lbs)"
                     min="0"
                     step="0.01"
                     filled
