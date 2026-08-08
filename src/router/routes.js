@@ -19,7 +19,7 @@ const routes = [
         component: () => import('pages/Concept.vue'),
         meta: {
           seo: {
-            title: 'The concept',
+            title: 'Resources',
             description: 'Discover the story and idea behind Slim Belly.',
             canonicalPath: '/theary',
           },

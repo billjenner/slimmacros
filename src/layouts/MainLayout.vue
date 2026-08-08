@@ -25,7 +25,7 @@
           />
           <q-btn
             flat
-            label="Concept"
+            label="Resources"
             to="/theary"
             class="q-mx-sm"
             style="min-width: 120px"
@@ -75,7 +75,7 @@
           <q-item-section>Intro</q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/theary')">
-          <q-item-section>Concept</q-item-section>
+          <q-item-section>Resources</q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/profiles')">
           <q-item-section>Profiles</q-item-section>

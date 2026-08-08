@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <div class="text-h4 q-mb-lg text-center">Concept</div>
+    <div class="text-h4 q-mb-lg text-center">Resources</div>
 
     <div
       class="row q-col-gutter-md"
