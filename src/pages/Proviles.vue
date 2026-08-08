@@ -66,7 +66,7 @@
                   <q-input
                     v-model="profile.height"
                     type="number"
-                    label="Height"
+                    label="Height (inches)"
                     min="0"
                     step="0.01"
                     filled
