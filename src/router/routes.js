@@ -60,7 +60,7 @@ const routes = [
       },
       {
         path: 'profiles',
-        component: () => import('pages/Proviles.vue'),
+        component: () => import('pages/Profiles.vue'),
         meta: {
           seo: {
             title: 'Profiles',
