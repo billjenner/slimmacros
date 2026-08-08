@@ -25,22 +25,22 @@
           />
           <q-btn
             flat
-            label="Resources"
-            to="/theary"
-            class="q-mx-sm"
-            style="min-width: 120px"
-            :style="buttonStyle('/theary')"
-            @mouseover="hoveredPath = '/theary'"
-            @mouseleave="hoveredPath = null"
-          />
-          <q-btn
-            flat
             label="Profiles"
             to="/profiles"
             class="q-mx-sm"
             style="min-width: 120px"
             :style="buttonStyle('/profiles')"
             @mouseover="hoveredPath = '/profiles'"
+            @mouseleave="hoveredPath = null"
+          />
+          <q-btn
+            flat
+            label="Resources"
+            to="/theary"
+            class="q-mx-sm"
+            style="min-width: 120px"
+            :style="buttonStyle('/theary')"
+            @mouseover="hoveredPath = '/theary'"
             @mouseleave="hoveredPath = null"
           />
           <q-btn
