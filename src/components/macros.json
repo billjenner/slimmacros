@@ -1,0 +1,38 @@
+{
+  "High Metabolic": {
+    "Sunday": { "Protein": 40, "Carbs": 10, "Fat": 50 },
+    "Monday": { "Protein": 40, "Carbs": 10, "Fat": 50 },
+    "Tuesday": { "Protein": 35, "Carbs": 35, "Fat": 30 },
+    "Wednesday": { "Protein": 35, "Carbs": 45, "Fat": 20 },
+    "Thursday": { "Protein": 40, "Carbs": 10, "Fat": 50 },
+    "Friday": { "Protein": 35, "Carbs": 35, "Fat": 30 },
+    "Saturday": { "Protein": 35, "Carbs": 45, "Fat": 20 }
+  },
+  "Balanced": {
+    "Sunday": { "Protein": 30, "Carbs": 30, "Fat": 40 },
+    "Monday": { "Protein": 30, "Carbs": 30, "Fat": 40 },
+    "Tuesday": { "Protein": 30, "Carbs": 30, "Fat": 40 },
+    "Wednesday": { "Protein": 30, "Carbs": 30, "Fat": 40 },
+    "Thursday": { "Protein": 30, "Carbs": 30, "Fat": 40 },
+    "Friday": { "Protein": 30, "Carbs": 30, "Fat": 40 },
+    "Saturday": { "Protein": 30, "Carbs": 30, "Fat": 40 }
+  },
+  "Low Carb": {
+    "Sunday": { "Protein": 40, "Carbs": 10, "Fat": 50 },
+    "Monday": { "Protein": 40, "Carbs": 10, "Fat": 50 },
+    "Tuesday": { "Protein": 40, "Carbs": 10, "Fat": 50 },
+    "Wednesday": { "Protein": 40, "Carbs": 10, "Fat": 50 },
+    "Thursday": { "Protein": 40, "Carbs": 10, "Fat": 50 },
+    "Friday": { "Protein": 40, "Carbs": 10, "Fat": 50 },
+    "Saturday": { "Protein": 40, "Carbs": 10, "Fat": 50 }
+  },
+  "High Protein": {
+    "Sunday": { "Protein": 35, "Carbs": 25, "Fat": 40 },
+    "Monday": { "Protein": 35, "Carbs": 25, "Fat": 40 },
+    "Tuesday": { "Protein": 35, "Carbs": 25, "Fat": 40 },
+    "Wednesday": { "Protein": 35, "Carbs": 25, "Fat": 40 },
+    "Thursday": { "Protein": 35, "Carbs": 25, "Fat": 40 },
+    "Friday": { "Protein": 35, "Carbs": 25, "Fat": 40 },
+    "Saturday": { "Protein": 35, "Carbs": 25, "Fat": 40 }
+  }
+}

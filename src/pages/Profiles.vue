@@ -134,7 +134,16 @@
             </q-card>
 
             <q-card flat bordered class="q-pa-md bg-grey-1">
-              <div class="text-subtitle1 q-mb-sm">Macro split by day</div>
+              <div class="row items-center justify-between q-mb-sm">
+                <div class="text-subtitle1">Macro split by day</div>
+                <q-btn
+                  label="Load template"
+                  color="secondary"
+                  flat
+                  :disable="!profile.diet_type"
+                  @click="loadMacroTemplate"
+                />
+              </div>
               <div v-for="day in dayGroups" :key="day.key" class="q-mb-md">
                 <div class="text-weight-medium q-mb-sm">{{ day.label }}</div>
                 <div class="row q-col-gutter-md">
@@ -185,15 +194,16 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
 import { useProfilesStore } from 'stores/profiles'
 import { calculateBodyMassIndex, calculateTotalDailyCalories } from '../utils/rules'
+import macroTemplates from '../components/macros.json'
 
 const usersStore = useUsersStore()
 const store = useProfilesStore()
 const loading = ref(false)
 
 const dietTypeOptions = [
-  { label: 'Low Cal', value: 'Low Cal' },
+  { label: 'Balanced', value: 'Balanced' },
   { label: 'Low Carb', value: 'Low Carb' },
-  { label: 'Lean Muscle', value: 'Lean Muscle' },
+  { label: 'High Protein', value: 'High Protein' },
   { label: 'High Metabolic', value: 'High Metabolic' },
 ]
 
@@ -325,6 +335,30 @@ const bodyMassIndex = computed(() => {
 
   return bmi ?? ''
 })
+
+function loadMacroTemplate() {
+  const selectedTemplate = macroTemplates[profile.diet_type]
+  if (!selectedTemplate) {
+    return
+  }
+
+  dayGroups.forEach((day) => {
+    const dayTemplate = selectedTemplate[day.label]
+    if (!dayTemplate) {
+      return
+    }
+
+    day.fields.forEach((field) => {
+      if (field.key.endsWith('_protein')) {
+        profile[field.key] = dayTemplate.Protein ?? null
+      } else if (field.key.endsWith('_carbs')) {
+        profile[field.key] = dayTemplate.Carbs ?? null
+      } else if (field.key.endsWith('_fat')) {
+        profile[field.key] = dayTemplate.Fat ?? null
+      }
+    })
+  })
+}
 
 function syncUserDetails() {
   profile.fname = usersStore.currentUser?.fname || ''
