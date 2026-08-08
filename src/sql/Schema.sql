@@ -34,7 +34,9 @@ CREATE TABLE public.profile (
 
 	goal_weight numeric(6,2) CHECK (goal_weight >= 0),
 	
-    activity_level public.activity_level,	
+	height numeric(6,2) CHECK (height >= 0), 
+
+    activity_level public.activity_level,		
 
     daily_calorie_deficit integer NOT NULL DEFAULT 0
         CHECK (daily_calorie_deficit >= 0),

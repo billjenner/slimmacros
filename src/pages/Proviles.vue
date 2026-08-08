@@ -63,6 +63,18 @@
                 </div>
 
                 <div class="col-12 col-md-6">
+                  <q-input
+                    v-model="profile.height"
+                    type="number"
+                    label="Height"
+                    min="0"
+                    step="0.01"
+                    filled
+                    dense
+                  />
+                </div>
+
+                <div class="col-12 col-md-6">
                   <q-select
                     v-model="profile.activity_level"
                     :options="activityLevelOptions"
@@ -248,6 +260,7 @@ const profile = reactive({
   sex: '',
   weight: null,
   goal_weight: null,
+  height: null,
   activity_level: null,
   daily_calorie_deficit: 0,
   diet_type: null,
@@ -290,6 +303,7 @@ async function loadProfile() {
     store.currentProfile = null
     profile.weight = null
     profile.goal_weight = null
+    profile.height = null
     profile.activity_level = null
     profile.daily_calorie_deficit = 0
     profile.diet_type = null
@@ -305,6 +319,7 @@ async function loadProfile() {
   const data = await store.loadCurrentProfile(currentUserId.value)
   profile.weight = data?.weight ?? null
   profile.goal_weight = data?.goal_weight ?? null
+  profile.height = data?.height ?? null
   profile.activity_level = data?.activity_level ?? null
   profile.daily_calorie_deficit = data?.daily_calorie_deficit ?? 0
   profile.diet_type = data?.diet_type ?? null
@@ -325,6 +340,7 @@ async function saveProfile() {
   await store.saveProfile(currentUserId.value, {
     weight: profile.weight,
     goal_weight: profile.goal_weight,
+    height: profile.height,
     activity_level: profile.activity_level,
     daily_calorie_deficit: profile.daily_calorie_deficit,
     diet_type: profile.diet_type,
