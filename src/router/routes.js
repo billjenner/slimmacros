@@ -15,34 +15,6 @@ const routes = [
         },
       },
       {
-        path: 'personality-review',
-        component: () => import('pages/PersonalityReview.vue'),
-        meta: {
-          seo: {
-            title: 'Personality review',
-            description:
-              'Review and explore saved personality insights and answers in The Cube Game.',
-            canonicalPath: '/personality-review',
-          },
-        },
-      },
-      {
-        path: 'analyze',
-        component: () => import('pages/PersonalityGame.vue'),
-        meta: {
-          seo: {
-            title: 'Analyze your personality',
-            description:
-              'Play the interactive personality Game and see how your answers are interpreted.',
-            canonicalPath: '/analyze',
-          },
-        },
-      },
-      {
-        path: 'personality-game',
-        redirect: '/analyze',
-      },
-      {
         path: 'theary',
         component: () => import('pages/Concept.vue'),
         meta: {

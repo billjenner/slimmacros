@@ -25,26 +25,6 @@
           />
           <q-btn
             flat
-            label="Personality Game"
-            class="q-mx-sm"
-            style="min-width: 172px"
-            :style="buttonStyle('/analyze')"
-            @click="navigate('/analyze')"
-            @mouseover="hoveredPath = '/analyze'"
-            @mouseleave="hoveredPath = null"
-          />
-          <q-btn
-            flat
-            label="PERSONALITY REVIEW"
-            class="q-mx-sm"
-            style="min-width: 172px"
-            :style="buttonStyle('/personality-review')"
-            @click="navigate('/personality-review')"
-            @mouseover="hoveredPath = '/personality-review'"
-            @mouseleave="hoveredPath = null"
-          />
-          <q-btn
-            flat
             label="Concept"
             to="/theary"
             class="q-mx-sm"
@@ -83,12 +63,6 @@
       <q-list padding>
         <q-item clickable v-ripple @click="navigateAndClose('/')">
           <q-item-section>Intro</q-item-section>
-        </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/analyze')">
-          <q-item-section>Personality Game</q-item-section>
-        </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/personality-review')">
-          <q-item-section>Personality Review</q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/theary')">
           <q-item-section>Concept</q-item-section>
@@ -162,10 +136,6 @@ async function navigate(path) {
   if (!(usersStore.currentUser && usersStore.currentUser.email)) {
     router.push('/login')
     return
-  }
-
-  if (path === '/personality-review') {
-    await promptInstall()
   }
 
   router.push(path)

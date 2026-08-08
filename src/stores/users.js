@@ -1,43 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
-import { generateAnswerExplanation } from '../utils/interpretAnswers'
-
-function trimAnswer(value) {
-  return String(value || '').trim()
-}
-
-function normalizeAnswers(answers) {
-  return {
-    room: trimAnswer(answers?.room),
-    cube: trimAnswer(answers?.cube),
-    ladder: trimAnswer(answers?.ladder),
-    horse: trimAnswer(answers?.horse),
-    window: trimAnswer(answers?.window),
-    storm: trimAnswer(answers?.storm),
-    flowers: trimAnswer(answers?.flowers),
-  }
-}
-
-function buildAnswerPayload(email, answers, explanations, currentTime) {
-  return {
-    email,
-    room: answers.room || '',
-    room_explanation: explanations.room || '',
-    cube: answers.cube || '',
-    cube_explanation: explanations.cube || '',
-    ladder: answers.ladder || '',
-    ladder_explanation: explanations.ladder || '',
-    horse: answers.horse || '',
-    horse_explanation: explanations.horse || '',
-    window: answers.window || '',
-    window_explanation: explanations.window || '',
-    storm: answers.storm || '',
-    storm_explanation: explanations.storm || '',
-    flowers: answers.flowers || '',
-    flowers_explanation: explanations.flowers || '',
-    date_time: currentTime,
-  }
-}
+import { generateAnswerExplanation, normalizeAnswers } from '../utils/interpretAnswers'
 
 export const useUsersStore = defineStore('Users', {
   state: () => ({
@@ -206,12 +169,24 @@ export const useUsersStore = defineStore('Users', {
       const currentTime = new Date().toISOString()
       const normalizedAnswers = normalizeAnswers(answers)
       const explanations = await generateAnswerExplanation(normalizedAnswers)
-      const payload = buildAnswerPayload(
-        this.currentUser.email,
-        normalizedAnswers,
-        explanations,
-        currentTime,
-      )
+      const payload = {
+        email: this.currentUser.email,
+        room: normalizedAnswers.room || '',
+        room_explanation: explanations.room || '',
+        cube: normalizedAnswers.cube || '',
+        cube_explanation: explanations.cube || '',
+        ladder: normalizedAnswers.ladder || '',
+        ladder_explanation: explanations.ladder || '',
+        horse: normalizedAnswers.horse || '',
+        horse_explanation: explanations.horse || '',
+        window: normalizedAnswers.window || '',
+        window_explanation: explanations.window || '',
+        storm: normalizedAnswers.storm || '',
+        storm_explanation: explanations.storm || '',
+        flowers: normalizedAnswers.flowers || '',
+        flowers_explanation: explanations.flowers || '',
+        date_time: currentTime,
+      }
 
       const { data, error } = await supabase.from('answers').insert(payload).select().single()
 
@@ -245,12 +220,24 @@ export const useUsersStore = defineStore('Users', {
       const normalizedAnswers = normalizeAnswers(answers)
       const explanations = await generateAnswerExplanation(normalizedAnswers)
       const targetDateTime = this.activeAnswerDateTime || currentTime
-      const payload = buildAnswerPayload(
-        this.currentUser.email,
-        normalizedAnswers,
-        explanations,
-        targetDateTime,
-      )
+      const payload = {
+        email: this.currentUser.email,
+        room: normalizedAnswers.room || '',
+        room_explanation: explanations.room || '',
+        cube: normalizedAnswers.cube || '',
+        cube_explanation: explanations.cube || '',
+        ladder: normalizedAnswers.ladder || '',
+        ladder_explanation: explanations.ladder || '',
+        horse: normalizedAnswers.horse || '',
+        horse_explanation: explanations.horse || '',
+        window: normalizedAnswers.window || '',
+        window_explanation: explanations.window || '',
+        storm: normalizedAnswers.storm || '',
+        storm_explanation: explanations.storm || '',
+        flowers: normalizedAnswers.flowers || '',
+        flowers_explanation: explanations.flowers || '',
+        date_time: targetDateTime,
+      }
 
       let data = null
       let error = null
