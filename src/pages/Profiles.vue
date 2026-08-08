@@ -40,7 +40,7 @@
               <div class="row q-col-gutter-md">
                 <div class="col-12 col-md-6">
                   <q-input
-                    v-model="profile.weight"
+                    v-model="profile.start_weight"
                     type="number"
                     label="Start weight (lbs)"
                     min="0"
@@ -283,7 +283,7 @@ const profile = reactive({
   fname: '',
   lname: '',
   sex: '',
-  weight: null,
+  start_weight: null,
   goal_weight: null,
   height: null,
   activity_level: null,
@@ -317,7 +317,7 @@ const currentUserId = computed(() => usersStore.currentUser?.user_id || null)
 
 const totalDailyCalories = computed(() => {
   const calories = calculateTotalDailyCalories({
-    weight: profile.weight,
+    weight: profile.start_weight,
     height: profile.height,
     age: usersStore.currentUser?.age,
     sex: usersStore.currentUser?.sex,
@@ -329,7 +329,7 @@ const totalDailyCalories = computed(() => {
 
 const bodyMassIndex = computed(() => {
   const bmi = calculateBodyMassIndex({
-    weight: profile.weight,
+    weight: profile.start_weight,
     height: profile.height,
   })
 
@@ -371,7 +371,7 @@ async function loadProfile() {
 
   if (!currentUserId.value) {
     store.currentProfile = null
-    profile.weight = null
+    profile.start_weight = null
     profile.goal_weight = null
     profile.height = null
     profile.activity_level = null
@@ -387,7 +387,7 @@ async function loadProfile() {
 
   loading.value = true
   const data = await store.loadCurrentProfile(currentUserId.value)
-  profile.weight = data?.weight ?? null
+  profile.start_weight = data?.start_weight ?? null
   profile.goal_weight = data?.goal_weight ?? null
   profile.height = data?.height ?? null
   profile.activity_level = data?.activity_level ?? null
@@ -408,7 +408,7 @@ async function saveProfile() {
 
   loading.value = true
   await store.saveProfile(currentUserId.value, {
-    weight: profile.weight,
+    start_weight: profile.start_weight,
     goal_weight: profile.goal_weight,
     height: profile.height,
     activity_level: profile.activity_level,

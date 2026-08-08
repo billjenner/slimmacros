@@ -22,7 +22,7 @@ export const useProfilesStore = defineStore('Profiles', {
     buildProfilePayload(userId, profile = {}) {
       return {
         user_id: userId,
-        weight: this.toNullableNumber(profile.weight),
+        start_weight: this.toNullableNumber(profile.start_weight),
         goal_weight: this.toNullableNumber(profile.goal_weight),
         height: this.toNullableNumber(profile.height),
         activity_level: profile.activity_level || null,
