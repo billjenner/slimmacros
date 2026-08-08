@@ -42,7 +42,7 @@
                   <q-input
                     v-model="profile.weight"
                     type="number"
-                    label="Weight"
+                    label="Weight (lbs)"
                     min="0"
                     step="0.01"
                     filled
@@ -54,7 +54,7 @@
                   <q-input
                     v-model="profile.goal_weight"
                     type="number"
-                    label="Goal weight"
+                    label="Goal weight (lbs)"
                     min="0"
                     step="0.01"
                     filled
