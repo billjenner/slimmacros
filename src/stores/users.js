@@ -1,6 +1,5 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
-import { generateAnswerExplanation, normalizeAnswers } from '../utils/interpretAnswers'
 
 export const useUsersStore = defineStore('Users', {
   state: () => ({
@@ -167,24 +166,15 @@ export const useUsersStore = defineStore('Users', {
       }
 
       const currentTime = new Date().toISOString()
-      const normalizedAnswers = normalizeAnswers(answers)
-      const explanations = await generateAnswerExplanation(normalizedAnswers)
       const payload = {
         email: this.currentUser.email,
-        room: normalizedAnswers.room || '',
-        room_explanation: explanations.room || '',
-        cube: normalizedAnswers.cube || '',
-        cube_explanation: explanations.cube || '',
-        ladder: normalizedAnswers.ladder || '',
-        ladder_explanation: explanations.ladder || '',
-        horse: normalizedAnswers.horse || '',
-        horse_explanation: explanations.horse || '',
-        window: normalizedAnswers.window || '',
-        window_explanation: explanations.window || '',
-        storm: normalizedAnswers.storm || '',
-        storm_explanation: explanations.storm || '',
-        flowers: normalizedAnswers.flowers || '',
-        flowers_explanation: explanations.flowers || '',
+        room: answers?.room || '',
+        cube: answers?.cube || '',
+        ladder: answers?.ladder || '',
+        horse: answers?.horse || '',
+        window: answers?.window || '',
+        storm: answers?.storm || '',
+        flowers: answers?.flowers || '',
         date_time: currentTime,
       }
 
@@ -217,25 +207,16 @@ export const useUsersStore = defineStore('Users', {
       }
 
       const currentTime = new Date().toISOString()
-      const normalizedAnswers = normalizeAnswers(answers)
-      const explanations = await generateAnswerExplanation(normalizedAnswers)
       const targetDateTime = this.activeAnswerDateTime || currentTime
       const payload = {
         email: this.currentUser.email,
-        room: normalizedAnswers.room || '',
-        room_explanation: explanations.room || '',
-        cube: normalizedAnswers.cube || '',
-        cube_explanation: explanations.cube || '',
-        ladder: normalizedAnswers.ladder || '',
-        ladder_explanation: explanations.ladder || '',
-        horse: normalizedAnswers.horse || '',
-        horse_explanation: explanations.horse || '',
-        window: normalizedAnswers.window || '',
-        window_explanation: explanations.window || '',
-        storm: normalizedAnswers.storm || '',
-        storm_explanation: explanations.storm || '',
-        flowers: normalizedAnswers.flowers || '',
-        flowers_explanation: explanations.flowers || '',
+        room: answers?.room || '',
+        cube: answers?.cube || '',
+        ladder: answers?.ladder || '',
+        horse: answers?.horse || '',
+        window: answers?.window || '',
+        storm: answers?.storm || '',
+        flowers: answers?.flowers || '',
         date_time: targetDateTime,
       }
 
