@@ -20,6 +20,27 @@
           :rules="[(val) => !!val || 'Last name is required']"
         />
 
+        <q-select
+          v-model="sex"
+          label="Sex"
+          :options="['Male', 'Female']"
+          outlined
+          dense
+          :rules="[(val) => !!val || 'Sex is required']"
+        />
+
+        <q-input
+          v-model.number="age"
+          label="Age"
+          type="number"
+          outlined
+          dense
+          :rules="[
+            (val) => (val !== null && val !== '') || 'Age is required',
+            (val) => val >= 0 || 'Age must be 0 or greater',
+          ]"
+        />
+
         <q-input
           v-model="email"
           label="Email"
@@ -70,6 +91,8 @@ const store = useUsersStore()
 
 const fname = ref('')
 const lname = ref('')
+const sex = ref('')
+const age = ref(null)
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
@@ -77,13 +100,28 @@ const message = ref('')
 const messageClass = ref('text-positive')
 
 async function handleSubmit() {
-  if (!fname.value.trim() || !lname.value.trim() || !email.value.trim() || !password.value) {
-    message.value = 'Please enter first name, last name, email, and password.'
+  if (
+    !fname.value.trim() ||
+    !lname.value.trim() ||
+    !sex.value ||
+    age.value === null ||
+    age.value === '' ||
+    !email.value.trim() ||
+    !password.value
+  ) {
+    message.value = 'Please fill in all required fields.'
     messageClass.value = 'text-negative'
     return
   }
 
-  const result = await store.saveUser(email.value, password.value, fname.value, lname.value)
+  const result = await store.saveUser(
+    email.value,
+    password.value,
+    fname.value,
+    lname.value,
+    sex.value,
+    age.value,
+  )
 
   if (result) {
     message.value = `User created for ${store.currentUser?.email}`

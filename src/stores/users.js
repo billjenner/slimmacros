@@ -50,7 +50,7 @@ export const useUsersStore = defineStore('Users', {
   }),
 
   actions: {
-    async saveUser(email, password, fname = '', lname = '') {
+    async saveUser(email, password, fname = '', lname = '', sex = '', age = null) {
       this.error = null
 
       if (!supabase) {
@@ -64,6 +64,9 @@ export const useUsersStore = defineStore('Users', {
         password,
         fname,
         lname,
+        sex,
+        age: age !== null && age !== '' ? Number(age) : null,
+        is_active: true,
       }
 
       const { data: existingUser, error: lookupError } = await supabase
