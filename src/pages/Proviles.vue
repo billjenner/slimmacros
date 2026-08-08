@@ -36,7 +36,7 @@
             </q-card>
 
             <q-card flat bordered class="q-pa-md bg-grey-1">
-              <div class="text-subtitle1 q-mb-sm">Nutrition targets</div>
+              <div class="text-subtitle1 q-mb-sm">Body</div>
               <div class="row q-col-gutter-md">
                 <div class="col-12 col-md-6">
                   <q-input
@@ -62,6 +62,24 @@
                   />
                 </div>
 
+                <div class="col-12 col-md-6">
+                  <q-select
+                    v-model="profile.activity_level"
+                    :options="activityLevelOptions"
+                    label="Activity level"
+                    filled
+                    dense
+                    emit-value
+                    map-options
+                    clearable
+                  />
+                </div>
+              </div>
+            </q-card>
+
+            <q-card flat bordered class="q-pa-md bg-grey-1">
+              <div class="text-subtitle1 q-mb-sm">Nutrition targets</div>
+              <div class="row q-col-gutter-md">
                 <div class="col-12 col-md-6">
                   <q-input
                     v-model="profile.daily_calorie_deficit"
@@ -152,6 +170,12 @@ const dietTypeOptions = [
   { label: 'High Metabolic', value: 'High Metabolic' },
 ]
 
+const activityLevelOptions = [
+  { label: 'Low', value: 'Low' },
+  { label: 'Medium', value: 'Medium' },
+  { label: 'High', value: 'High' },
+]
+
 const dayGroups = [
   {
     key: 'sunday',
@@ -224,6 +248,7 @@ const profile = reactive({
   sex: '',
   weight: null,
   goal_weight: null,
+  activity_level: null,
   daily_calorie_deficit: 0,
   diet_type: null,
   is_active: true,
@@ -265,6 +290,7 @@ async function loadProfile() {
     store.currentProfile = null
     profile.weight = null
     profile.goal_weight = null
+    profile.activity_level = null
     profile.daily_calorie_deficit = 0
     profile.diet_type = null
     dayGroups.forEach((day) => {
@@ -279,6 +305,7 @@ async function loadProfile() {
   const data = await store.loadCurrentProfile(currentUserId.value)
   profile.weight = data?.weight ?? null
   profile.goal_weight = data?.goal_weight ?? null
+  profile.activity_level = data?.activity_level ?? null
   profile.daily_calorie_deficit = data?.daily_calorie_deficit ?? 0
   profile.diet_type = data?.diet_type ?? null
   dayGroups.forEach((day) => {
@@ -298,6 +325,7 @@ async function saveProfile() {
   await store.saveProfile(currentUserId.value, {
     weight: profile.weight,
     goal_weight: profile.goal_weight,
+    activity_level: profile.activity_level,
     daily_calorie_deficit: profile.daily_calorie_deficit,
     diet_type: profile.diet_type,
     is_active: true,

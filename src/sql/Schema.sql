@@ -4,6 +4,7 @@
 CREATE TYPE public.diet_type AS ENUM ( 'Low Cal', 'Low Carb', 'Lean Muscle', 'High Metabolic' ); 
 CREATE TYPE public.food_serving_unit AS ENUM ( 'cup', 'oz', 'grams', 'slice', 'bar', 'unit' ); 
 CREATE TYPE public.supplement_serving_unit AS ENUM ( 'pills', 'oz', 'other' );
+CREATE TYPE public.activity_level AS ENUM ( 'Low', 'Medium', 'High' );
 
 -- ============================================================ 
 -- USERS 
@@ -22,10 +23,18 @@ CREATE TABLE public.users (
   CONSTRAINT users_pkey PRIMARY KEY (user_id)
 );
 
+DROP TABLE IF EXISTS public.profile;
+
 CREATE TABLE public.profile (
     profile_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 
     user_id uuid NOT NULL UNIQUE,
+
+	weight numeric(6,2) CHECK (weight >= 0), 
+
+	goal_weight numeric(6,2) CHECK (goal_weight >= 0),
+	
+    activity_level public.activity_level,	
 
     daily_calorie_deficit integer NOT NULL DEFAULT 0
         CHECK (daily_calorie_deficit >= 0),
