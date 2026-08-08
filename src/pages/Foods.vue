@@ -8,6 +8,7 @@
             <q-btn
               color="primary"
               class="q-mb-sm"
+              unelevated
               :label="showFoodForm ? 'Hide Form' : 'Add Food'"
               @click="showFoodForm = !showFoodForm"
             />
@@ -147,6 +148,19 @@
             </q-form>
           </transition>
 
+          <q-dialog v-model="confirmDeleteOpen">
+            <q-card style="min-width: 320px">
+              <q-card-section class="text-h6">Delete food?</q-card-section>
+              <q-card-section>
+                Are you sure you want to delete food {{ pendingDeleteFood?.description || '' }}?
+              </q-card-section>
+              <q-card-actions align="right">
+                <q-btn flat label="No" color="primary" @click="cancelDeleteFood" />
+                <q-btn label="Yes" color="negative" @click="confirmDeleteFood" />
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
+
           <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
             <div class="text-subtitle1 q-mb-sm">Saved foods</div>
             <q-table
@@ -156,9 +170,36 @@
               flat
               bordered
               dense
+              hide-header
               :loading="store.loading"
               no-data-label="No food records yet."
-            />
+            >
+              <template #body-cell-description="props">
+                <q-td :props="props">
+                  <div class="row items-center justify-between full-width">
+                    <span>{{ props.row.description }}</span>
+                    <div class="row items-center q-gutter-xs">
+                      <q-btn
+                        flat
+                        dense
+                        size="sm"
+                        color="primary"
+                        label="Edit"
+                        @click="editFood(props.row)"
+                      />
+                      <q-btn
+                        flat
+                        dense
+                        size="sm"
+                        color="negative"
+                        label="Delete"
+                        @click="requestDeleteFood(props.row)"
+                      />
+                    </div>
+                  </div>
+                </q-td>
+              </template>
+            </q-table>
           </q-card>
         </q-card>
       </div>
@@ -209,6 +250,8 @@ const foodColumns = [
 
 const foodRows = computed(() => store.foods || [])
 const showFoodForm = ref(false)
+const confirmDeleteOpen = ref(false)
+const pendingDeleteFood = ref(null)
 
 onMounted(() => {
   if (usersStore.currentUser?.user_id) {
@@ -233,6 +276,50 @@ async function loadFoodsForCurrentUser(userId) {
   }
 
   await store.loadFoods(userId)
+}
+
+function editFood(row) {
+  Object.assign(food, {
+    description: row.description || '',
+    protein: row.protein ?? 0,
+    carb: row.carb ?? 0,
+    fat: row.fat ?? 0,
+    calories_extra: row.calories_extra ?? 0,
+    my_food: row.my_food !== false,
+    favorite_food: Boolean(row.favorite_food),
+    share_with_others: Boolean(row.share_with_others),
+    serving_size: row.serving_size ?? 1,
+    serving_unit: row.serving_unit || 'unit',
+    is_active: row.is_active !== false,
+  })
+
+  showFoodForm.value = true
+}
+
+function requestDeleteFood(row) {
+  pendingDeleteFood.value = row
+  confirmDeleteOpen.value = true
+}
+
+function cancelDeleteFood() {
+  pendingDeleteFood.value = null
+  confirmDeleteOpen.value = false
+}
+
+async function confirmDeleteFood() {
+  const row = pendingDeleteFood.value
+  pendingDeleteFood.value = null
+  confirmDeleteOpen.value = false
+
+  if (!usersStore.currentUser?.user_id || !row?.food_id) {
+    store.error = 'No current user is available.'
+    return
+  }
+
+  const { error } = await store.deactivateFood(usersStore.currentUser.user_id, row.food_id)
+  if (!error) {
+    await loadFoodsForCurrentUser(usersStore.currentUser.user_id)
+  }
 }
 
 async function submitFood() {

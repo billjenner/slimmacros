@@ -86,6 +86,7 @@ export const useFoodsStore = defineStore('Foods', {
           .from('food')
           .select('*')
           .eq('user_id', userId)
+          .eq('is_active', true)
           .order('created_at', { ascending: false })
 
         if (error) {
@@ -95,6 +96,39 @@ export const useFoodsStore = defineStore('Foods', {
 
         this.foods = data || []
         return this.foods
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async deactivateFood(userId, foodId) {
+      this.error = null
+      this.loading = true
+
+      try {
+        if (!supabase) {
+          this.error = 'Supabase client is not configured.'
+          return { error: this.error }
+        }
+
+        if (!userId || !foodId) {
+          this.error = 'No current user is available.'
+          return { error: this.error }
+        }
+
+        const { error } = await supabase
+          .from('food')
+          .update({ is_active: false })
+          .eq('food_id', foodId)
+          .eq('user_id', userId)
+
+        if (error) {
+          this.error = error.message
+          return { error: this.error }
+        }
+
+        this.foods = this.foods.filter((food) => food.food_id !== foodId)
+        return { error: null }
       } finally {
         this.loading = false
       }
