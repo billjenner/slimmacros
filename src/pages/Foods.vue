@@ -176,9 +176,17 @@
             >
               <template #body-cell-description="props">
                 <q-td :props="props">
-                  <div class="row items-center justify-between full-width">
-                    <span>{{ props.row.description }}</span>
-                    <div class="row items-center q-gutter-xs">
+                  <div class="row items-center full-width">
+                    <q-btn
+                      size="sm"
+                      color="secondary"
+                      dense
+                      round
+                      :icon="isExpanded(props.row) ? 'remove' : 'add'"
+                      @click="toggleExpanded(props.row)"
+                    />
+                    <span class="q-ml-lg">{{ props.row.description }}</span>
+                    <div class="row items-center q-gutter-xs q-ml-auto">
                       <q-btn
                         flat
                         dense
@@ -252,6 +260,7 @@ const foodRows = computed(() => store.foods || [])
 const showFoodForm = ref(false)
 const confirmDeleteOpen = ref(false)
 const pendingDeleteFood = ref(null)
+const expandedFoodIds = ref([])
 
 onMounted(() => {
   if (usersStore.currentUser?.user_id) {
@@ -276,6 +285,22 @@ async function loadFoodsForCurrentUser(userId) {
   }
 
   await store.loadFoods(userId)
+}
+
+function isExpanded(row) {
+  return expandedFoodIds.value.includes(row?.food_id)
+}
+
+function toggleExpanded(row) {
+  if (!row?.food_id) {
+    return
+  }
+
+  if (isExpanded(row)) {
+    expandedFoodIds.value = expandedFoodIds.value.filter((foodId) => foodId !== row.food_id)
+  } else {
+    expandedFoodIds.value = [...expandedFoodIds.value, row.food_id]
+  }
 }
 
 function editFood(row) {
