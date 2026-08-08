@@ -59,6 +59,17 @@ const routes = [
         },
       },
       {
+        path: 'profiles',
+        component: () => import('pages/Proviles.vue'),
+        meta: {
+          seo: {
+            title: 'Profiles',
+            description: 'Create and manage your Slim Belly profile.',
+            canonicalPath: '/profiles',
+          },
+        },
+      },
+      {
         path: 'users',
         component: () => import('pages/Users.vue'),
         meta: {

@@ -34,6 +34,16 @@
             @mouseleave="hoveredPath = null"
           />
           <q-btn
+            flat
+            label="Profiles"
+            to="/profiles"
+            class="q-mx-sm"
+            style="min-width: 120px"
+            :style="buttonStyle('/profiles')"
+            @mouseover="hoveredPath = '/profiles'"
+            @mouseleave="hoveredPath = null"
+          />
+          <q-btn
             v-if="!(usersStore.currentUser && usersStore.currentUser.email)"
             flat
             label="LOGIN"
@@ -66,6 +76,9 @@
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/theary')">
           <q-item-section>Concept</q-item-section>
+        </q-item>
+        <q-item clickable v-ripple @click="navigateAndClose('/profiles')">
+          <q-item-section>Profiles</q-item-section>
         </q-item>
         <q-item
           v-if="!(usersStore.currentUser && usersStore.currentUser.email)"
