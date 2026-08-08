@@ -9,7 +9,7 @@ const routes = [
         meta: {
           seo: {
             title: 'Home',
-            description: 'Learn about The Cube Game and begin your personality journey.',
+            description: 'Learn about Slim Belly and begin your personality journey.',
             canonicalPath: '/',
           },
         },
@@ -20,7 +20,7 @@ const routes = [
         meta: {
           seo: {
             title: 'The concept',
-            description: 'Discover the story and idea behind The Cube Game.',
+            description: 'Discover the story and idea behind Slim Belly.',
             canonicalPath: '/theary',
           },
         },
@@ -31,7 +31,7 @@ const routes = [
         meta: {
           seo: {
             title: 'Login',
-            description: 'Sign in to continue your The Cube Game experience.',
+            description: 'Sign in to continue your Slim Belly experience.',
             canonicalPath: '/login',
           },
         },
@@ -53,7 +53,7 @@ const routes = [
         meta: {
           seo: {
             title: 'Forgot password',
-            description: 'Reset your password to access your The Cube Game account.',
+            description: 'Reset your password to access your Slim Belly account.',
             canonicalPath: '/forgot-password',
           },
         },
@@ -64,7 +64,7 @@ const routes = [
         meta: {
           seo: {
             title: 'Users',
-            description: 'View the users and community members in The Cube Game.',
+            description: 'View the users and community members in Slim Belly.',
             canonicalPath: '/users',
           },
         },

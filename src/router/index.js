@@ -19,13 +19,13 @@ const defaultSeo = {
 
 function applySeoMeta(route) {
   const seo = { ...defaultSeo, ...(route.meta?.seo || {}) }
-  const title = seo.title ? `${seo.title} | The Cube Game` : defaultSeo.title
+  const title = seo.title ? `${seo.title} | Slim Belly` : defaultSeo.title
   const description = seo.description || defaultSeo.description
   const canonicalPath = seo.canonicalPath || route.path || '/'
   const origin =
     typeof window !== 'undefined' && window.location?.origin
       ? window.location.origin
-      : 'https://thecubegame.com'
+      : 'https://slimbelly.com'
   const canonicalUrl = `${origin}${canonicalPath === '/' ? '/' : `/${canonicalPath.replace(/^\/+/, '').replace(/\/+$/, '')}`}`
 
   document.title = title

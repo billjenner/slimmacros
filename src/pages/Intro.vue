@@ -33,7 +33,7 @@
     >
       Most of these tests are designed to allow the subconscious to reveal the truth about you to
       your conscious awareness and/or to your therapist. To see how this works for yourself, give
-      this very famous one to try! It’s called “The Cube”. This test was said to have been created
+      this very famous one to try! It’s called “Slim Belly”. This test was said to have been created
       by a psychologist from Japan.
     </h5>
     <div class="q-pa-md text-center" style="max-width: 720px; width: 100%">

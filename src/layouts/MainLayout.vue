@@ -10,7 +10,7 @@
           icon="menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
-        <q-toolbar-title>The Cube</q-toolbar-title>
+        <q-toolbar-title>Slim Belly</q-toolbar-title>
 
         <template v-if="!$q.screen.lt.md">
           <q-btn
@@ -101,7 +101,7 @@
     <q-dialog v-model="showInstallDialog" persistent>
       <q-card style="min-width: 320px; max-width: 420px">
         <q-card-section>
-          <div class="text-h6">Install The Cube App?</div>
+          <div class="text-h6">Install Slim Belly App?</div>
         </q-card-section>
 
         <q-card-section>

@@ -42,7 +42,7 @@
             transition-hide="jump-up"
           >
             <template v-slot:header>
-              <q-chip>Cube</q-chip>
+              <q-chip>Slim Belly</q-chip>
             </template>
 
             <q-card-section>
@@ -56,7 +56,11 @@
             </q-card-section>
           </q-expansion-item>
           <q-card-section>
-            <img src="/Cube.jpg" alt="Cube" style="max-width: 100%; height: auto; display: block" />
+            <img
+              src="/SlimBelly.jpg"
+              alt="Slim Belly"
+              style="max-width: 100%; height: auto; display: block"
+            />
           </q-card-section>
         </q-card>
       </div>
@@ -199,7 +203,7 @@
         <q-card flat bordered style="width: 90%; max-width: 90%; margin: 0 auto">
           <q-card-section>
             <p>Room → Your inner environment</p>
-            <p>Cube → Your identity</p>
+            <p>Slim Belly → Your identity</p>
             <p>Ladder → Your ambitions</p>
             <p>Horse → Your relationships and desires</p>
             <p>Window → Your view of the world</p>
@@ -227,7 +231,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Read the Cube Test article
+                Read the Slim Belly Test article
               </a>
             </q-card-section>
             <q-card-section>
@@ -237,18 +241,18 @@
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                The Cube - A Psychology Game - performed by Neil Strauss
+                Slim Belly - A Psychology Game - performed by Neil Strauss
               </a>
             </q-card-section>
 
             <q-card-section>
-              <div class="text-weight-bold">The Cube Psychology Test to Attract Girls</div>
+              <div class="text-weight-bold">Slim Belly Psychology Test to Attract Girls</div>
               <a
                 href="https://youtu.be/XS35MbPh31Q?si=05krSDVnI1ofqGMa"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                The Cube Psychology Test to Attract Girls
+                Slim Belly Psychology Test to Attract Girls
               </a>
             </q-card-section>
           </q-expansion-item>
@@ -257,7 +261,7 @@
       <div class="col-12 col-md-4">
         <q-card style="width: 90%; max-width: 90%; margin: 0 auto">
           <q-card-section>
-            <q-chip>The Cube</q-chip>
+            <q-chip>Slim Belly</q-chip>
           </q-card-section>
           <div style="width: 100%; max-width: 100%">
             <q-video
