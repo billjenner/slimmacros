@@ -1,0 +1,283 @@
+<template>
+  <q-page class="q-pa-md">
+    <div class="row justify-center">
+      <div class="col-12 col-md-10 col-lg-8">
+        <q-card flat bordered class="q-pa-md">
+          <div class="row items-center justify-between q-mb-md">
+            <div class="text-h5">Foods</div>
+            <q-btn
+              color="primary"
+              class="q-mb-sm"
+              :label="showFoodForm ? 'Hide Form' : 'Add Food'"
+              @click="showFoodForm = !showFoodForm"
+            />
+          </div>
+
+          <q-banner v-if="store.error" class="bg-negative text-white q-mb-md" rounded>
+            {{ store.error }}
+          </q-banner>
+
+          <q-banner
+            v-else-if="!usersStore.currentUser"
+            class="bg-warning text-dark q-mb-md"
+            rounded
+          >
+            Sign in to create a food entry.
+          </q-banner>
+
+          <transition name="form-slide" mode="out-in">
+            <q-form
+              v-if="showFoodForm"
+              key="food-form"
+              @submit.prevent="submitFood"
+              class="q-gutter-md"
+            >
+              <q-card flat bordered class="q-pa-md bg-grey-1">
+                <div class="text-subtitle1 q-mb-sm">Food details</div>
+                <div class="row q-col-gutter-md">
+                  <div class="col-12">
+                    <q-input
+                      v-model="food.description"
+                      label="Description"
+                      filled
+                      dense
+                      :rules="[(value) => !!value?.trim() || 'Description is required']"
+                    />
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <q-input
+                      v-model="food.protein"
+                      type="number"
+                      label="Protein"
+                      min="0"
+                      step="0.01"
+                      filled
+                      dense
+                    />
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <q-input
+                      v-model="food.carb"
+                      type="number"
+                      label="Carbs"
+                      min="0"
+                      step="0.01"
+                      filled
+                      dense
+                    />
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <q-input
+                      v-model="food.fat"
+                      type="number"
+                      label="Fat"
+                      min="0"
+                      step="0.01"
+                      filled
+                      dense
+                    />
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <q-input
+                      v-model="food.calories_extra"
+                      type="number"
+                      label="Extra calories"
+                      min="0"
+                      step="0.01"
+                      filled
+                      dense
+                    />
+                  </div>
+                </div>
+              </q-card>
+
+              <q-card flat bordered class="q-pa-md bg-grey-1">
+                <div class="text-subtitle1 q-mb-sm">Serving information</div>
+                <div class="row q-col-gutter-md">
+                  <div class="col-12 col-md-6">
+                    <q-input
+                      v-model="food.serving_size"
+                      type="number"
+                      label="Serving size"
+                      min="0.01"
+                      step="0.01"
+                      filled
+                      dense
+                    />
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <q-select
+                      v-model="food.serving_unit"
+                      :options="servingUnitOptions"
+                      label="Serving unit"
+                      filled
+                      dense
+                      emit-value
+                      map-options
+                    />
+                  </div>
+                </div>
+              </q-card>
+
+              <q-card flat bordered class="q-pa-md bg-grey-1">
+                <div class="text-subtitle1 q-mb-sm">Preferences</div>
+                <div class="row q-col-gutter-md">
+                  <div class="col-12 col-md-4">
+                    <q-toggle v-model="food.my_food" label="My food" />
+                  </div>
+
+                  <div class="col-12 col-md-4">
+                    <q-toggle v-model="food.favorite_food" label="Favorite" />
+                  </div>
+
+                  <div class="col-12 col-md-4">
+                    <q-toggle v-model="food.share_with_others" label="Share with others" />
+                  </div>
+                </div>
+              </q-card>
+
+              <div class="row justify-end q-gutter-sm">
+                <q-btn type="submit" color="primary" label="Save food" :loading="store.loading" />
+              </div>
+            </q-form>
+          </transition>
+
+          <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
+            <div class="text-subtitle1 q-mb-sm">Saved foods</div>
+            <q-table
+              :rows="foodRows"
+              :columns="foodColumns"
+              row-key="food_id"
+              flat
+              bordered
+              dense
+              :loading="store.loading"
+              no-data-label="No food records yet."
+            />
+          </q-card>
+        </q-card>
+      </div>
+    </div>
+  </q-page>
+</template>
+
+<script setup>
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useUsersStore } from 'stores/users'
+import { useFoodsStore } from 'stores/foods'
+
+const usersStore = useUsersStore()
+const store = useFoodsStore()
+
+const servingUnitOptions = [
+  { label: 'Cup', value: 'cup' },
+  { label: 'Ounce', value: 'oz' },
+  { label: 'Grams', value: 'grams' },
+  { label: 'Slice', value: 'slice' },
+  { label: 'Bar', value: 'bar' },
+  { label: 'Unit', value: 'unit' },
+]
+
+const food = reactive({
+  description: '',
+  protein: 0,
+  carb: 0,
+  fat: 0,
+  calories_extra: 0,
+  my_food: true,
+  favorite_food: false,
+  share_with_others: false,
+  serving_size: 1,
+  serving_unit: 'unit',
+  is_active: true,
+})
+
+const foodColumns = [
+  {
+    name: 'description',
+    label: 'Description',
+    field: 'description',
+    align: 'left',
+    sortable: true,
+  },
+]
+
+const foodRows = computed(() => store.foods || [])
+const showFoodForm = ref(false)
+
+onMounted(() => {
+  if (usersStore.currentUser?.user_id) {
+    loadFoodsForCurrentUser(usersStore.currentUser.user_id)
+  }
+})
+
+watch(
+  () => usersStore.currentUser?.user_id,
+  (userId) => {
+    if (userId) {
+      loadFoodsForCurrentUser(userId)
+    } else {
+      store.foods = []
+    }
+  },
+)
+
+async function loadFoodsForCurrentUser(userId) {
+  if (!userId) {
+    return
+  }
+
+  await store.loadFoods(userId)
+}
+
+async function submitFood() {
+  if (!usersStore.currentUser?.user_id) {
+    store.error = 'No current user is available.'
+    return
+  }
+
+  const savedFood = await store.createFood(usersStore.currentUser.user_id, food)
+  if (savedFood) {
+    Object.assign(food, {
+      description: '',
+      protein: 0,
+      carb: 0,
+      fat: 0,
+      calories_extra: 0,
+      my_food: true,
+      favorite_food: false,
+      share_with_others: false,
+      serving_size: 1,
+      serving_unit: 'unit',
+      is_active: true,
+    })
+
+    showFoodForm.value = false
+    await loadFoodsForCurrentUser(usersStore.currentUser.user_id)
+  }
+}
+</script>
+
+<style scoped>
+.form-slide-enter-active,
+.form-slide-leave-active {
+  transition: all 0.45s ease;
+}
+
+.form-slide-enter-from,
+.form-slide-leave-to {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.form-slide-enter-to,
+.form-slide-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>

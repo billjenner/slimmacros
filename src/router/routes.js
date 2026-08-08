@@ -80,6 +80,17 @@ const routes = [
           },
         },
       },
+      {
+        path: 'foods',
+        component: () => import('pages/Foods.vue'),
+        meta: {
+          seo: {
+            title: 'Foods',
+            description: 'Create and manage your Slim Belly food entries.',
+            canonicalPath: '/foods',
+          },
+        },
+      },
     ],
   },
 
