@@ -35,6 +35,16 @@
           />
           <q-btn
             flat
+            label="Suppliments"
+            to="/suppliments"
+            class="q-mx-sm"
+            style="min-width: 108px"
+            :style="buttonStyle('/suppliments')"
+            @mouseover="hoveredPath = '/suppliments'"
+            @mouseleave="hoveredPath = null"
+          />
+          <q-btn
+            flat
             label="Profiles"
             to="/profiles"
             class="q-mx-sm"
@@ -61,16 +71,6 @@
             style="min-width: 108px"
             :style="buttonStyle('/workouts')"
             @mouseover="hoveredPath = '/workouts'"
-            @mouseleave="hoveredPath = null"
-          />
-          <q-btn
-            flat
-            label="Suppliments"
-            to="/suppliments"
-            class="q-mx-sm"
-            style="min-width: 108px"
-            :style="buttonStyle('/suppliments')"
-            @mouseover="hoveredPath = '/suppliments'"
             @mouseleave="hoveredPath = null"
           />
           <q-btn
