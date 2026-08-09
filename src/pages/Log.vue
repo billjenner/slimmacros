@@ -36,7 +36,7 @@
 
               <q-form @submit.prevent="submitFoodLog" class="q-gutter-md">
                 <q-card flat bordered class="q-pa-md bg-grey-1">
-                  <div class="text-subtitle1 q-mb-sm">Log entry</div>
+                  <div class="text-subtitle1 q-mb-sm">Log Food</div>
                   <div class="row q-col-gutter-md">
                     <div class="col-12 col-md-6">
                       <q-select
@@ -184,7 +184,7 @@
 
               <q-form @submit.prevent="submitWorkoutLog" class="q-gutter-md">
                 <q-card flat bordered class="q-pa-md bg-grey-1">
-                  <div class="text-subtitle1 q-mb-sm">Workout log entry</div>
+                  <div class="text-subtitle1 q-mb-sm">Log Workout</div>
                   <div class="row q-col-gutter-md">
                     <div class="col-12 col-md-6">
                       <q-select
@@ -321,7 +321,7 @@
 
               <q-form @submit.prevent="submitSupplementLog" class="q-gutter-md">
                 <q-card flat bordered class="q-pa-md bg-grey-1">
-                  <div class="text-subtitle1 q-mb-sm">Suppliment log entry</div>
+                  <div class="text-subtitle1 q-mb-sm">Log Suppliment</div>
                   <div class="row q-col-gutter-md">
                     <div class="col-12 col-md-6">
                       <q-select
@@ -454,7 +454,7 @@
 
               <q-form @submit.prevent="submitWeightLog" class="q-gutter-md">
                 <q-card flat bordered class="q-pa-md bg-grey-1">
-                  <div class="text-subtitle1 q-mb-sm">Weight log entry</div>
+                  <div class="text-subtitle1 q-mb-sm">Log Weight</div>
                   <div class="row q-col-gutter-md">
                     <div class="col-12 col-md-6">
                       <q-input
