@@ -143,7 +143,12 @@
               </q-card>
 
               <div class="row justify-end q-gutter-sm">
-                <q-btn type="submit" color="primary" label="Save food" :loading="store.loading" />
+                <q-btn
+                  type="submit"
+                  color="primary"
+                  :label="editingFoodId ? 'Update food' : 'Save food'"
+                  :loading="store.loading"
+                />
               </div>
             </q-form>
           </transition>
@@ -341,6 +346,7 @@ const showFoodForm = ref(false)
 const confirmDeleteOpen = ref(false)
 const pendingDeleteFood = ref(null)
 const expandedFoodIds = ref([])
+const editingFoodId = ref(null)
 
 onMounted(() => {
   if (usersStore.currentUser?.user_id) {
@@ -384,6 +390,8 @@ function toggleExpanded(row) {
 }
 
 function editFood(row) {
+  editingFoodId.value = row.food_id
+
   Object.assign(food, {
     description: row.description || '',
     protein: row.protein ?? 0,
@@ -399,6 +407,24 @@ function editFood(row) {
   })
 
   showFoodForm.value = true
+}
+
+function resetFoodForm() {
+  Object.assign(food, {
+    description: '',
+    protein: 0,
+    carb: 0,
+    fat: 0,
+    calories_extra: 0,
+    my_food: true,
+    favorite_food: false,
+    share_with_others: false,
+    serving_size: 1,
+    serving_unit: 'unit',
+    is_active: true,
+  })
+
+  editingFoodId.value = null
 }
 
 function requestDeleteFood(row) {
@@ -433,21 +459,12 @@ async function submitFood() {
     return
   }
 
-  const savedFood = await store.createFood(usersStore.currentUser.user_id, food)
+  const savedFood = editingFoodId.value
+    ? await store.updateFood(usersStore.currentUser.user_id, editingFoodId.value, food)
+    : await store.createFood(usersStore.currentUser.user_id, food)
+
   if (savedFood) {
-    Object.assign(food, {
-      description: '',
-      protein: 0,
-      carb: 0,
-      fat: 0,
-      calories_extra: 0,
-      my_food: true,
-      favorite_food: false,
-      share_with_others: false,
-      serving_size: 1,
-      serving_unit: 'unit',
-      is_active: true,
-    })
+    resetFoodForm()
 
     showFoodForm.value = false
     await loadFoodsForCurrentUser(usersStore.currentUser.user_id)

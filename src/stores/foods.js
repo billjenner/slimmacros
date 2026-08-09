@@ -67,6 +67,45 @@ export const useFoodsStore = defineStore('Foods', {
       }
     },
 
+    async updateFood(userId, foodId, food = {}) {
+      this.error = null
+      this.loading = true
+
+      try {
+        if (!supabase) {
+          this.error = 'Supabase client is not configured.'
+          return null
+        }
+
+        if (!userId || !foodId) {
+          this.error = 'No current user is available.'
+          return null
+        }
+
+        const payload = this.buildFoodPayload(userId, food)
+        delete payload.user_id
+
+        const { data, error } = await supabase
+          .from('food')
+          .update(payload)
+          .eq('food_id', foodId)
+          .eq('user_id', userId)
+          .select()
+          .single()
+
+        if (error) {
+          this.error = error.message
+          return null
+        }
+
+        this.currentFood = data
+        this.foods = this.foods.map((item) => (item.food_id === foodId ? data : item))
+        return data
+      } finally {
+        this.loading = false
+      }
+    },
+
     async loadFoods(userId) {
       this.error = null
       this.loading = true
