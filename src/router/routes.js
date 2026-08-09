@@ -62,6 +62,7 @@ const routes = [
         path: 'profiles',
         component: () => import('pages/Profiles.vue'),
         meta: {
+          requiresAuth: true,
           seo: {
             title: 'Profiles',
             description: 'Create and manage your Slim Belly profile.',
@@ -84,6 +85,7 @@ const routes = [
         path: 'foods',
         component: () => import('pages/Foods.vue'),
         meta: {
+          requiresAuth: true,
           seo: {
             title: 'Foods',
             description: 'Create and manage your Slim Belly food entries.',
@@ -95,6 +97,7 @@ const routes = [
         path: 'workouts',
         component: () => import('pages/Workouts.vue'),
         meta: {
+          requiresAuth: true,
           seo: {
             title: 'Workouts',
             description: 'Create and manage your Slim Belly workout entries.',
@@ -106,6 +109,7 @@ const routes = [
         path: 'suppliments',
         component: () => import('pages/Suppliments.vue'),
         meta: {
+          requiresAuth: true,
           seo: {
             title: 'Suppliments',
             description: 'Create and manage your Slim Belly suppliment log entries.',
@@ -117,6 +121,7 @@ const routes = [
         path: 'food-log',
         component: () => import('pages/Log.vue'),
         meta: {
+          requiresAuth: true,
           seo: {
             title: 'Food Log',
             description: 'Track food consumption and servings throughout the day.',

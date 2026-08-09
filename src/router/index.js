@@ -95,13 +95,13 @@ export default defineRouter(async (/* { store, ssrContext } */) => {
   try {
     const { useUsersStore } = await import('../stores/users')
     const store = useUsersStore()
-    const protectedPaths = ['/analyze', '/personality-review']
 
     Router.beforeEach((to, from, next) => {
-      const loggedIn = Boolean(store.currentUser && store.currentUser.email)
+      const loggedIn = Boolean(store.currentUser?.user_id)
+      const requiresAuth = to.matched.some((record) => record.meta?.requiresAuth)
 
-      if (protectedPaths.includes(to.path) && !loggedIn) {
-        return next('/login')
+      if (requiresAuth && !loggedIn) {
+        return next({ path: '/login', query: { redirect: to.fullPath } })
       }
 
       applySeoMeta(to)
