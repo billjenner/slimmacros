@@ -167,11 +167,16 @@
           </q-dialog>
 
           <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-            <div class="text-subtitle1 q-mb-sm">Saved foods</div>
+            <div class="row items-center justify-between q-mb-sm">
+              <div class="text-subtitle1">Saved foods</div>
+              <q-toggle v-model="showSharedFoods" label="Show shared foods" />
+            </div>
 
             <q-table
               :rows="foodRows"
               :columns="foodColumns"
+              :pagination="{ rowsPerPage: 50 }"
+              :rows-per-page-options="[20, 50, 200, 0]"
               row-key="food_id"
               flat
               bordered
@@ -361,8 +366,28 @@ const foodColumns = [
   },
 ]
 
-const foodRows = computed(() => store.foods || [])
+const foodRows = computed(() => {
+  const allRows = store.foods || []
+  const currentUserId = usersStore.currentUser?.user_id
+  const rowsWithoutShared = showSharedFoods.value
+    ? allRows
+    : allRows.filter((row) => row?.user_id === currentUserId)
+  const searchText = String(food.description || '')
+    .trim()
+    .toLowerCase()
+
+  if (!searchText) {
+    return rowsWithoutShared
+  }
+
+  return rowsWithoutShared.filter((row) =>
+    String(row?.description || '')
+      .toLowerCase()
+      .includes(searchText),
+  )
+})
 const showFoodForm = ref(false)
+const showSharedFoods = ref(false)
 const confirmDeleteOpen = ref(false)
 const pendingDeleteFood = ref(null)
 const expandedFoodIds = ref([])

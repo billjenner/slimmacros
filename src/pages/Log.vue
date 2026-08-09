@@ -36,81 +36,102 @@
 
               <q-form @submit.prevent="submitFoodLog" class="q-gutter-md">
                 <q-card flat bordered class="q-pa-md bg-grey-1">
-                  <div class="text-subtitle1 q-mb-sm">Log Food</div>
-                  <div class="row q-col-gutter-md">
-                    <div class="col-12 col-md-6">
-                      <q-select
-                        v-model="foodLog.food_id"
-                        :options="foodOptions"
-                        label="Food"
-                        filled
-                        dense
-                        emit-value
-                        map-options
-                        :disable="!usersStore.currentUser"
-                        :rules="[(value) => !!value || 'Food is required']"
-                      />
-                    </div>
-
-                    <div class="col-12 col-md-3">
-                      <q-input
-                        v-model="foodLog.servings"
-                        type="number"
-                        label="Servings"
-                        min="0.01"
-                        step="0.01"
-                        filled
-                        dense
-                        :disable="!usersStore.currentUser"
-                        :rules="[(value) => Number(value) > 0 || 'Servings must be greater than 0']"
-                      />
-                    </div>
-
-                    <div class="col-12 col-md-3">
-                      <q-input
-                        v-model="foodLog.datetime"
-                        type="datetime-local"
-                        label="Date and time"
-                        filled
-                        dense
-                        :disable="!usersStore.currentUser"
-                      />
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                      <q-input
-                        :model-value="selectedFoodCalories"
-                        label="Calories per serving"
-                        readonly
-                        filled
-                        dense
-                      />
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                      <q-input
-                        :model-value="entryTotalCalories"
-                        label="Total calories"
-                        readonly
-                        filled
-                        dense
-                      />
-                    </div>
+                  <div class="row items-center q-mb-sm">
+                    <q-btn
+                      flat
+                      round
+                      dense
+                      type="button"
+                      :icon="isFoodLogExpanded ? 'expand_more' : 'chevron_right'"
+                      @click="isFoodLogExpanded = !isFoodLogExpanded"
+                    />
+                    <div class="text-subtitle1">Log Food</div>
                   </div>
 
-                  <div class="row justify-end q-mt-md">
-                    <q-btn
-                      type="submit"
-                      color="primary"
-                      label="Add to log"
-                      :loading="foodLogsStore.loading"
-                      :disable="!usersStore.currentUser"
-                    />
+                  <div v-show="isFoodLogExpanded">
+                    <div class="row q-col-gutter-md">
+                      <div class="col-12 col-md-6">
+                        <q-select
+                          v-model="foodLog.food_id"
+                          :options="foodOptions"
+                          label="Food"
+                          filled
+                          dense
+                          emit-value
+                          map-options
+                          :disable="!usersStore.currentUser"
+                          :rules="[(value) => !!value || 'Food is required']"
+                        />
+                      </div>
+
+                      <div class="col-12 col-md-3">
+                        <q-input
+                          v-model="foodLog.servings"
+                          type="number"
+                          label="Servings"
+                          min="0.01"
+                          step="0.01"
+                          filled
+                          dense
+                          :disable="!usersStore.currentUser"
+                          :rules="[
+                            (value) => Number(value) > 0 || 'Servings must be greater than 0',
+                          ]"
+                        />
+                      </div>
+
+                      <div class="col-12 col-md-3">
+                        <q-input
+                          v-model="foodLog.datetime"
+                          type="datetime-local"
+                          label="Date and time"
+                          filled
+                          dense
+                          :disable="!usersStore.currentUser"
+                        />
+                      </div>
+
+                      <div class="col-12 col-md-6">
+                        <q-input
+                          :model-value="selectedFoodCalories"
+                          label="Calories per serving"
+                          readonly
+                          filled
+                          dense
+                        />
+                      </div>
+
+                      <div class="col-12 col-md-6">
+                        <q-input
+                          :model-value="entryTotalCalories"
+                          label="Total calories"
+                          readonly
+                          filled
+                          dense
+                        />
+                      </div>
+                    </div>
+
+                    <div class="row items-center justify-between q-mt-md">
+                      <q-toggle
+                        v-model="includeSharedFoods"
+                        label="Include shared foods"
+                        :disable="!usersStore.currentUser"
+                      />
+                      <q-btn
+                        type="submit"
+                        color="primary"
+                        label="Add to log"
+                        :loading="foodLogsStore.loading"
+                        :disable="!usersStore.currentUser"
+                      />
+                    </div>
                   </div>
                 </q-card>
               </q-form>
 
               <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
+                <div class="text-center text-subtitle2 q-mb-sm">Today's budget</div>
                 <q-markup-table flat bordered dense separator="horizontal">
                   <tbody>
                     <tr>
@@ -192,6 +213,8 @@
                 <q-table
                   :rows="tableRows"
                   :columns="columns"
+                  :pagination="{ rowsPerPage: 50 }"
+                  :rows-per-page-options="[20, 50, 200, 0]"
                   row-key="food_log_id"
                   flat
                   bordered
@@ -328,6 +351,8 @@
                 <q-table
                   :rows="workoutTableRows"
                   :columns="workoutColumns"
+                  :pagination="{ rowsPerPage: 50 }"
+                  :rows-per-page-options="[20, 50, 200, 0]"
                   row-key="workout_log_id"
                   flat
                   bordered
@@ -465,6 +490,8 @@
                 <q-table
                   :rows="supplementTableRows"
                   :columns="supplementColumns"
+                  :pagination="{ rowsPerPage: 50 }"
+                  :rows-per-page-options="[20, 50, 200, 0]"
                   row-key="supplement_log_id"
                   flat
                   bordered
@@ -571,6 +598,8 @@
                 <q-table
                   :rows="weightTableRows"
                   :columns="weightColumns"
+                  :pagination="{ rowsPerPage: 50 }"
+                  :rows-per-page-options="[20, 50, 200, 0]"
                   row-key="weight_log_id"
                   flat
                   bordered
@@ -649,6 +678,8 @@ const supplimentsStore = useSupplimentsStore()
 const supplementLogsStore = useSupplimentsLogStore()
 const weightLogsStore = useWeightLogsStore()
 const activeTab = ref('food')
+const isFoodLogExpanded = ref(true)
+const includeSharedFoods = ref(false)
 
 function getCurrentLocalDateTime() {
   const now = new Date()
@@ -762,8 +793,45 @@ const weightColumns = [
   },
 ]
 
+function sortFoodsForOptionList(foods = []) {
+  return [...foods].sort((leftFood, rightFood) => {
+    const leftIsFavorite = leftFood?.favorite_food ? 1 : 0
+    const rightIsFavorite = rightFood?.favorite_food ? 1 : 0
+
+    if (leftIsFavorite !== rightIsFavorite) {
+      return rightIsFavorite - leftIsFavorite
+    }
+
+    const leftCreatedAt = new Date(leftFood?.created_at || 0).getTime()
+    const rightCreatedAt = new Date(rightFood?.created_at || 0).getTime()
+
+    if (leftCreatedAt !== rightCreatedAt) {
+      return rightCreatedAt - leftCreatedAt
+    }
+
+    return String(leftFood?.description || '').localeCompare(String(rightFood?.description || ''))
+  })
+}
+
 const foodOptions = computed(() => {
-  return (foodsStore.foods || []).map((food) => ({
+  const allFoods = foodsStore.foods || []
+  const currentUserId = usersStore.currentUser?.user_id
+  const ownFoods = sortFoodsForOptionList(
+    allFoods.filter((food) => String(food?.user_id || '') === String(currentUserId || '')),
+  )
+
+  if (!includeSharedFoods.value) {
+    return ownFoods.map((food) => ({
+      label: food.description,
+      value: food.food_id,
+    }))
+  }
+
+  const sharedFoods = sortFoodsForOptionList(
+    allFoods.filter((food) => String(food?.user_id || '') !== String(currentUserId || '')),
+  )
+
+  return [...ownFoods, ...sharedFoods].map((food) => ({
     label: food.description,
     value: food.food_id,
   }))

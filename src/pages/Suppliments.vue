@@ -105,11 +105,16 @@
           </q-dialog>
 
           <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-            <div class="text-subtitle1 q-mb-sm">Saved suppliments</div>
+            <div class="row items-center justify-between q-mb-sm">
+              <div class="text-subtitle1">Saved suppliments</div>
+              <q-toggle v-model="showSharedSuppliments" label="Show shared suppliments" />
+            </div>
 
             <q-table
               :rows="supplimentRows"
               :columns="supplimentColumns"
+              :pagination="{ rowsPerPage: 50 }"
+              :rows-per-page-options="[20, 50, 200, 0]"
               row-key="supplement_id"
               flat
               bordered
@@ -245,7 +250,13 @@ const supplimentColumns = [
 ]
 
 const supplimentRows = computed(() => {
-  return (store.supplements || []).map((supplement) => {
+  const allRows = store.supplements || []
+  const currentUserId = usersStore.currentUser?.user_id
+  const visibleRows = showSharedSuppliments.value
+    ? allRows
+    : allRows.filter((supplement) => supplement?.user_id === currentUserId)
+
+  return visibleRows.map((supplement) => {
     const servingSize = Number(supplement.serving_size) || 0
     const servingUnitLabel = supplement.serving_unit || 'other'
     const summary = `${supplement.description || ''} | ${servingSize.toFixed(2)} | ${servingUnitLabel}`
@@ -260,6 +271,7 @@ const supplimentRows = computed(() => {
 })
 
 const showSupplimentForm = ref(false)
+const showSharedSuppliments = ref(false)
 const confirmDeleteOpen = ref(false)
 const pendingDeleteSuppliment = ref(null)
 const editingSupplimentId = ref(null)
