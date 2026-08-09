@@ -3,7 +3,7 @@
 -- ============================================================ 
 CREATE TYPE public.diet_type AS ENUM ( 'Low Cal', 'Low Carb', 'Lean Muscle', 'High Metabolic' ); 
 CREATE TYPE public.food_serving_unit AS ENUM ( 'cup', 'oz', 'grams', 'slice', 'bar', 'unit' ); 
-CREATE TYPE public.supplement_serving_unit AS ENUM ( 'pills', 'oz', 'other' );
+CREATE TYPE public.supplement_serving_unit AS ENUM ( 'pills', 'oz', 'scoop', 'other' );
 CREATE TYPE public.activity_level AS ENUM ( 'Low', 'Medium', 'High' );
 
 -- ============================================================ 
@@ -87,9 +87,10 @@ CREATE TABLE public.profile (
 CREATE TABLE public.food ( 
 	food_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
 	user_id uuid NOT NULL REFERENCES public.users(user_id) ON DELETE CASCADE, 
-	description text NOT NULL, protein numeric(8,2) NOT NULL DEFAULT 0 CHECK (protein >= 0), 
-	fat numeric(8,2) NOT NULL DEFAULT 0 CHECK (fat >= 0), 
+	description text NOT NULL, 
+	protein numeric(8,2) NOT NULL DEFAULT 0 CHECK (protein >= 0), 
 	carb numeric(8,2) NOT NULL DEFAULT 0 CHECK (carb >= 0), 
+	fat numeric(8,2) NOT NULL DEFAULT 0 CHECK (fat >= 0), 
 	calories_extra numeric(8,2) NOT NULL DEFAULT 0 CHECK (calories_extra >= 0), 
 	my_food boolean NOT NULL DEFAULT true, 
 	favorite_food boolean NOT NULL DEFAULT false, 
@@ -130,7 +131,7 @@ CREATE TABLE public.supplement (
 -- ============================================================ 
 -- SUPPLEMENT LOG 
 -- ============================================================ 
-	CREATE TABLE public.supplement_log ( 
+CREATE TABLE public.supplement_log ( 
 	supplement_log_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
 	supplement_id bigint NOT NULL REFERENCES public.supplement(supplement_id) ON DELETE CASCADE, 
 	user_id uuid NOT NULL REFERENCES public.users(user_id) ON DELETE CASCADE, servings numeric(8,2) 

@@ -182,7 +182,7 @@
             >
               <template #body="props">
                 <!-- Main row -->
-                <q-tr :props="props">
+                <q-tr :props="props" :class="sharedRowClass(props.row)">
                   <q-td key="description" :props="props">
                     <div class="row items-center full-width">
                       <q-btn
@@ -198,6 +198,16 @@
                         {{ props.row.description }}
                       </span>
 
+                      <q-chip
+                        v-if="!isOwnedByCurrentUser(props.row)"
+                        dense
+                        color="secondary"
+                        text-color="white"
+                        class="q-ml-sm"
+                      >
+                        Shared
+                      </q-chip>
+
                       <!-- Push buttons to right -->
                       <div class="row items-center q-gutter-xs q-ml-auto">
                         <q-btn
@@ -206,6 +216,7 @@
                           size="sm"
                           color="negative"
                           label="Edit"
+                          :disable="!isOwnedByCurrentUser(props.row)"
                           @click="editFood(props.row)"
                         />
 
@@ -215,6 +226,7 @@
                           size="sm"
                           color="negative"
                           label="Delete"
+                          :disable="!isOwnedByCurrentUser(props.row)"
                           @click="requestDeleteFood(props.row)"
                         />
                       </div>
@@ -223,8 +235,15 @@
                 </q-tr>
 
                 <!-- Expanded row -->
-                <q-tr v-if="isExpanded(props.row)" :props="props">
-                  <q-td :colspan="foodColumns.length" class="bg-grey-2">
+                <q-tr
+                  v-if="isExpanded(props.row)"
+                  :props="props"
+                  :class="sharedRowClass(props.row)"
+                >
+                  <q-td
+                    :colspan="foodColumns.length"
+                    :class="isOwnedByCurrentUser(props.row) ? 'bg-grey-2' : ''"
+                  >
                     <div class="row q-col-gutter-sm q-py-sm">
                       <div class="col-12 col-sm-6 col-md-3">
                         <div class="text-caption text-grey-7">Protein</div>
@@ -371,6 +390,14 @@ async function loadFoodsForCurrentUser(userId) {
   }
 
   await store.loadFoods(userId)
+}
+
+function isOwnedByCurrentUser(row) {
+  return Boolean(usersStore.currentUser?.user_id && row?.user_id === usersStore.currentUser.user_id)
+}
+
+function sharedRowClass(row) {
+  return isOwnedByCurrentUser(row) ? '' : 'bg-info text-white'
 }
 
 function isExpanded(row) {

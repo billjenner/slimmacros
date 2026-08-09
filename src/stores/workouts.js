@@ -1,50 +1,57 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
 
-export const useFoodsStore = defineStore('Foods', {
+export const useWorkoutsStore = defineStore('Workouts', {
   state: () => ({
-    foods: [],
-    currentFood: null,
+    workouts: [],
+    currentWorkout: null,
     error: null,
     loading: false,
   }),
 
   actions: {
-    toNumber(value) {
+    toNullableNonNegativeInteger(value) {
       if (value === null || value === undefined || value === '') {
-        return 0
+        return null
       }
 
       const numericValue = Number(value)
-      return Number.isNaN(numericValue) ? 0 : numericValue
+      if (!Number.isFinite(numericValue) || numericValue < 0) {
+        return null
+      }
+
+      return Math.trunc(numericValue)
     },
 
-    sortByDescription(items = []) {
-      return [...items].sort((a, b) => {
-        const aDescription = String(a?.description ?? '').toLowerCase()
-        const bDescription = String(b?.description ?? '').toLowerCase()
+    toNonNegativeInteger(value) {
+      const numericValue = Number(value)
+      if (!Number.isFinite(numericValue) || numericValue < 0) {
+        return 0
+      }
+
+      return Math.trunc(numericValue)
+    },
+
+    sortByDescription(workouts = []) {
+      return [...workouts].sort((a, b) => {
+        const aDescription = String(a?.description ?? a?.type ?? '').toLowerCase()
+        const bDescription = String(b?.description ?? b?.type ?? '').toLowerCase()
         return aDescription.localeCompare(bDescription)
       })
     },
 
-    buildFoodPayload(userId, food = {}) {
+    buildWorkoutPayload(userId, workout = {}) {
       return {
         user_id: userId,
-        description: food.description?.trim() || '',
-        protein: this.toNumber(food.protein),
-        carb: this.toNumber(food.carb),
-        fat: this.toNumber(food.fat),
-        calories_extra: this.toNumber(food.calories_extra),
-        my_food: food.my_food !== false,
-        favorite_food: Boolean(food.favorite_food),
-        share_with_others: Boolean(food.share_with_others),
-        serving_size: this.toNumber(food.serving_size) || 1,
-        serving_unit: food.serving_unit || 'unit',
-        is_active: food.is_active !== false,
+        type: workout.type?.trim() || '',
+        average_workout_time: this.toNullableNonNegativeInteger(workout.average_workout_time),
+        calories_burned: this.toNonNegativeInteger(workout.calories_burned),
+        share_with_others: Boolean(workout.share_with_others),
+        is_active: workout.is_active !== false,
       }
     },
 
-    async createFood(userId, food = {}) {
+    async createWorkout(userId, workout = {}) {
       this.error = null
       this.loading = true
 
@@ -59,23 +66,23 @@ export const useFoodsStore = defineStore('Foods', {
           return null
         }
 
-        const payload = this.buildFoodPayload(userId, food)
-        const { data, error } = await supabase.from('food').insert(payload).select().single()
+        const payload = this.buildWorkoutPayload(userId, workout)
+        const { data, error } = await supabase.from('workout').insert(payload).select().single()
 
         if (error) {
           this.error = error.message
           return null
         }
 
-        this.currentFood = data
-        this.foods = [data, ...this.foods]
+        this.currentWorkout = data
+        this.workouts = [data, ...this.workouts]
         return data
       } finally {
         this.loading = false
       }
     },
 
-    async updateFood(userId, foodId, food = {}) {
+    async updateWorkout(userId, workoutId, workout = {}) {
       this.error = null
       this.loading = true
 
@@ -85,18 +92,18 @@ export const useFoodsStore = defineStore('Foods', {
           return null
         }
 
-        if (!userId || !foodId) {
+        if (!userId || !workoutId) {
           this.error = 'No current user is available.'
           return null
         }
 
-        const payload = this.buildFoodPayload(userId, food)
+        const payload = this.buildWorkoutPayload(userId, workout)
         delete payload.user_id
 
         const { data, error } = await supabase
-          .from('food')
+          .from('workout')
           .update(payload)
-          .eq('food_id', foodId)
+          .eq('workout_id', workoutId)
           .eq('user_id', userId)
           .select()
           .single()
@@ -106,15 +113,15 @@ export const useFoodsStore = defineStore('Foods', {
           return null
         }
 
-        this.currentFood = data
-        this.foods = this.foods.map((item) => (item.food_id === foodId ? data : item))
+        this.currentWorkout = data
+        this.workouts = this.workouts.map((item) => (item.workout_id === workoutId ? data : item))
         return data
       } finally {
         this.loading = false
       }
     },
 
-    async loadFoods(userId) {
+    async loadWorkouts(userId) {
       this.error = null
       this.loading = true
 
@@ -129,8 +136,8 @@ export const useFoodsStore = defineStore('Foods', {
           return []
         }
 
-        const { data: ownFoods, error: ownError } = await supabase
-          .from('food')
+        const { data: ownWorkouts, error: ownError } = await supabase
+          .from('workout')
           .select('*')
           .eq('user_id', userId)
           .eq('is_active', true)
@@ -141,8 +148,8 @@ export const useFoodsStore = defineStore('Foods', {
           return []
         }
 
-        const { data: sharedFoods, error: sharedError } = await supabase
-          .from('food')
+        const { data: sharedWorkouts, error: sharedError } = await supabase
+          .from('workout')
           .select('*')
           .neq('user_id', userId)
           .eq('share_with_others', true)
@@ -154,17 +161,17 @@ export const useFoodsStore = defineStore('Foods', {
           return []
         }
 
-        const sortedOwnFoods = this.sortByDescription(ownFoods || [])
-        const sortedSharedFoods = this.sortByDescription(sharedFoods || [])
+        const sortedOwnWorkouts = this.sortByDescription(ownWorkouts || [])
+        const sortedSharedWorkouts = this.sortByDescription(sharedWorkouts || [])
 
-        this.foods = [...sortedOwnFoods, ...sortedSharedFoods]
-        return this.foods
+        this.workouts = [...sortedOwnWorkouts, ...sortedSharedWorkouts]
+        return this.workouts
       } finally {
         this.loading = false
       }
     },
 
-    async deactivateFood(userId, foodId) {
+    async deactivateWorkout(userId, workoutId) {
       this.error = null
       this.loading = true
 
@@ -174,15 +181,15 @@ export const useFoodsStore = defineStore('Foods', {
           return { error: this.error }
         }
 
-        if (!userId || !foodId) {
+        if (!userId || !workoutId) {
           this.error = 'No current user is available.'
           return { error: this.error }
         }
 
         const { error } = await supabase
-          .from('food')
+          .from('workout')
           .update({ is_active: false })
-          .eq('food_id', foodId)
+          .eq('workout_id', workoutId)
           .eq('user_id', userId)
 
         if (error) {
@@ -190,7 +197,7 @@ export const useFoodsStore = defineStore('Foods', {
           return { error: this.error }
         }
 
-        this.foods = this.foods.filter((food) => food.food_id !== foodId)
+        this.workouts = this.workouts.filter((workout) => workout.workout_id !== workoutId)
         return { error: null }
       } finally {
         this.loading = false
@@ -200,5 +207,5 @@ export const useFoodsStore = defineStore('Foods', {
 })
 
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useFoodsStore, import.meta.hot))
+  import.meta.hot.accept(acceptHMRUpdate(useWorkoutsStore, import.meta.hot))
 }

@@ -92,6 +92,28 @@ const routes = [
         },
       },
       {
+        path: 'workouts',
+        component: () => import('pages/Workouts.vue'),
+        meta: {
+          seo: {
+            title: 'Workouts',
+            description: 'Create and manage your Slim Belly workout entries.',
+            canonicalPath: '/workouts',
+          },
+        },
+      },
+      {
+        path: 'suppliments',
+        component: () => import('pages/Suppliments.vue'),
+        meta: {
+          seo: {
+            title: 'Suppliments',
+            description: 'Create and manage your Slim Belly suppliment log entries.',
+            canonicalPath: '/suppliments',
+          },
+        },
+      },
+      {
         path: 'food-log',
         component: () => import('pages/Log.vue'),
         meta: {

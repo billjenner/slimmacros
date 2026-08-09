@@ -55,6 +55,26 @@
           />
           <q-btn
             flat
+            label="Workouts"
+            to="/workouts"
+            class="q-mx-sm"
+            style="min-width: 108px"
+            :style="buttonStyle('/workouts')"
+            @mouseover="hoveredPath = '/workouts'"
+            @mouseleave="hoveredPath = null"
+          />
+          <q-btn
+            flat
+            label="Suppliments"
+            to="/suppliments"
+            class="q-mx-sm"
+            style="min-width: 108px"
+            :style="buttonStyle('/suppliments')"
+            @mouseover="hoveredPath = '/suppliments'"
+            @mouseleave="hoveredPath = null"
+          />
+          <q-btn
+            flat
             label="Log"
             to="/food-log"
             class="q-mx-sm"
@@ -112,6 +132,12 @@
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/foods')">
           <q-item-section>Foods</q-item-section>
+        </q-item>
+        <q-item clickable v-ripple @click="navigateAndClose('/workouts')">
+          <q-item-section>Workouts</q-item-section>
+        </q-item>
+        <q-item clickable v-ripple @click="navigateAndClose('/suppliments')">
+          <q-item-section>Suppliments</q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/food-log')">
           <q-item-section>Log</q-item-section>
