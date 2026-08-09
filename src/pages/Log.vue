@@ -112,9 +112,51 @@
 
               <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
                 <div class="row items-center justify-between q-mb-sm">
+                  <q-chip color="secondary" text-color="white" square>
+                    Calories: {{ totalLoggedCalories }} / {{ totalCaloriesForPerson || 2000 }}
+                  </q-chip>
+
+                  <q-linear-progress :value="foodLogProgress" color="accent" size="10px" rounded />
+                </div>
+
+                <div class="row items-center justify-between q-mb-sm">
+                  <q-chip color="secondary" text-color="white" square>
+                    Protein: {{ totalProteinLoggedToday.toFixed(2) }} /
+                    {{ totalProteinBudgetForToday.toFixed(2) }}
+                  </q-chip>
+
+                  <q-linear-progress
+                    :value="foodProteinProgress"
+                    color="green"
+                    size="10px"
+                    rounded
+                  />
+                </div>
+
+                <div class="row items-center justify-between q-mb-sm">
+                  <q-chip color="secondary" text-color="white" square>
+                    Carbs: {{ totalCarbsLoggedToday.toFixed(2) }} /
+                    {{ totalCarbBudgetForToday.toFixed(2) }}
+                  </q-chip>
+
+                  <q-linear-progress :value="foodCarbProgress" color="yellow" size="10px" rounded />
+                </div>
+
+                <div class="row items-center justify-between q-mb-sm">
+                  <q-chip color="secondary" text-color="white" square>
+                    Fat: {{ totalFatLoggedToday.toFixed(2) }} /
+                    {{ totalFatBudgetForToday.toFixed(2) }}
+                  </q-chip>
+
+                  <q-linear-progress :value="foodFatProgress" color="blue" size="10px" rounded />
+                </div>
+              </q-card>
+
+              <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
+                <div class="row items-center justify-between q-mb-sm">
                   <div class="text-subtitle1">Logged foods</div>
                   <q-chip color="secondary" text-color="white" square>
-                    Total logged calories: {{ totalLoggedCalories }}
+                    Total logged calories today: {{ totalLoggedCalories }}
                   </q-chip>
                 </div>
 
@@ -556,16 +598,22 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
 import { useFoodsStore } from 'stores/foods'
 import { useFoodLogsStore } from 'stores/food-logs'
+import { useProfilesStore } from 'stores/profiles'
 import { useWorkoutsStore } from 'stores/workouts'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { useSupplimentsStore } from 'stores/suppliments'
 import { useSupplimentsLogStore } from 'stores/suppliments_log'
 import { useWeightLogsStore } from 'stores/weight-logs'
-import { calculateFoodCalories } from '../utils/rules'
+import {
+  calculateFoodCalories,
+  calculateTotalCaloriesForPerson,
+  calculateTotalDailyCalories,
+} from '../utils/rules'
 
 const usersStore = useUsersStore()
 const foodsStore = useFoodsStore()
 const foodLogsStore = useFoodLogsStore()
+const profilesStore = useProfilesStore()
 const workoutsStore = useWorkoutsStore()
 const workoutLogsStore = useWorkoutLogsStore()
 const supplimentsStore = useSupplimentsStore()
@@ -589,6 +637,29 @@ function getCurrentLocalDate() {
   const year = now.getFullYear()
   const month = String(now.getMonth() + 1).padStart(2, '0')
   const day = String(now.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
+function getCurrentDayOfWeekKey() {
+  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+
+  return dayNames[new Date().getDay()] || 'sunday'
+}
+
+function getLocalDateKey(value) {
+  if (!value) {
+    return ''
+  }
+
+  const dateValue = new Date(value)
+  if (Number.isNaN(dateValue.getTime())) {
+    return ''
+  }
+
+  const year = dateValue.getFullYear()
+  const month = String(dateValue.getMonth() + 1).padStart(2, '0')
+  const day = String(dateValue.getDate()).padStart(2, '0')
 
   return `${year}-${month}-${day}`
 }
@@ -717,6 +788,84 @@ const selectedSupplement = computed(() => {
   )
 })
 
+const currentProfile = computed(() => profilesStore.currentProfile || null)
+
+const totalDailyCalories = computed(() => {
+  const calories = calculateTotalDailyCalories({
+    weight: currentProfile.value?.start_weight,
+    height: currentProfile.value?.height,
+    age: usersStore.currentUser?.age,
+    sex: usersStore.currentUser?.sex,
+    activityLevel: currentProfile.value?.activity_level,
+  })
+
+  return calories ?? null
+})
+
+const totalCaloriesForPerson = computed(() => {
+  return calculateTotalCaloriesForPerson({
+    totalDailyCalories: totalDailyCalories.value,
+    dailyCalorieDeficit: currentProfile.value?.daily_calorie_deficit,
+  })
+})
+
+const carbBudgetPercentForToday = computed(() => {
+  const dayKey = getCurrentDayOfWeekKey()
+  return Number(currentProfile.value?.[`${dayKey}_carbs`]) || 175
+})
+
+const totalCarbsLoggedToday = computed(() => {
+  return (tableRows.value || []).reduce((sum, row) => {
+    const food = row.food || {}
+    const carbsPerServing = Number(food.carb) || 0
+    const servings = Number(row.servings) || 0
+
+    return sum + carbsPerServing * servings
+  }, 0)
+})
+
+const totalCarbBudgetForToday = computed(() => {
+  return (totalCaloriesForPerson.value * carbBudgetPercentForToday.value) / 100 / 4
+})
+
+const proteinBudgetPercentForToday = computed(() => {
+  const dayKey = getCurrentDayOfWeekKey()
+  return Number(currentProfile.value?.[`${dayKey}_protein`]) || 0
+})
+
+const fatBudgetPercentForToday = computed(() => {
+  const dayKey = getCurrentDayOfWeekKey()
+  return Number(currentProfile.value?.[`${dayKey}_fat`]) || 0
+})
+
+const totalProteinLoggedToday = computed(() => {
+  return (tableRows.value || []).reduce((sum, row) => {
+    const food = row.food || {}
+    const proteinPerServing = Number(food.protein) || 0
+    const servings = Number(row.servings) || 0
+
+    return sum + proteinPerServing * servings
+  }, 0)
+})
+
+const totalProteinBudgetForToday = computed(() => {
+  return (totalCaloriesForPerson.value * proteinBudgetPercentForToday.value) / 100 / 4
+})
+
+const totalFatLoggedToday = computed(() => {
+  return (tableRows.value || []).reduce((sum, row) => {
+    const food = row.food || {}
+    const fatPerServing = Number(food.fat) || 0
+    const servings = Number(row.servings) || 0
+
+    return sum + fatPerServing * servings
+  }, 0)
+})
+
+const totalFatBudgetForToday = computed(() => {
+  return (totalCaloriesForPerson.value * fatBudgetPercentForToday.value) / 100 / 4
+})
+
 const selectedFoodCalories = computed(() => {
   if (!selectedFood.value) {
     return 0
@@ -740,28 +889,64 @@ const entryTotalCalories = computed(() => {
 })
 
 const tableRows = computed(() => {
-  return (foodLogsStore.logs || []).map((log) => {
-    const food = log.food || {}
-    const perServingCalories = calculateFoodCalories({
-      carbs: food.carb,
-      protein: food.protein,
-      fat: food.fat,
-      extraCalories: food.calories_extra,
-    })
+  const today = getCurrentLocalDate()
 
-    const servings = Number(log.servings) || 0
-    return {
-      ...log,
-      description: food.description || `Food #${log.food_id}`,
-      servingsLabel: servings.toFixed(2),
-      totalCalories: Math.round(perServingCalories * servings),
-      summary: `${food.description || `Food #${log.food_id}`} | ${servings.toFixed(2)} | ${Math.round(perServingCalories * servings)}`,
-    }
-  })
+  return (foodLogsStore.logs || [])
+    .filter((log) => getLocalDateKey(log.datetime) === today)
+    .map((log) => {
+      const food = log.food || {}
+      const perServingCalories = calculateFoodCalories({
+        carbs: food.carb,
+        protein: food.protein,
+        fat: food.fat,
+        extraCalories: food.calories_extra,
+      })
+
+      const servings = Number(log.servings) || 0
+      return {
+        ...log,
+        description: food.description || `Food #${log.food_id}`,
+        servingsLabel: servings.toFixed(2),
+        totalCalories: Math.round(perServingCalories * servings),
+        summary: `${food.description || `Food #${log.food_id}`} | ${servings.toFixed(2)} | ${Math.round(perServingCalories * servings)}`,
+      }
+    })
 })
 
 const totalLoggedCalories = computed(() => {
   return tableRows.value.reduce((sum, row) => sum + (Number(row.totalCalories) || 0), 0)
+})
+
+const foodLogProgress = computed(() => {
+  if (!totalCaloriesForPerson.value) {
+    return 0
+  }
+
+  return Math.min(1, totalLoggedCalories.value / totalCaloriesForPerson.value)
+})
+
+const foodCarbProgress = computed(() => {
+  if (!totalCarbBudgetForToday.value) {
+    return 0
+  }
+
+  return Math.min(1, totalCarbsLoggedToday.value / totalCarbBudgetForToday.value)
+})
+
+const foodProteinProgress = computed(() => {
+  if (!totalProteinBudgetForToday.value) {
+    return 0
+  }
+
+  return Math.min(1, totalProteinLoggedToday.value / totalProteinBudgetForToday.value)
+})
+
+const foodFatProgress = computed(() => {
+  if (!totalFatBudgetForToday.value) {
+    return 0
+  }
+
+  return Math.min(1, totalFatLoggedToday.value / totalFatBudgetForToday.value)
 })
 
 const workoutTableRows = computed(() => {
@@ -873,6 +1058,7 @@ watch(
 
     foodsStore.foods = []
     foodLogsStore.logs = []
+    profilesStore.currentProfile = null
     workoutsStore.workouts = []
     workoutLogsStore.logs = []
     supplimentsStore.supplements = []
@@ -926,6 +1112,7 @@ async function loadDataForUser(userId) {
   await Promise.all([
     foodsStore.loadFoods(userId),
     foodLogsStore.loadFoodLogs(userId),
+    profilesStore.loadCurrentProfile(userId),
     workoutsStore.loadWorkouts(userId),
     workoutLogsStore.loadWorkoutLogs(userId),
     supplimentsStore.loadSupplements(userId),

@@ -23,9 +23,8 @@
       "
     >
       Daily diary for your health and wellness. This app is designed to help you track your daily
-      habits, monitor your progress, and provide insights into your overall well-being. By using
-      this app regularly, you can gain a better understanding of your health patterns and make
-      informed decisions to improve your lifestyle.
+      habits, monitor your progress. Logs can help you gain a better understanding of your habbits
+      and make informed decisions to improve your lifestyle.
     </h5>
 
     <h5
