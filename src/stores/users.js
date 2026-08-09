@@ -1,10 +1,51 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
 
+const CURRENT_USER_STORAGE_KEY = 'slimbelly.currentUser'
+
+function getPersistedCurrentUser() {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  try {
+    const storedUser = window.localStorage.getItem(CURRENT_USER_STORAGE_KEY)
+    return storedUser ? JSON.parse(storedUser) : null
+  } catch {
+    return null
+  }
+}
+
+function persistCurrentUser(user) {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  try {
+    if (user) {
+      window.localStorage.setItem(CURRENT_USER_STORAGE_KEY, JSON.stringify(user))
+    } else {
+      window.localStorage.removeItem(CURRENT_USER_STORAGE_KEY)
+    }
+  } catch {
+    // Ignore storage failures and keep the in-memory session active.
+  }
+}
+
+function sanitizeCurrentUser(user) {
+  if (!user) {
+    return null
+  }
+
+  const safeUser = { ...user }
+  delete safeUser.password
+  return safeUser
+}
+
 export const useUsersStore = defineStore('Users', {
   state: () => ({
     users: [],
-    currentUser: null,
+    currentUser: getPersistedCurrentUser(),
     answers: [],
     error: null,
     activeAnswerId: null,
@@ -58,9 +99,12 @@ export const useUsersStore = defineStore('Users', {
         return null
       }
 
+      const savedUser = sanitizeCurrentUser(data)
+
       this.users = this.users.filter((user) => user.email !== normalizedEmail)
-      this.users.push(data)
-      this.currentUser = data
+      this.users.push(savedUser)
+      this.currentUser = savedUser
+      persistCurrentUser(savedUser)
       return data
     },
 
@@ -122,9 +166,12 @@ export const useUsersStore = defineStore('Users', {
         return null
       }
 
-      this.currentUser = data
+      const savedUser = sanitizeCurrentUser(data)
+
+      this.currentUser = savedUser
       this.users = this.users.filter((u) => u.email !== normalizedEmail)
-      this.users.push(data)
+      this.users.push(savedUser)
+      persistCurrentUser(savedUser)
       return data
     },
 
@@ -284,6 +331,7 @@ export const useUsersStore = defineStore('Users', {
       this.currentUser = null
       this.activeAnswerId = null
       this.activeAnswerDateTime = null
+      persistCurrentUser(null)
     },
   },
 })
