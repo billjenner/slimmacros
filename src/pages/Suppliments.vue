@@ -256,6 +256,7 @@ const servingUnitOptions = [
   { label: 'Pills', value: 'pills' },
   { label: 'Oz', value: 'oz' },
   { label: 'Scoop', value: 'scoop' },
+  { label: 'Glasses', value: 'glasses' },
   { label: 'Other', value: 'other' },
 ]
 
