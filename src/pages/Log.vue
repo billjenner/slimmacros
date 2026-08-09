@@ -333,7 +333,12 @@
                     </div>
                   </div>
 
-                  <div class="row justify-end q-mt-md">
+                  <div class="row items-center justify-between q-mt-md">
+                    <q-toggle
+                      v-model="includeSharedWorkouts"
+                      label="Include shared workouts"
+                      :disable="!usersStore.currentUser"
+                    />
                     <q-btn
                       type="submit"
                       color="primary"
@@ -472,7 +477,12 @@
                     </div>
                   </div>
 
-                  <div class="row justify-end q-mt-md">
+                  <div class="row items-center justify-between q-mt-md">
+                    <q-toggle
+                      v-model="includeSharedSuppliments"
+                      label="Include shared suppliments"
+                      :disable="!usersStore.currentUser"
+                    />
                     <q-btn
                       type="submit"
                       color="primary"
@@ -680,6 +690,8 @@ const weightLogsStore = useWeightLogsStore()
 const activeTab = ref('food')
 const isFoodLogExpanded = ref(true)
 const includeSharedFoods = ref(false)
+const includeSharedWorkouts = ref(false)
+const includeSharedSuppliments = ref(false)
 
 function getCurrentLocalDateTime() {
   const now = new Date()
@@ -838,14 +850,48 @@ const foodOptions = computed(() => {
 })
 
 const workoutOptions = computed(() => {
-  return (workoutsStore.workouts || []).map((workout) => ({
+  const allWorkouts = workoutsStore.workouts || []
+  const currentUserId = usersStore.currentUser?.user_id
+  const ownWorkouts = allWorkouts.filter(
+    (workout) => String(workout?.user_id || '') === String(currentUserId || ''),
+  )
+
+  if (!includeSharedWorkouts.value) {
+    return ownWorkouts.map((workout) => ({
+      label: workout.type,
+      value: workout.workout_id,
+    }))
+  }
+
+  const sharedWorkouts = allWorkouts.filter(
+    (workout) => String(workout?.user_id || '') !== String(currentUserId || ''),
+  )
+
+  return [...ownWorkouts, ...sharedWorkouts].map((workout) => ({
     label: workout.type,
     value: workout.workout_id,
   }))
 })
 
 const supplementOptions = computed(() => {
-  return (supplimentsStore.supplements || []).map((supplement) => ({
+  const allSuppliments = supplimentsStore.supplements || []
+  const currentUserId = usersStore.currentUser?.user_id
+  const ownSuppliments = allSuppliments.filter(
+    (supplement) => String(supplement?.user_id || '') === String(currentUserId || ''),
+  )
+
+  if (!includeSharedSuppliments.value) {
+    return ownSuppliments.map((supplement) => ({
+      label: `${supplement.description} (${supplement.serving_size ?? 1} ${supplement.serving_unit || 'other'})`,
+      value: supplement.supplement_id,
+    }))
+  }
+
+  const sharedSuppliments = allSuppliments.filter(
+    (supplement) => String(supplement?.user_id || '') !== String(currentUserId || ''),
+  )
+
+  return [...ownSuppliments, ...sharedSuppliments].map((supplement) => ({
     label: `${supplement.description} (${supplement.serving_size ?? 1} ${supplement.serving_unit || 'other'})`,
     value: supplement.supplement_id,
   }))
