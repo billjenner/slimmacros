@@ -23,7 +23,7 @@
             class="bg-warning text-dark q-mb-md"
             rounded
           >
-            Sign in to create a suppliment log entry.
+            Sign in to manage suppliments.
           </q-banner>
 
           <transition name="form-slide" mode="out-in">
@@ -34,9 +34,9 @@
               class="q-gutter-md"
             >
               <q-card flat bordered class="q-pa-md bg-grey-1">
-                <div class="text-subtitle1 q-mb-sm">Suppliment log details</div>
+                <div class="text-subtitle1 q-mb-sm">Suppliment details</div>
                 <div class="row q-col-gutter-md">
-                  <div class="col-12 col-md-3">
+                  <div class="col-12 col-md-6">
                     <q-input
                       v-model="suppliment.description"
                       label="Suppliment"
@@ -49,15 +49,17 @@
 
                   <div class="col-12 col-md-3">
                     <q-input
-                      v-model="suppliment.servings"
+                      v-model="suppliment.serving_size"
                       type="number"
-                      label="Servings"
+                      label="Serving size"
                       min="0.01"
                       step="0.01"
                       filled
                       dense
                       :disable="!usersStore.currentUser"
-                      :rules="[(value) => Number(value) > 0 || 'Servings must be greater than 0']"
+                      :rules="[
+                        (value) => Number(value) > 0 || 'Serving size must be greater than 0',
+                      ]"
                     />
                   </div>
 
@@ -75,22 +77,6 @@
                   </div>
 
                   <div class="col-12 col-md-3">
-                    <q-input
-                      v-model="suppliment.date"
-                      type="date"
-                      label="Date"
-                      filled
-                      dense
-                      :disable="!usersStore.currentUser"
-                    />
-                  </div>
-                </div>
-              </q-card>
-
-              <q-card flat bordered class="q-pa-md bg-grey-1">
-                <div class="text-subtitle1 q-mb-sm">Preferences</div>
-                <div class="row q-col-gutter-md">
-                  <div class="col-12 col-md-4">
                     <q-toggle v-model="suppliment.share_with_others" label="Share with others" />
                   </div>
                 </div>
@@ -100,7 +86,7 @@
                 <q-btn
                   type="submit"
                   color="primary"
-                  :label="editingSupplimentLogId ? 'Update suppliment' : 'Save suppliment'"
+                  :label="editingSupplimentId ? 'Update suppliment' : 'Save suppliment'"
                   :loading="store.loading"
                 />
               </div>
@@ -109,10 +95,8 @@
 
           <q-dialog v-model="confirmDeleteOpen">
             <q-card style="min-width: 320px">
-              <q-card-section class="text-h6">Delete suppliment log?</q-card-section>
-              <q-card-section>
-                Are you sure you want to delete this suppliment log entry?
-              </q-card-section>
+              <q-card-section class="text-h6">Delete suppliment?</q-card-section>
+              <q-card-section> Are you sure you want to delete this suppliment? </q-card-section>
               <q-card-actions align="right">
                 <q-btn flat label="No" color="primary" @click="cancelDeleteSuppliment" />
                 <q-btn label="Yes" color="negative" @click="confirmDeleteSuppliment" />
@@ -126,13 +110,13 @@
             <q-table
               :rows="supplimentRows"
               :columns="supplimentColumns"
-              row-key="supplement_log_id"
+              row-key="supplement_id"
               flat
               bordered
               dense
               hide-header
               :loading="store.loading"
-              no-data-label="No suppliment records yet."
+              no-data-label="No suppliments yet."
             >
               <template #body="props">
                 <q-tr :props="props" :class="sharedRowClass(props.row)">
@@ -161,7 +145,7 @@
                         Shared
                       </q-chip>
 
-                      <div class="row items-center q-gutter-xs q-ml-auto">
+                      <div class="row items-center q-gutter-xs q-ml-auto no-wrap">
                         <q-btn
                           flat
                           dense
@@ -198,23 +182,21 @@
                     <div class="row q-col-gutter-sm q-py-sm">
                       <div class="col-12 col-sm-6 col-md-4">
                         <div class="text-caption text-grey-7">Suppliment</div>
-                        <div class="text-body2">{{ props.row.supplementLabel }}</div>
-                      </div>
-                      <div class="col-12 col-sm-6 col-md-4">
-                        <div class="text-caption text-grey-7">Servings</div>
-                        <div class="text-body2">{{ props.row.servingsLabel }}</div>
-                      </div>
-                      <div class="col-12 col-sm-6 col-md-4">
-                        <div class="text-caption text-grey-7">Date</div>
-                        <div class="text-body2">{{ props.row.date || 'N/A' }}</div>
-                      </div>
-                      <div class="col-12 col-sm-6 col-md-4">
-                        <div class="text-caption text-grey-7">Serving unit</div>
-                        <div class="text-body2">{{ props.row.servingUnitLabel }}</div>
+                        <div class="text-body2">{{ props.row.description }}</div>
                       </div>
                       <div class="col-12 col-sm-6 col-md-4">
                         <div class="text-caption text-grey-7">Serving size</div>
                         <div class="text-body2">{{ props.row.servingSizeLabel }}</div>
+                      </div>
+                      <div class="col-12 col-sm-6 col-md-4">
+                        <div class="text-caption text-grey-7">Serving type</div>
+                        <div class="text-body2">{{ props.row.servingUnitLabel }}</div>
+                      </div>
+                      <div class="col-12 col-sm-6 col-md-4">
+                        <div class="text-caption text-grey-7">Share with others</div>
+                        <div class="text-body2">
+                          {{ props.row.share_with_others ? 'Yes' : 'No' }}
+                        </div>
                       </div>
                     </div>
                   </q-td>
@@ -231,23 +213,14 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
-import { useSupplementLogsStore } from 'stores/supplement-logs'
+import { useSupplimentsStore } from 'stores/suppliments'
 
 const usersStore = useUsersStore()
-const store = useSupplementLogsStore()
-
-function getCurrentLocalDate() {
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const day = String(now.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
+const store = useSupplimentsStore()
 
 const suppliment = reactive({
   description: '',
-  servings: 1,
-  date: getCurrentLocalDate(),
+  serving_size: 1,
   serving_unit: 'other',
   share_with_others: false,
 })
@@ -271,18 +244,16 @@ const supplimentColumns = [
 ]
 
 const supplimentRows = computed(() => {
-  return (store.logs || []).map((log) => {
-    const supplement = log.supplement || {}
-    const servings = Number(log.servings) || 0
-    const supplementLabel = supplement.description || `Suppliment #${log.supplement_id}`
+  return (store.supplements || []).map((supplement) => {
+    const servingSize = Number(supplement.serving_size) || 0
+    const servingUnitLabel = supplement.serving_unit || 'other'
+    const summary = `${supplement.description || ''} | ${servingSize.toFixed(2)} | ${servingUnitLabel}`
 
     return {
-      ...log,
-      supplementLabel,
-      servingsLabel: servings.toFixed(2),
-      servingUnitLabel: supplement.serving_unit || 'other',
-      servingSizeLabel: supplement.serving_size ?? 1,
-      summary: `${supplementLabel} | ${servings.toFixed(2)} | ${supplement.serving_unit || 'other'} | ${log.date || ''}`,
+      ...supplement,
+      servingSizeLabel: servingSize.toFixed(2),
+      servingUnitLabel,
+      summary,
     }
   })
 })
@@ -290,8 +261,8 @@ const supplimentRows = computed(() => {
 const showSupplimentForm = ref(false)
 const confirmDeleteOpen = ref(false)
 const pendingDeleteSuppliment = ref(null)
+const editingSupplimentId = ref(null)
 const expandedSupplimentIds = ref([])
-const editingSupplimentLogId = ref(null)
 
 onMounted(() => {
   if (usersStore.currentUser?.user_id) {
@@ -316,7 +287,7 @@ async function loadDataForCurrentUser(userId) {
     return
   }
 
-  await Promise.all([store.loadSupplements(userId), store.loadSupplementLogs(userId)])
+  await store.loadSupplements(userId)
 }
 
 function isOwnedByCurrentUser(row) {
@@ -328,32 +299,31 @@ function sharedRowClass(row) {
 }
 
 function isExpanded(row) {
-  return expandedSupplimentIds.value.includes(row?.supplement_log_id)
+  return expandedSupplimentIds.value.includes(row?.supplement_id)
 }
 
 function toggleExpanded(row) {
-  if (!row?.supplement_log_id) {
+  if (!row?.supplement_id) {
     return
   }
 
   if (isExpanded(row)) {
     expandedSupplimentIds.value = expandedSupplimentIds.value.filter(
-      (supplementLogId) => supplementLogId !== row.supplement_log_id,
+      (supplementId) => supplementId !== row.supplement_id,
     )
   } else {
-    expandedSupplimentIds.value = [...expandedSupplimentIds.value, row.supplement_log_id]
+    expandedSupplimentIds.value = [...expandedSupplimentIds.value, row.supplement_id]
   }
 }
 
 function editSuppliment(row) {
-  editingSupplimentLogId.value = row.supplement_log_id
+  editingSupplimentId.value = row.supplement_id
 
   Object.assign(suppliment, {
-    description: row.supplementLabel || '',
-    servings: row.servings ?? 1,
-    date: row.date || getCurrentLocalDate(),
-    serving_unit: row.supplement?.serving_unit || 'other',
-    share_with_others: Boolean(row.supplement?.share_with_others),
+    description: row.description || '',
+    serving_size: row.serving_size ?? 1,
+    serving_unit: row.serving_unit || 'other',
+    share_with_others: Boolean(row.share_with_others),
   })
 
   showSupplimentForm.value = true
@@ -362,13 +332,12 @@ function editSuppliment(row) {
 function resetSupplimentForm() {
   Object.assign(suppliment, {
     description: '',
-    servings: 1,
-    date: getCurrentLocalDate(),
+    serving_size: 1,
     serving_unit: 'other',
     share_with_others: false,
   })
 
-  editingSupplimentLogId.value = null
+  editingSupplimentId.value = null
 }
 
 function requestDeleteSuppliment(row) {
@@ -386,17 +355,17 @@ async function confirmDeleteSuppliment() {
   pendingDeleteSuppliment.value = null
   confirmDeleteOpen.value = false
 
-  if (!usersStore.currentUser?.user_id || !row?.supplement_log_id) {
+  if (!usersStore.currentUser?.user_id || !row?.supplement_id) {
     store.error = 'No current user is available.'
     return
   }
 
-  const { error } = await store.deleteSupplementLog(
+  const { error } = await store.deactivateSupplement(
     usersStore.currentUser.user_id,
-    row.supplement_log_id,
+    row.supplement_id,
   )
   if (!error) {
-    await store.loadSupplementLogs(usersStore.currentUser.user_id)
+    await store.loadSupplements(usersStore.currentUser.user_id)
   }
 }
 
@@ -412,44 +381,25 @@ async function submitSuppliment() {
     return
   }
 
-  const existingSupplement = (store.supplements || []).find(
-    (supplement) =>
-      String(supplement.description || '')
-        .trim()
-        .toLowerCase() === normalizedDescription.toLowerCase(),
-  )
-
-  const resolvedSupplement =
-    existingSupplement ||
-    (await store.createSupplement(usersStore.currentUser.user_id, {
-      description: normalizedDescription,
-      serving_size: 1,
-      serving_unit: suppliment.serving_unit || 'other',
-      share_with_others: Boolean(suppliment.share_with_others),
-    }))
-
-  if (!resolvedSupplement?.supplement_id) {
-    return
-  }
-
   const payload = {
-    supplement_id: resolvedSupplement.supplement_id,
-    servings: suppliment.servings,
-    date: suppliment.date,
+    description: normalizedDescription,
+    serving_size: suppliment.serving_size,
+    serving_unit: suppliment.serving_unit || 'other',
+    share_with_others: Boolean(suppliment.share_with_others),
   }
 
-  const savedSuppliment = editingSupplimentLogId.value
-    ? await store.updateSupplementLog(
+  const savedSuppliment = editingSupplimentId.value
+    ? await store.updateSupplement(
         usersStore.currentUser.user_id,
-        editingSupplimentLogId.value,
+        editingSupplimentId.value,
         payload,
       )
-    : await store.createSupplementLog(usersStore.currentUser.user_id, payload)
+    : await store.createSupplement(usersStore.currentUser.user_id, payload)
 
   if (savedSuppliment) {
     resetSupplimentForm()
     showSupplimentForm.value = false
-    await store.loadSupplementLogs(usersStore.currentUser.user_id)
+    await store.loadSupplements(usersStore.currentUser.user_id)
   }
 }
 </script>

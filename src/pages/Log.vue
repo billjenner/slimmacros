@@ -352,6 +352,19 @@
                     </div>
 
                     <div class="col-12 col-md-3">
+                      <q-select
+                        v-model="supplementLog.serving_unit"
+                        :options="servingUnitOptions"
+                        label="Serving type"
+                        filled
+                        dense
+                        emit-value
+                        map-options
+                        :disable="!usersStore.currentUser"
+                      />
+                    </div>
+
+                    <div class="col-12 col-md-3">
                       <q-input
                         v-model="supplementLog.date"
                         type="date"
@@ -445,7 +458,8 @@ import { useFoodsStore } from 'stores/foods'
 import { useFoodLogsStore } from 'stores/food-logs'
 import { useWorkoutsStore } from 'stores/workouts'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
-import { useSupplementLogsStore } from 'stores/supplement-logs'
+import { useSupplimentsStore } from 'stores/suppliments'
+import { useSupplimentsLogStore } from 'stores/suppliments_log'
 import { calculateFoodCalories } from '../utils/rules'
 
 const usersStore = useUsersStore()
@@ -453,7 +467,8 @@ const foodsStore = useFoodsStore()
 const foodLogsStore = useFoodLogsStore()
 const workoutsStore = useWorkoutsStore()
 const workoutLogsStore = useWorkoutLogsStore()
-const supplementLogsStore = useSupplementLogsStore()
+const supplimentsStore = useSupplimentsStore()
+const supplementLogsStore = useSupplimentsLogStore()
 const activeTab = ref('food')
 
 function getCurrentLocalDateTime() {
@@ -491,6 +506,7 @@ const workoutLog = reactive({
 const supplementLog = reactive({
   supplement_id: null,
   servings: 1,
+  serving_unit: 'other',
   date: getCurrentLocalDate(),
 })
 
@@ -543,11 +559,19 @@ const workoutOptions = computed(() => {
 })
 
 const supplementOptions = computed(() => {
-  return (supplementLogsStore.supplements || []).map((supplement) => ({
+  return (supplimentsStore.supplements || []).map((supplement) => ({
     label: `${supplement.description} (${supplement.serving_size ?? 1} ${supplement.serving_unit || 'other'})`,
     value: supplement.supplement_id,
   }))
 })
+
+const servingUnitOptions = [
+  { label: 'Pills', value: 'pills' },
+  { label: 'Oz', value: 'oz' },
+  { label: 'Scoop', value: 'scoop' },
+  { label: 'Glasses', value: 'glasses' },
+  { label: 'Other', value: 'other' },
+]
 
 function areSameId(leftId, rightId) {
   if (leftId === null || leftId === undefined || rightId === null || rightId === undefined) {
@@ -565,6 +589,14 @@ const selectedWorkout = computed(() => {
 
 const selectedFood = computed(() => {
   return (foodsStore.foods || []).find((food) => food.food_id === foodLog.food_id) || null
+})
+
+const selectedSupplement = computed(() => {
+  return (
+    (supplimentsStore.supplements || []).find((supplement) =>
+      areSameId(supplement.supplement_id, supplementLog.supplement_id),
+    ) || null
+  )
 })
 
 const selectedFoodCalories = computed(() => {
@@ -623,7 +655,7 @@ const workoutTableRows = computed(() => {
     return {
       ...log,
       description: workoutLabel,
-      summary: `${workoutLabel} | ${workoutTime} | ${log.date || ''}`,
+      summary: `${workoutLabel} | ${workoutTime} (minutes) | ${log.date || ''}`,
     }
   })
 })
@@ -653,17 +685,32 @@ const workoutTotalCaloriesBurned = computed(() => {
 })
 
 const supplementTableRows = computed(() => {
-  return (supplementLogsStore.logs || []).map((log) => {
-    const supplement = log.supplement || {}
-    const label = supplement.description || `Suppliment #${log.supplement_id}`
-    const servings = Number(log.servings) || 0
+  return [...(supplementLogsStore.logs || [])]
+    .sort((leftLog, rightLog) => {
+      const leftDate = String(leftLog?.date || '')
+      const rightDate = String(rightLog?.date || '')
 
-    return {
-      ...log,
-      description: label,
-      summary: `${label} | ${servings.toFixed(2)} | ${log.date || ''}`,
-    }
-  })
+      if (leftDate !== rightDate) {
+        return rightDate.localeCompare(leftDate)
+      }
+
+      const leftDescription = String(leftLog?.supplement?.description || '').toLowerCase()
+      const rightDescription = String(rightLog?.supplement?.description || '').toLowerCase()
+
+      return leftDescription.localeCompare(rightDescription)
+    })
+    .map((log) => {
+      const supplement = log.supplement || {}
+      const label = supplement.description || `Suppliment #${log.supplement_id}`
+      const servings = Number(log.servings) || 0
+      const servingType = supplement.serving_unit || 'other'
+
+      return {
+        ...log,
+        description: label,
+        summary: `${label} | ${servings.toFixed(2)} | ${servingType} | ${log.date || ''}`,
+      }
+    })
 })
 
 onMounted(() => {
@@ -684,7 +731,7 @@ watch(
     foodLogsStore.logs = []
     workoutsStore.workouts = []
     workoutLogsStore.logs = []
-    supplementLogsStore.supplements = []
+    supplimentsStore.supplements = []
     supplementLogsStore.logs = []
   },
 )
@@ -705,6 +752,27 @@ watch(
   },
 )
 
+watch(
+  () => supplementLog.supplement_id,
+  () => {
+    supplementLog.servings = selectedSupplement.value?.serving_size ?? 1
+    supplementLog.serving_unit = selectedSupplement.value?.serving_unit || 'other'
+  },
+)
+
+watch(
+  () => selectedSupplement.value,
+  (supplement) => {
+    if (supplement && (supplementLog.servings === null || supplementLog.servings === '')) {
+      supplementLog.servings = supplement.serving_size ?? 1
+    }
+
+    if (supplement && !supplementLog.serving_unit) {
+      supplementLog.serving_unit = supplement.serving_unit || 'other'
+    }
+  },
+)
+
 async function loadDataForUser(userId) {
   if (!userId) {
     return
@@ -715,7 +783,7 @@ async function loadDataForUser(userId) {
     foodLogsStore.loadFoodLogs(userId),
     workoutsStore.loadWorkouts(userId),
     workoutLogsStore.loadWorkoutLogs(userId),
-    supplementLogsStore.loadSupplements(userId),
+    supplimentsStore.loadSupplements(userId),
     supplementLogsStore.loadSupplementLogs(userId),
   ])
 }
@@ -791,6 +859,7 @@ async function submitSupplementLog() {
   const payload = {
     supplement_id: supplementLog.supplement_id,
     servings: supplementLog.servings,
+    serving_unit: supplementLog.serving_unit,
     date: supplementLog.date,
   }
 
@@ -800,6 +869,7 @@ async function submitSupplementLog() {
   )
   if (saved) {
     supplementLog.servings = 1
+    supplementLog.serving_unit = selectedSupplement.value?.serving_unit || 'other'
     supplementLog.date = getCurrentLocalDate()
     await supplementLogsStore.loadSupplementLogs(usersStore.currentUser.user_id)
   }
