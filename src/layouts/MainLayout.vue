@@ -55,6 +55,16 @@
           />
           <q-btn
             flat
+            label="Log"
+            to="/food-log"
+            class="q-mx-sm"
+            style="min-width: 108px"
+            :style="buttonStyle('/food-log')"
+            @mouseover="hoveredPath = '/food-log'"
+            @mouseleave="hoveredPath = null"
+          />
+          <q-btn
+            flat
             label="Resources"
             to="/theary"
             class="q-mx-sm"
@@ -102,6 +112,9 @@
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/foods')">
           <q-item-section>Foods</q-item-section>
+        </q-item>
+        <q-item clickable v-ripple @click="navigateAndClose('/food-log')">
+          <q-item-section>Log</q-item-section>
         </q-item>
         <q-item
           v-if="!(usersStore.currentUser && usersStore.currentUser.email)"

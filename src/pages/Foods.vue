@@ -199,7 +199,7 @@
                           flat
                           dense
                           size="sm"
-                          color="primary"
+                          color="negative"
                           label="Edit"
                           @click="editFood(props.row)"
                         />
@@ -208,7 +208,7 @@
                           flat
                           dense
                           size="sm"
-                          color="primary"
+                          color="negative"
                           label="Delete"
                           @click="requestDeleteFood(props.row)"
                         />
@@ -221,30 +221,6 @@
                 <q-tr v-if="isExpanded(props.row)" :props="props">
                   <q-td :colspan="foodColumns.length" class="bg-grey-2">
                     <div class="row q-col-gutter-sm q-py-sm">
-                      <div class="col-12">
-                        <div class="text-caption text-grey-7 q-mb-xs">Calories vs budget</div>
-                        <q-linear-progress
-                          :value="
-                            Math.min(
-                              1,
-                              (calculateFoodCalories({
-                                carbs: props.row.carb,
-                                protein: props.row.protein,
-                                fat: props.row.fat,
-                                extraCalories: props.row.calories_extra,
-                              }) || 0) /
-                                (calculateTotalCaloriesForPerson({
-                                  totalDailyCalories: 2000,
-                                  dailyCalorieDeficit: 0,
-                                }) || 1),
-                            )
-                          "
-                          color="accent"
-                          size="24px"
-                          rounded
-                        />
-                      </div>
-
                       <div class="col-12 col-sm-6 col-md-3">
                         <div class="text-caption text-grey-7">Protein</div>
                         <div class="text-body2">{{ props.row.protein ?? 0 }}</div>
@@ -283,6 +259,29 @@
                           {{ props.row.share_with_others ? 'Yes' : 'No' }}
                         </div>
                       </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="text-caption text-grey-7 q-mb-xs">Calories vs budget</div>
+                      <q-linear-progress
+                        :value="
+                          Math.min(
+                            1,
+                            (calculateFoodCalories({
+                              carbs: props.row.carb,
+                              protein: props.row.protein,
+                              fat: props.row.fat,
+                              extraCalories: props.row.calories_extra,
+                            }) || 0) /
+                              (calculateTotalCaloriesForPerson({
+                                totalDailyCalories: 2000,
+                                dailyCalorieDeficit: 0,
+                              }) || 1),
+                          )
+                        "
+                        color="accent"
+                        size="8px"
+                        rounded
+                      />
                     </div>
                   </q-td>
                 </q-tr>

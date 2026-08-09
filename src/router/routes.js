@@ -91,6 +91,17 @@ const routes = [
           },
         },
       },
+      {
+        path: 'food-log',
+        component: () => import('pages/Log.vue'),
+        meta: {
+          seo: {
+            title: 'Food Log',
+            description: 'Track food consumption and servings throughout the day.',
+            canonicalPath: '/food-log',
+          },
+        },
+      },
     ],
   },
 
