@@ -3,142 +3,186 @@
     <div class="row justify-center">
       <div class="col-12 col-md-10 col-lg-8">
         <q-card flat bordered class="q-pa-md">
-          <div class="text-h5 q-mb-md">Food Log</div>
+          <div class="text-h5 q-mb-md">Log</div>
 
-          <q-banner v-if="foodLogsStore.error" class="bg-negative text-white q-mb-md" rounded>
-            {{ foodLogsStore.error }}
-          </q-banner>
-
-          <q-banner
-            v-else-if="!usersStore.currentUser"
-            class="bg-warning text-dark q-mb-md"
-            rounded
+          <q-tabs
+            v-model="activeTab"
+            align="left"
+            dense
+            class="text-primary"
+            indicator-color="accent"
           >
-            Sign in to record food consumption.
-          </q-banner>
+            <q-tab name="food" label="Food" />
+            <q-tab name="workouts" label="Workouts" />
+            <q-tab name="suplliments" label="Suplliments" />
+            <q-tab name="weight" label="Weight" />
+          </q-tabs>
 
-          <q-form @submit.prevent="submitFoodLog" class="q-gutter-md">
-            <q-card flat bordered class="q-pa-md bg-grey-1">
-              <div class="text-subtitle1 q-mb-sm">Log entry</div>
-              <div class="row q-col-gutter-md">
-                <div class="col-12 col-md-6">
-                  <q-select
-                    v-model="foodLog.food_id"
-                    :options="foodOptions"
-                    label="Food"
-                    filled
-                    dense
-                    emit-value
-                    map-options
-                    :disable="!usersStore.currentUser"
-                    :rules="[(value) => !!value || 'Food is required']"
-                  />
+          <q-separator class="q-my-md" />
+
+          <q-tab-panels v-model="activeTab" animated>
+            <q-tab-panel name="food" class="q-pa-none">
+              <q-banner v-if="foodLogsStore.error" class="bg-negative text-white q-mb-md" rounded>
+                {{ foodLogsStore.error }}
+              </q-banner>
+
+              <q-banner
+                v-else-if="!usersStore.currentUser"
+                class="bg-warning text-dark q-mb-md"
+                rounded
+              >
+                Sign in to record food consumption.
+              </q-banner>
+
+              <q-form @submit.prevent="submitFoodLog" class="q-gutter-md">
+                <q-card flat bordered class="q-pa-md bg-grey-1">
+                  <div class="text-subtitle1 q-mb-sm">Log entry</div>
+                  <div class="row q-col-gutter-md">
+                    <div class="col-12 col-md-6">
+                      <q-select
+                        v-model="foodLog.food_id"
+                        :options="foodOptions"
+                        label="Food"
+                        filled
+                        dense
+                        emit-value
+                        map-options
+                        :disable="!usersStore.currentUser"
+                        :rules="[(value) => !!value || 'Food is required']"
+                      />
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                      <q-input
+                        v-model="foodLog.servings"
+                        type="number"
+                        label="Servings"
+                        min="0.01"
+                        step="0.01"
+                        filled
+                        dense
+                        :disable="!usersStore.currentUser"
+                        :rules="[(value) => Number(value) > 0 || 'Servings must be greater than 0']"
+                      />
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                      <q-input
+                        v-model="foodLog.datetime"
+                        type="datetime-local"
+                        label="Date and time"
+                        filled
+                        dense
+                        :disable="!usersStore.currentUser"
+                      />
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                      <q-input
+                        :model-value="selectedFoodCalories"
+                        label="Calories per serving"
+                        readonly
+                        filled
+                        dense
+                      />
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                      <q-input
+                        :model-value="entryTotalCalories"
+                        label="Total calories"
+                        readonly
+                        filled
+                        dense
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row justify-end q-mt-md">
+                    <q-btn
+                      type="submit"
+                      color="primary"
+                      label="Add to log"
+                      :loading="foodLogsStore.loading"
+                      :disable="!usersStore.currentUser"
+                    />
+                  </div>
+                </q-card>
+              </q-form>
+
+              <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
+                <div class="row items-center justify-between q-mb-sm">
+                  <div class="text-subtitle1">Logged foods</div>
+                  <q-chip color="secondary" text-color="white" square>
+                    Total logged calories: {{ totalLoggedCalories }}
+                  </q-chip>
                 </div>
 
-                <div class="col-12 col-md-3">
-                  <q-input
-                    v-model="foodLog.servings"
-                    type="number"
-                    label="Servings"
-                    min="0.01"
-                    step="0.01"
-                    filled
-                    dense
-                    :disable="!usersStore.currentUser"
-                    :rules="[(value) => Number(value) > 0 || 'Servings must be greater than 0']"
-                  />
-                </div>
-
-                <div class="col-12 col-md-3">
-                  <q-input
-                    v-model="foodLog.datetime"
-                    type="datetime-local"
-                    label="Date and time"
-                    filled
-                    dense
-                    :disable="!usersStore.currentUser"
-                    hint="Leave blank to use current time"
-                  />
-                </div>
-
-                <div class="col-12 col-md-6">
-                  <q-input
-                    :model-value="selectedFoodCalories"
-                    label="Calories per serving"
-                    readonly
-                    filled
-                    dense
-                  />
-                </div>
-
-                <div class="col-12 col-md-6">
-                  <q-input
-                    :model-value="entryTotalCalories"
-                    label="Total calories"
-                    readonly
-                    filled
-                    dense
-                  />
-                </div>
-              </div>
-
-              <div class="row justify-end q-mt-md">
-                <q-btn
-                  type="submit"
-                  color="primary"
-                  label="Add to log"
+                <q-table
+                  :rows="tableRows"
+                  :columns="columns"
+                  row-key="food_log_id"
+                  flat
+                  bordered
+                  dense
+                  hide-header
                   :loading="foodLogsStore.loading"
-                  :disable="!usersStore.currentUser"
-                />
-              </div>
-            </q-card>
-          </q-form>
+                  no-data-label="No food log records yet."
+                >
+                  <template #body="props">
+                    <q-tr :props="props">
+                      <q-td key="summary" :props="props">
+                        <div class="row items-center full-width">
+                          <span>{{ props.row.summary }}</span>
+                          <div class="q-ml-auto">
+                            <q-btn
+                              flat
+                              dense
+                              size="sm"
+                              color="negative"
+                              label="Delete"
+                              @click="requestDelete(props.row)"
+                            />
+                          </div>
+                        </div>
+                      </q-td>
+                    </q-tr>
+                  </template>
+                </q-table>
+              </q-card>
 
-          <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-            <div class="row items-center justify-between q-mb-sm">
-              <div class="text-subtitle1">Logged foods</div>
-              <q-chip color="secondary" text-color="white" square>
-                Total logged calories: {{ totalLoggedCalories }}
-              </q-chip>
-            </div>
+              <q-dialog v-model="confirmDeleteOpen">
+                <q-card style="min-width: 320px">
+                  <q-card-section class="text-h6">Delete log entry?</q-card-section>
+                  <q-card-section>
+                    Delete {{ pendingDeleteRow?.description || 'this entry' }} from your food log?
+                  </q-card-section>
+                  <q-card-actions align="right">
+                    <q-btn flat label="No" color="primary" @click="cancelDelete" />
+                    <q-btn label="Yes" color="negative" @click="confirmDelete" />
+                  </q-card-actions>
+                </q-card>
+              </q-dialog>
+            </q-tab-panel>
 
-            <q-table
-              :rows="tableRows"
-              :columns="columns"
-              row-key="food_log_id"
-              flat
-              bordered
-              dense
-              :loading="foodLogsStore.loading"
-              no-data-label="No food log records yet."
-            >
-              <template #body-cell-actions="props">
-                <q-td :props="props">
-                  <q-btn
-                    flat
-                    dense
-                    size="sm"
-                    color="negative"
-                    label="Delete"
-                    @click="requestDelete(props.row)"
-                  />
-                </q-td>
-              </template>
-            </q-table>
-          </q-card>
+            <q-tab-panel name="workouts" class="q-pa-none">
+              <q-card flat bordered class="q-pa-md bg-grey-1">
+                <div class="text-subtitle1">Workouts log coming soon</div>
+              </q-card>
+            </q-tab-panel>
 
-          <q-dialog v-model="confirmDeleteOpen">
-            <q-card style="min-width: 320px">
-              <q-card-section class="text-h6">Delete log entry?</q-card-section>
-              <q-card-section>
-                Delete {{ pendingDeleteRow?.description || 'this entry' }} from your food log?
-              </q-card-section>
-              <q-card-actions align="right">
-                <q-btn flat label="No" color="primary" @click="cancelDelete" />
-                <q-btn label="Yes" color="negative" @click="confirmDelete" />
-              </q-card-actions>
-            </q-card>
-          </q-dialog>
+            <q-tab-panel name="suplliments" class="q-pa-none">
+              <q-card flat bordered class="q-pa-md bg-grey-1">
+                <div class="text-subtitle1">Suplliments log coming soon</div>
+              </q-card>
+            </q-tab-panel>
+
+            <q-tab-panel name="weight" class="q-pa-none">
+              <q-card flat bordered class="q-pa-md bg-grey-1">
+                <div class="text-subtitle1">Weight log coming soon</div>
+              </q-card>
+            </q-tab-panel>
+          </q-tab-panels>
         </q-card>
       </div>
     </div>
@@ -155,6 +199,7 @@ import { calculateFoodCalories } from '../utils/rules'
 const usersStore = useUsersStore()
 const foodsStore = useFoodsStore()
 const foodLogsStore = useFoodLogsStore()
+const activeTab = ref('food')
 
 function getCurrentLocalDateTime() {
   const now = new Date()
@@ -178,37 +223,9 @@ const pendingDeleteRow = ref(null)
 
 const columns = [
   {
-    name: 'datetime',
-    label: 'Date and Time',
-    field: 'datetimeLabel',
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'description',
-    label: 'Food',
-    field: 'description',
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'servings',
-    label: 'Servings',
-    field: 'servingsLabel',
-    align: 'right',
-    sortable: true,
-  },
-  {
-    name: 'calories',
-    label: 'Total Calories',
-    field: 'totalCalories',
-    align: 'right',
-    sortable: true,
-  },
-  {
-    name: 'actions',
-    label: 'Actions',
-    field: 'actions',
+    name: 'summary',
+    label: 'Summary',
+    field: 'summary',
     align: 'right',
   },
 ]
@@ -261,8 +278,8 @@ const tableRows = computed(() => {
       ...log,
       description: food.description || `Food #${log.food_id}`,
       servingsLabel: servings.toFixed(2),
-      datetimeLabel: formatDateTime(log.datetime),
       totalCalories: Math.round(perServingCalories * servings),
+      summary: `${food.description || `Food #${log.food_id}`} | ${servings.toFixed(2)} | ${Math.round(perServingCalories * servings)}`,
     }
   })
 })
@@ -309,19 +326,6 @@ function toIsoDateTime(localDateTime) {
   }
 
   return parsed.toISOString()
-}
-
-function formatDateTime(value) {
-  if (!value) {
-    return ''
-  }
-
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) {
-    return String(value)
-  }
-
-  return date.toLocaleString()
 }
 
 async function submitFoodLog() {
