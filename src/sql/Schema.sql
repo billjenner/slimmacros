@@ -3,7 +3,7 @@
 -- ============================================================ 
 CREATE TYPE public.diet_type AS ENUM ( 'Low Cal', 'Low Carb', 'Lean Muscle', 'High Metabolic' ); 
 CREATE TYPE public.food_serving_unit AS ENUM ( 'cup', 'oz', 'grams', 'slice', 'bar', 'unit' ); 
-CREATE TYPE public.supplement_serving_unit AS ENUM ( 'pills', 'oz', 'scoop', 'other' );
+CREATE TYPE public.supplement_serving_unit AS ENUM ( 'pills', 'oz', 'scoop', 'glasses', 'other' );
 CREATE TYPE public.activity_level AS ENUM ( 'Low', 'Medium', 'High' );
 
 -- ============================================================ 
@@ -124,6 +124,7 @@ CREATE TABLE public.supplement (
 	user_id uuid NOT NULL REFERENCES public.users(user_id) ON DELETE CASCADE, 
 	description text NOT NULL, serving_size numeric(8,2) NOT NULL DEFAULT 1 CHECK (serving_size > 0), 
 	serving_unit public.supplement_serving_unit NOT NULL DEFAULT 'other', 
+	share_with_others boolean NOT NULL DEFAULT false, 
 	is_active boolean NOT NULL DEFAULT true, 
 	created_at timestamptz NOT NULL DEFAULT now() 
 );

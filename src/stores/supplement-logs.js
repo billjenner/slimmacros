@@ -45,6 +45,45 @@ export const useSupplementLogsStore = defineStore('SupplementLogs', {
       }
     },
 
+    async createSupplement(userId, supplement = {}) {
+      this.error = null
+
+      if (!supabase) {
+        this.error = 'Supabase client is not configured.'
+        return null
+      }
+
+      if (!userId) {
+        this.error = 'No current user is available.'
+        return null
+      }
+
+      const description = String(supplement.description || '').trim()
+      if (!description) {
+        this.error = 'Suppliment description is required.'
+        return null
+      }
+
+      const payload = {
+        user_id: userId,
+        description,
+        serving_size: this.toPositiveNumber(supplement.serving_size, 1),
+        serving_unit: supplement.serving_unit || 'other',
+        share_with_others: Boolean(supplement.share_with_others),
+        is_active: supplement.is_active !== false,
+      }
+
+      const { data, error } = await supabase.from('supplement').insert(payload).select().single()
+
+      if (error) {
+        this.error = error.message
+        return null
+      }
+
+      this.supplements = [data, ...this.supplements]
+      return data
+    },
+
     async loadSupplements(userId) {
       this.error = null
 
@@ -60,7 +99,7 @@ export const useSupplementLogsStore = defineStore('SupplementLogs', {
 
       const { data, error } = await supabase
         .from('supplement')
-        .select('supplement_id, description, serving_size, serving_unit')
+        .select('supplement_id, description, serving_size, serving_unit, share_with_others')
         .eq('user_id', userId)
         .eq('is_active', true)
         .order('created_at', { ascending: false })

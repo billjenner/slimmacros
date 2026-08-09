@@ -36,17 +36,14 @@
               <q-card flat bordered class="q-pa-md bg-grey-1">
                 <div class="text-subtitle1 q-mb-sm">Suppliment log details</div>
                 <div class="row q-col-gutter-md">
-                  <div class="col-12 col-md-6">
-                    <q-select
-                      v-model="suppliment.supplement_id"
-                      :options="supplementOptions"
+                  <div class="col-12 col-md-3">
+                    <q-input
+                      v-model="suppliment.description"
                       label="Suppliment"
                       filled
                       dense
-                      emit-value
-                      map-options
                       :disable="!usersStore.currentUser"
-                      :rules="[(value) => !!value || 'Suppliment is required']"
+                      :rules="[(value) => !!value?.trim() || 'Suppliment is required']"
                     />
                   </div>
 
@@ -65,6 +62,19 @@
                   </div>
 
                   <div class="col-12 col-md-3">
+                    <q-select
+                      v-model="suppliment.serving_unit"
+                      :options="servingUnitOptions"
+                      label="Serving type"
+                      filled
+                      dense
+                      emit-value
+                      map-options
+                      :disable="!usersStore.currentUser"
+                    />
+                  </div>
+
+                  <div class="col-12 col-md-3">
                     <q-input
                       v-model="suppliment.date"
                       type="date"
@@ -73,6 +83,15 @@
                       dense
                       :disable="!usersStore.currentUser"
                     />
+                  </div>
+                </div>
+              </q-card>
+
+              <q-card flat bordered class="q-pa-md bg-grey-1">
+                <div class="text-subtitle1 q-mb-sm">Preferences</div>
+                <div class="row q-col-gutter-md">
+                  <div class="col-12 col-md-4">
+                    <q-toggle v-model="suppliment.share_with_others" label="Share with others" />
                   </div>
                 </div>
               </q-card>
@@ -226,10 +245,19 @@ function getCurrentLocalDate() {
 }
 
 const suppliment = reactive({
-  supplement_id: null,
+  description: '',
   servings: 1,
   date: getCurrentLocalDate(),
+  serving_unit: 'other',
+  share_with_others: false,
 })
+
+const servingUnitOptions = [
+  { label: 'Pills', value: 'pills' },
+  { label: 'Oz', value: 'oz' },
+  { label: 'Scoop', value: 'scoop' },
+  { label: 'Other', value: 'other' },
+]
 
 const supplimentColumns = [
   {
@@ -253,16 +281,9 @@ const supplimentRows = computed(() => {
       servingsLabel: servings.toFixed(2),
       servingUnitLabel: supplement.serving_unit || 'other',
       servingSizeLabel: supplement.serving_size ?? 1,
-      summary: `${supplementLabel} | ${servings.toFixed(2)} | ${log.date || ''}`,
+      summary: `${supplementLabel} | ${servings.toFixed(2)} | ${supplement.serving_unit || 'other'} | ${log.date || ''}`,
     }
   })
-})
-
-const supplementOptions = computed(() => {
-  return (store.supplements || []).map((supplement) => ({
-    label: `${supplement.description} (${supplement.serving_size ?? 1} ${supplement.serving_unit || 'other'})`,
-    value: supplement.supplement_id,
-  }))
 })
 
 const showSupplimentForm = ref(false)
@@ -327,9 +348,11 @@ function editSuppliment(row) {
   editingSupplimentLogId.value = row.supplement_log_id
 
   Object.assign(suppliment, {
-    supplement_id: row.supplement_id,
+    description: row.supplementLabel || '',
     servings: row.servings ?? 1,
     date: row.date || getCurrentLocalDate(),
+    serving_unit: row.supplement?.serving_unit || 'other',
+    share_with_others: Boolean(row.supplement?.share_with_others),
   })
 
   showSupplimentForm.value = true
@@ -337,9 +360,11 @@ function editSuppliment(row) {
 
 function resetSupplimentForm() {
   Object.assign(suppliment, {
-    supplement_id: null,
+    description: '',
     servings: 1,
     date: getCurrentLocalDate(),
+    serving_unit: 'other',
+    share_with_others: false,
   })
 
   editingSupplimentLogId.value = null
@@ -380,8 +405,34 @@ async function submitSuppliment() {
     return
   }
 
+  const normalizedDescription = String(suppliment.description || '').trim()
+  if (!normalizedDescription) {
+    store.error = 'Suppliment is required.'
+    return
+  }
+
+  const existingSupplement = (store.supplements || []).find(
+    (supplement) =>
+      String(supplement.description || '')
+        .trim()
+        .toLowerCase() === normalizedDescription.toLowerCase(),
+  )
+
+  const resolvedSupplement =
+    existingSupplement ||
+    (await store.createSupplement(usersStore.currentUser.user_id, {
+      description: normalizedDescription,
+      serving_size: 1,
+      serving_unit: suppliment.serving_unit || 'other',
+      share_with_others: Boolean(suppliment.share_with_others),
+    }))
+
+  if (!resolvedSupplement?.supplement_id) {
+    return
+  }
+
   const payload = {
-    supplement_id: suppliment.supplement_id,
+    supplement_id: resolvedSupplement.supplement_id,
     servings: suppliment.servings,
     date: suppliment.date,
   }
