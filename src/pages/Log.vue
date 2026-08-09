@@ -111,45 +111,74 @@
               </q-form>
 
               <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-                <div class="row items-center justify-between q-mb-sm">
-                  <q-chip color="secondary" text-color="white" square>
-                    Calories: {{ totalLoggedCalories }} / {{ totalCaloriesForPerson || 2000 }}
-                  </q-chip>
-
-                  <q-linear-progress :value="foodLogProgress" color="accent" size="10px" rounded />
-                </div>
-
-                <div class="row items-center justify-between q-mb-sm">
-                  <q-chip color="secondary" text-color="white" square>
-                    Protein: {{ totalProteinLoggedToday.toFixed(2) }} /
-                    {{ totalProteinBudgetForToday.toFixed(2) }}
-                  </q-chip>
-
-                  <q-linear-progress
-                    :value="foodProteinProgress"
-                    color="green"
-                    size="10px"
-                    rounded
-                  />
-                </div>
-
-                <div class="row items-center justify-between q-mb-sm">
-                  <q-chip color="secondary" text-color="white" square>
-                    Carbs: {{ totalCarbsLoggedToday.toFixed(2) }} /
-                    {{ totalCarbBudgetForToday.toFixed(2) }}
-                  </q-chip>
-
-                  <q-linear-progress :value="foodCarbProgress" color="yellow" size="10px" rounded />
-                </div>
-
-                <div class="row items-center justify-between q-mb-sm">
-                  <q-chip color="secondary" text-color="white" square>
-                    Fat: {{ totalFatLoggedToday.toFixed(2) }} /
-                    {{ totalFatBudgetForToday.toFixed(2) }}
-                  </q-chip>
-
-                  <q-linear-progress :value="foodFatProgress" color="blue" size="10px" rounded />
-                </div>
+                <q-markup-table flat bordered dense separator="horizontal">
+                  <tbody>
+                    <tr>
+                      <td style="width: 80%">
+                        <q-linear-progress
+                          :value="foodLogProgress"
+                          color="accent"
+                          size="10px"
+                          rounded
+                        />
+                      </td>
+                      <td style="width: 20%">
+                        <q-chip color="secondary" text-color="white" square>
+                          Calories: {{ totalLoggedCalories }} /
+                          {{ totalCaloriesForPerson || 2000 }}
+                        </q-chip>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <q-linear-progress
+                          :value="foodProteinProgress"
+                          color="green"
+                          size="10px"
+                          rounded
+                        />
+                      </td>
+                      <td>
+                        <q-chip color="secondary" text-color="white" square>
+                          Protein: {{ totalProteinLoggedToday.toFixed(2) }} /
+                          {{ totalProteinBudgetForToday.toFixed(2) }}
+                        </q-chip>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <q-linear-progress
+                          :value="foodCarbProgress"
+                          color="yellow"
+                          size="10px"
+                          rounded
+                        />
+                      </td>
+                      <td>
+                        <q-chip color="secondary" text-color="white" square>
+                          Carbs: {{ totalCarbsLoggedToday.toFixed(2) }} /
+                          {{ totalCarbBudgetForToday.toFixed(2) }}
+                        </q-chip>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <q-linear-progress
+                          :value="foodFatProgress"
+                          color="blue"
+                          size="10px"
+                          rounded
+                        />
+                      </td>
+                      <td>
+                        <q-chip color="secondary" text-color="white" square>
+                          Fat: {{ totalFatLoggedToday.toFixed(2) }} /
+                          {{ totalFatBudgetForToday.toFixed(2) }}
+                        </q-chip>
+                      </td>
+                    </tr>
+                  </tbody>
+                </q-markup-table>
               </q-card>
 
               <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
