@@ -28,37 +28,28 @@
             label="Intro"
             to="/"
             class="q-mx-sm"
-            style="min-width: 110px"
+            style="min-width: 126px"
             :style="buttonStyle('/')"
             @mouseover="hoveredPath = '/'"
             @mouseleave="hoveredPath = null"
           />
           <q-btn
             flat
-            label="Suppliments"
-            to="/suppliments"
+            label="Log"
+            to="/food-log"
             class="q-mx-sm"
-            style="min-width: 108px"
-            :style="buttonStyle('/suppliments')"
-            @mouseover="hoveredPath = '/suppliments'"
+            style="min-width: 126px"
+            :style="buttonStyle('/food-log')"
+            @mouseover="hoveredPath = '/food-log'"
             @mouseleave="hoveredPath = null"
           />
-          <q-btn
-            flat
-            label="Profiles"
-            to="/profiles"
-            class="q-mx-sm"
-            style="min-width: 108px"
-            :style="buttonStyle('/profiles')"
-            @mouseover="hoveredPath = '/profiles'"
-            @mouseleave="hoveredPath = null"
-          />
+
           <q-btn
             flat
             label="Foods"
             to="/foods"
             class="q-mx-sm"
-            style="min-width: 108px"
+            style="min-width: 126px"
             :style="buttonStyle('/foods')"
             @mouseover="hoveredPath = '/foods'"
             @mouseleave="hoveredPath = null"
@@ -68,27 +59,38 @@
             label="Workouts"
             to="/workouts"
             class="q-mx-sm"
-            style="min-width: 108px"
+            style="min-width: 126px"
             :style="buttonStyle('/workouts')"
             @mouseover="hoveredPath = '/workouts'"
             @mouseleave="hoveredPath = null"
           />
           <q-btn
             flat
-            label="Log"
-            to="/food-log"
+            label="Suppliments"
+            to="/suppliments"
             class="q-mx-sm"
-            style="min-width: 108px"
-            :style="buttonStyle('/food-log')"
-            @mouseover="hoveredPath = '/food-log'"
+            style="min-width: 126px"
+            :style="buttonStyle('/suppliments')"
+            @mouseover="hoveredPath = '/suppliments'"
             @mouseleave="hoveredPath = null"
           />
+          <q-btn
+            flat
+            label="Profiles"
+            to="/profiles"
+            class="q-mx-sm"
+            style="min-width: 126px"
+            :style="buttonStyle('/profiles')"
+            @mouseover="hoveredPath = '/profiles'"
+            @mouseleave="hoveredPath = null"
+          />
+
           <q-btn
             flat
             label="Resources"
             to="/theary"
             class="q-mx-sm"
-            style="min-width: 108px"
+            style="min-width: 126px"
             :style="buttonStyle('/theary')"
             @mouseover="hoveredPath = '/theary'"
             @mouseleave="hoveredPath = null"
@@ -99,7 +101,7 @@
             label="LOGIN"
             to="/login"
             class="q-mx-sm"
-            style="min-width: 108px"
+            style="min-width: 126px"
             :style="buttonStyle('/login')"
             @mouseover="hoveredPath = '/login'"
             @mouseleave="hoveredPath = null"
@@ -109,7 +111,7 @@
             flat
             label="LOG OFF"
             class="q-mx-sm"
-            style="min-width: 108px"
+            style="min-width: 126px"
             :style="buttonStyle('/login')"
             @click="logOff"
             @mouseover="hoveredPath = '/login'"

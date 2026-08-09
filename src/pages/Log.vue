@@ -166,9 +166,140 @@
             </q-tab-panel>
 
             <q-tab-panel name="workouts" class="q-pa-none">
-              <q-card flat bordered class="q-pa-md bg-grey-1">
-                <div class="text-subtitle1">Workouts log coming soon</div>
+              <q-banner
+                v-if="workoutLogsStore.error"
+                class="bg-negative text-white q-mb-md"
+                rounded
+              >
+                {{ workoutLogsStore.error }}
+              </q-banner>
+
+              <q-banner
+                v-else-if="!usersStore.currentUser"
+                class="bg-warning text-dark q-mb-md"
+                rounded
+              >
+                Sign in to record workouts.
+              </q-banner>
+
+              <q-form @submit.prevent="submitWorkoutLog" class="q-gutter-md">
+                <q-card flat bordered class="q-pa-md bg-grey-1">
+                  <div class="text-subtitle1 q-mb-sm">Workout log entry</div>
+                  <div class="row q-col-gutter-md">
+                    <div class="col-12 col-md-6">
+                      <q-select
+                        v-model="workoutLog.workout_id"
+                        :options="workoutOptions"
+                        label="Workout"
+                        filled
+                        dense
+                        emit-value
+                        map-options
+                        :disable="!usersStore.currentUser"
+                        :rules="[(value) => !!value || 'Workout is required']"
+                      />
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                      <q-input
+                        v-model="workoutLog.workout_time"
+                        type="number"
+                        label="Workout time (min)"
+                        min="0"
+                        step="1"
+                        filled
+                        dense
+                        :disable="!usersStore.currentUser"
+                        :rules="[
+                          (value) =>
+                            value === '' || Number(value) >= 0 || 'Time must be 0 or greater',
+                        ]"
+                      />
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                      <q-input
+                        v-model="workoutLog.date"
+                        type="date"
+                        label="Date"
+                        filled
+                        dense
+                        :disable="!usersStore.currentUser"
+                      />
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                      <q-input
+                        :model-value="workoutTotalCaloriesBurned"
+                        label="Total calories burned"
+                        filled
+                        dense
+                        readonly
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row justify-end q-mt-md">
+                    <q-btn
+                      type="submit"
+                      color="primary"
+                      label="Add to log"
+                      :loading="workoutLogsStore.loading"
+                      :disable="!usersStore.currentUser"
+                    />
+                  </div>
+                </q-card>
+              </q-form>
+
+              <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
+                <div class="text-subtitle1 q-mb-sm">Logged workouts</div>
+
+                <q-table
+                  :rows="workoutTableRows"
+                  :columns="workoutColumns"
+                  row-key="workout_log_id"
+                  flat
+                  bordered
+                  dense
+                  hide-header
+                  :loading="workoutLogsStore.loading"
+                  no-data-label="No workout log records yet."
+                >
+                  <template #body="props">
+                    <q-tr :props="props">
+                      <q-td key="summary" :props="props">
+                        <div class="row items-center full-width">
+                          <span>{{ props.row.summary }}</span>
+                          <div class="q-ml-auto">
+                            <q-btn
+                              flat
+                              dense
+                              size="sm"
+                              color="negative"
+                              label="Delete"
+                              @click="requestDeleteWorkoutLog(props.row)"
+                            />
+                          </div>
+                        </div>
+                      </q-td>
+                    </q-tr>
+                  </template>
+                </q-table>
               </q-card>
+
+              <q-dialog v-model="confirmDeleteWorkoutLogOpen">
+                <q-card style="min-width: 320px">
+                  <q-card-section class="text-h6">Delete workout log entry?</q-card-section>
+                  <q-card-section>
+                    Delete {{ pendingDeleteWorkoutRow?.description || 'this entry' }} from your
+                    workout log?
+                  </q-card-section>
+                  <q-card-actions align="right">
+                    <q-btn flat label="No" color="primary" @click="cancelDeleteWorkoutLog" />
+                    <q-btn label="Yes" color="negative" @click="confirmDeleteWorkoutLog" />
+                  </q-card-actions>
+                </q-card>
+              </q-dialog>
             </q-tab-panel>
 
             <q-tab-panel name="suplliments" class="q-pa-none">
@@ -194,11 +325,15 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
 import { useFoodsStore } from 'stores/foods'
 import { useFoodLogsStore } from 'stores/food-logs'
+import { useWorkoutsStore } from 'stores/workouts'
+import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { calculateFoodCalories } from '../utils/rules'
 
 const usersStore = useUsersStore()
 const foodsStore = useFoodsStore()
 const foodLogsStore = useFoodLogsStore()
+const workoutsStore = useWorkoutsStore()
+const workoutLogsStore = useWorkoutLogsStore()
 const activeTab = ref('food')
 
 function getCurrentLocalDateTime() {
@@ -212,16 +347,42 @@ function getCurrentLocalDateTime() {
   return `${year}-${month}-${day}T${hours}:${minutes}`
 }
 
+function getCurrentLocalDate() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 const foodLog = reactive({
   food_id: null,
   servings: 1,
   datetime: getCurrentLocalDateTime(),
 })
 
+const workoutLog = reactive({
+  workout_id: null,
+  workout_time: null,
+  date: getCurrentLocalDate(),
+})
+
 const confirmDeleteOpen = ref(false)
 const pendingDeleteRow = ref(null)
+const confirmDeleteWorkoutLogOpen = ref(false)
+const pendingDeleteWorkoutRow = ref(null)
 
 const columns = [
+  {
+    name: 'summary',
+    label: 'Summary',
+    field: 'summary',
+    align: 'right',
+  },
+]
+
+const workoutColumns = [
   {
     name: 'summary',
     label: 'Summary',
@@ -235,6 +396,27 @@ const foodOptions = computed(() => {
     label: food.description,
     value: food.food_id,
   }))
+})
+
+const workoutOptions = computed(() => {
+  return (workoutsStore.workouts || []).map((workout) => ({
+    label: workout.type,
+    value: workout.workout_id,
+  }))
+})
+
+function areSameId(leftId, rightId) {
+  if (leftId === null || leftId === undefined || rightId === null || rightId === undefined) {
+    return false
+  }
+
+  return String(leftId) === String(rightId)
+}
+
+const selectedWorkout = computed(() => {
+  return (workoutsStore.workouts || []).find((workout) =>
+    areSameId(workout.workout_id, workoutLog.workout_id),
+  )
 })
 
 const selectedFood = computed(() => {
@@ -288,6 +470,44 @@ const totalLoggedCalories = computed(() => {
   return tableRows.value.reduce((sum, row) => sum + (Number(row.totalCalories) || 0), 0)
 })
 
+const workoutTableRows = computed(() => {
+  return (workoutLogsStore.logs || []).map((log) => {
+    const workout = log.workout || {}
+    const workoutLabel = workout.type || `Workout #${log.workout_id}`
+    const workoutTime = log.workout_time ?? workout.average_workout_time ?? 'N/A'
+
+    return {
+      ...log,
+      description: workoutLabel,
+      summary: `${workoutLabel} | ${workoutTime} | ${log.date || ''}`,
+    }
+  })
+})
+
+const workoutTotalCaloriesBurned = computed(() => {
+  const selected = selectedWorkout.value
+  if (!selected) {
+    return 0
+  }
+
+  const workoutTime = Number(workoutLog.workout_time)
+  const averageWorkoutTime = Number(selected.average_workout_time)
+  const caloriesBurned = Number(selected.calories_burned)
+
+  if (
+    !Number.isFinite(workoutTime) ||
+    workoutTime < 0 ||
+    !Number.isFinite(averageWorkoutTime) ||
+    averageWorkoutTime <= 0 ||
+    !Number.isFinite(caloriesBurned) ||
+    caloriesBurned < 0
+  ) {
+    return 0
+  }
+
+  return Math.round((workoutTime / averageWorkoutTime) * caloriesBurned)
+})
+
 onMounted(() => {
   if (usersStore.currentUser?.user_id) {
     loadDataForUser(usersStore.currentUser.user_id)
@@ -304,6 +524,24 @@ watch(
 
     foodsStore.foods = []
     foodLogsStore.logs = []
+    workoutsStore.workouts = []
+    workoutLogsStore.logs = []
+  },
+)
+
+watch(
+  () => workoutLog.workout_id,
+  () => {
+    workoutLog.workout_time = selectedWorkout.value?.average_workout_time ?? null
+  },
+)
+
+watch(
+  () => selectedWorkout.value,
+  (workout) => {
+    if (workout && (workoutLog.workout_time === null || workoutLog.workout_time === '')) {
+      workoutLog.workout_time = workout.average_workout_time ?? null
+    }
   },
 )
 
@@ -312,7 +550,12 @@ async function loadDataForUser(userId) {
     return
   }
 
-  await Promise.all([foodsStore.loadFoods(userId), foodLogsStore.loadFoodLogs(userId)])
+  await Promise.all([
+    foodsStore.loadFoods(userId),
+    foodLogsStore.loadFoodLogs(userId),
+    workoutsStore.loadWorkouts(userId),
+    workoutLogsStore.loadWorkoutLogs(userId),
+  ])
 }
 
 function toIsoDateTime(localDateTime) {
@@ -357,6 +600,26 @@ async function submitFoodLog() {
   }
 }
 
+async function submitWorkoutLog() {
+  if (!usersStore.currentUser?.user_id) {
+    workoutLogsStore.error = 'No current user is available.'
+    return
+  }
+
+  const payload = {
+    workout_id: workoutLog.workout_id,
+    workout_time: workoutLog.workout_time,
+    date: workoutLog.date,
+  }
+
+  const saved = await workoutLogsStore.createWorkoutLog(usersStore.currentUser.user_id, payload)
+  if (saved) {
+    workoutLog.workout_time = selectedWorkout.value?.average_workout_time ?? null
+    workoutLog.date = getCurrentLocalDate()
+    await workoutLogsStore.loadWorkoutLogs(usersStore.currentUser.user_id)
+  }
+}
+
 function requestDelete(row) {
   pendingDeleteRow.value = row
   confirmDeleteOpen.value = true
@@ -383,6 +646,35 @@ async function confirmDelete() {
   )
   if (!error) {
     await foodLogsStore.loadFoodLogs(usersStore.currentUser.user_id)
+  }
+}
+
+function requestDeleteWorkoutLog(row) {
+  pendingDeleteWorkoutRow.value = row
+  confirmDeleteWorkoutLogOpen.value = true
+}
+
+function cancelDeleteWorkoutLog() {
+  pendingDeleteWorkoutRow.value = null
+  confirmDeleteWorkoutLogOpen.value = false
+}
+
+async function confirmDeleteWorkoutLog() {
+  const row = pendingDeleteWorkoutRow.value
+  pendingDeleteWorkoutRow.value = null
+  confirmDeleteWorkoutLogOpen.value = false
+
+  if (!usersStore.currentUser?.user_id || !row?.workout_log_id) {
+    workoutLogsStore.error = 'No current user is available.'
+    return
+  }
+
+  const { error } = await workoutLogsStore.deleteWorkoutLog(
+    usersStore.currentUser.user_id,
+    row.workout_log_id,
+  )
+  if (!error) {
+    await workoutLogsStore.loadWorkoutLogs(usersStore.currentUser.user_id)
   }
 }
 </script>
