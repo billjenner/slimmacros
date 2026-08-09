@@ -303,9 +303,127 @@
             </q-tab-panel>
 
             <q-tab-panel name="suplliments" class="q-pa-none">
-              <q-card flat bordered class="q-pa-md bg-grey-1">
-                <div class="text-subtitle1">Suplliments log coming soon</div>
+              <q-banner
+                v-if="supplementLogsStore.error"
+                class="bg-negative text-white q-mb-md"
+                rounded
+              >
+                {{ supplementLogsStore.error }}
+              </q-banner>
+
+              <q-banner
+                v-else-if="!usersStore.currentUser"
+                class="bg-warning text-dark q-mb-md"
+                rounded
+              >
+                Sign in to record suppliments.
+              </q-banner>
+
+              <q-form @submit.prevent="submitSupplementLog" class="q-gutter-md">
+                <q-card flat bordered class="q-pa-md bg-grey-1">
+                  <div class="text-subtitle1 q-mb-sm">Suppliment log entry</div>
+                  <div class="row q-col-gutter-md">
+                    <div class="col-12 col-md-6">
+                      <q-select
+                        v-model="supplementLog.supplement_id"
+                        :options="supplementOptions"
+                        label="Suppliment"
+                        filled
+                        dense
+                        emit-value
+                        map-options
+                        :disable="!usersStore.currentUser"
+                        :rules="[(value) => !!value || 'Suppliment is required']"
+                      />
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                      <q-input
+                        v-model="supplementLog.servings"
+                        type="number"
+                        label="Servings"
+                        min="0.01"
+                        step="0.01"
+                        filled
+                        dense
+                        :disable="!usersStore.currentUser"
+                        :rules="[(value) => Number(value) > 0 || 'Servings must be greater than 0']"
+                      />
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                      <q-input
+                        v-model="supplementLog.date"
+                        type="date"
+                        label="Date"
+                        filled
+                        dense
+                        :disable="!usersStore.currentUser"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row justify-end q-mt-md">
+                    <q-btn
+                      type="submit"
+                      color="primary"
+                      label="Add to log"
+                      :loading="supplementLogsStore.loading"
+                      :disable="!usersStore.currentUser"
+                    />
+                  </div>
+                </q-card>
+              </q-form>
+
+              <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
+                <div class="text-subtitle1 q-mb-sm">Logged suppliments</div>
+
+                <q-table
+                  :rows="supplementTableRows"
+                  :columns="supplementColumns"
+                  row-key="supplement_log_id"
+                  flat
+                  bordered
+                  dense
+                  hide-header
+                  :loading="supplementLogsStore.loading"
+                  no-data-label="No suppliment log records yet."
+                >
+                  <template #body="props">
+                    <q-tr :props="props">
+                      <q-td key="summary" :props="props">
+                        <div class="row items-center full-width">
+                          <span>{{ props.row.summary }}</span>
+                          <div class="q-ml-auto">
+                            <q-btn
+                              flat
+                              dense
+                              size="sm"
+                              color="negative"
+                              label="Delete"
+                              @click="requestDeleteSupplementLog(props.row)"
+                            />
+                          </div>
+                        </div>
+                      </q-td>
+                    </q-tr>
+                  </template>
+                </q-table>
               </q-card>
+
+              <q-dialog v-model="confirmDeleteSupplementLogOpen">
+                <q-card style="min-width: 320px">
+                  <q-card-section class="text-h6">Delete suppliment log entry?</q-card-section>
+                  <q-card-section>
+                    Delete {{ pendingDeleteSupplementRow?.description || 'this entry' }} from your
+                    suppliment log?
+                  </q-card-section>
+                  <q-card-actions align="right">
+                    <q-btn flat label="No" color="primary" @click="cancelDeleteSupplementLog" />
+                    <q-btn label="Yes" color="negative" @click="confirmDeleteSupplementLog" />
+                  </q-card-actions>
+                </q-card>
+              </q-dialog>
             </q-tab-panel>
 
             <q-tab-panel name="weight" class="q-pa-none">
@@ -327,6 +445,7 @@ import { useFoodsStore } from 'stores/foods'
 import { useFoodLogsStore } from 'stores/food-logs'
 import { useWorkoutsStore } from 'stores/workouts'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
+import { useSupplementLogsStore } from 'stores/supplement-logs'
 import { calculateFoodCalories } from '../utils/rules'
 
 const usersStore = useUsersStore()
@@ -334,6 +453,7 @@ const foodsStore = useFoodsStore()
 const foodLogsStore = useFoodLogsStore()
 const workoutsStore = useWorkoutsStore()
 const workoutLogsStore = useWorkoutLogsStore()
+const supplementLogsStore = useSupplementLogsStore()
 const activeTab = ref('food')
 
 function getCurrentLocalDateTime() {
@@ -368,10 +488,18 @@ const workoutLog = reactive({
   date: getCurrentLocalDate(),
 })
 
+const supplementLog = reactive({
+  supplement_id: null,
+  servings: 1,
+  date: getCurrentLocalDate(),
+})
+
 const confirmDeleteOpen = ref(false)
 const pendingDeleteRow = ref(null)
 const confirmDeleteWorkoutLogOpen = ref(false)
 const pendingDeleteWorkoutRow = ref(null)
+const confirmDeleteSupplementLogOpen = ref(false)
+const pendingDeleteSupplementRow = ref(null)
 
 const columns = [
   {
@@ -391,6 +519,15 @@ const workoutColumns = [
   },
 ]
 
+const supplementColumns = [
+  {
+    name: 'summary',
+    label: 'Summary',
+    field: 'summary',
+    align: 'right',
+  },
+]
+
 const foodOptions = computed(() => {
   return (foodsStore.foods || []).map((food) => ({
     label: food.description,
@@ -402,6 +539,13 @@ const workoutOptions = computed(() => {
   return (workoutsStore.workouts || []).map((workout) => ({
     label: workout.type,
     value: workout.workout_id,
+  }))
+})
+
+const supplementOptions = computed(() => {
+  return (supplementLogsStore.supplements || []).map((supplement) => ({
+    label: `${supplement.description} (${supplement.serving_size ?? 1} ${supplement.serving_unit || 'other'})`,
+    value: supplement.supplement_id,
   }))
 })
 
@@ -508,6 +652,20 @@ const workoutTotalCaloriesBurned = computed(() => {
   return Math.round((workoutTime / averageWorkoutTime) * caloriesBurned)
 })
 
+const supplementTableRows = computed(() => {
+  return (supplementLogsStore.logs || []).map((log) => {
+    const supplement = log.supplement || {}
+    const label = supplement.description || `Suppliment #${log.supplement_id}`
+    const servings = Number(log.servings) || 0
+
+    return {
+      ...log,
+      description: label,
+      summary: `${label} | ${servings.toFixed(2)} | ${log.date || ''}`,
+    }
+  })
+})
+
 onMounted(() => {
   if (usersStore.currentUser?.user_id) {
     loadDataForUser(usersStore.currentUser.user_id)
@@ -526,6 +684,8 @@ watch(
     foodLogsStore.logs = []
     workoutsStore.workouts = []
     workoutLogsStore.logs = []
+    supplementLogsStore.supplements = []
+    supplementLogsStore.logs = []
   },
 )
 
@@ -555,6 +715,8 @@ async function loadDataForUser(userId) {
     foodLogsStore.loadFoodLogs(userId),
     workoutsStore.loadWorkouts(userId),
     workoutLogsStore.loadWorkoutLogs(userId),
+    supplementLogsStore.loadSupplements(userId),
+    supplementLogsStore.loadSupplementLogs(userId),
   ])
 }
 
@@ -620,6 +782,29 @@ async function submitWorkoutLog() {
   }
 }
 
+async function submitSupplementLog() {
+  if (!usersStore.currentUser?.user_id) {
+    supplementLogsStore.error = 'No current user is available.'
+    return
+  }
+
+  const payload = {
+    supplement_id: supplementLog.supplement_id,
+    servings: supplementLog.servings,
+    date: supplementLog.date,
+  }
+
+  const saved = await supplementLogsStore.createSupplementLog(
+    usersStore.currentUser.user_id,
+    payload,
+  )
+  if (saved) {
+    supplementLog.servings = 1
+    supplementLog.date = getCurrentLocalDate()
+    await supplementLogsStore.loadSupplementLogs(usersStore.currentUser.user_id)
+  }
+}
+
 function requestDelete(row) {
   pendingDeleteRow.value = row
   confirmDeleteOpen.value = true
@@ -675,6 +860,36 @@ async function confirmDeleteWorkoutLog() {
   )
   if (!error) {
     await workoutLogsStore.loadWorkoutLogs(usersStore.currentUser.user_id)
+  }
+}
+
+function requestDeleteSupplementLog(row) {
+  pendingDeleteSupplementRow.value = row
+  confirmDeleteSupplementLogOpen.value = true
+}
+
+function cancelDeleteSupplementLog() {
+  pendingDeleteSupplementRow.value = null
+  confirmDeleteSupplementLogOpen.value = false
+}
+
+async function confirmDeleteSupplementLog() {
+  const row = pendingDeleteSupplementRow.value
+  pendingDeleteSupplementRow.value = null
+  confirmDeleteSupplementLogOpen.value = false
+
+  if (!usersStore.currentUser?.user_id || !row?.supplement_log_id) {
+    supplementLogsStore.error = 'No current user is available.'
+    return
+  }
+
+  const { error } = await supplementLogsStore.deleteSupplementLog(
+    usersStore.currentUser.user_id,
+    row.supplement_log_id,
+  )
+
+  if (!error) {
+    await supplementLogsStore.loadSupplementLogs(usersStore.currentUser.user_id)
   }
 }
 </script>
