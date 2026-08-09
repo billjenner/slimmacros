@@ -440,9 +440,109 @@
             </q-tab-panel>
 
             <q-tab-panel name="weight" class="q-pa-none">
-              <q-card flat bordered class="q-pa-md bg-grey-1">
-                <div class="text-subtitle1">Weight log coming soon</div>
+              <q-banner v-if="weightLogsStore.error" class="bg-negative text-white q-mb-md" rounded>
+                {{ weightLogsStore.error }}
+              </q-banner>
+
+              <q-banner
+                v-else-if="!usersStore.currentUser"
+                class="bg-warning text-dark q-mb-md"
+                rounded
+              >
+                Sign in to record weight.
+              </q-banner>
+
+              <q-form @submit.prevent="submitWeightLog" class="q-gutter-md">
+                <q-card flat bordered class="q-pa-md bg-grey-1">
+                  <div class="text-subtitle1 q-mb-sm">Weight log entry</div>
+                  <div class="row q-col-gutter-md">
+                    <div class="col-12 col-md-6">
+                      <q-input
+                        v-model="weightLog.weight"
+                        type="number"
+                        label="Weight"
+                        min="0.01"
+                        step="0.01"
+                        filled
+                        dense
+                        :disable="!usersStore.currentUser"
+                        :rules="[(value) => Number(value) > 0 || 'Weight must be greater than 0']"
+                      />
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                      <q-input
+                        v-model="weightLog.date"
+                        type="date"
+                        label="Date"
+                        filled
+                        dense
+                        :disable="!usersStore.currentUser"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="row justify-end q-mt-md">
+                    <q-btn
+                      type="submit"
+                      color="primary"
+                      label="Add to log"
+                      :loading="weightLogsStore.loading"
+                      :disable="!usersStore.currentUser"
+                    />
+                  </div>
+                </q-card>
+              </q-form>
+
+              <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
+                <div class="text-subtitle1 q-mb-sm">Logged weight</div>
+
+                <q-table
+                  :rows="weightTableRows"
+                  :columns="weightColumns"
+                  row-key="weight_log_id"
+                  flat
+                  bordered
+                  dense
+                  hide-header
+                  :loading="weightLogsStore.loading"
+                  no-data-label="No weight log records yet."
+                >
+                  <template #body="props">
+                    <q-tr :props="props">
+                      <q-td key="summary" :props="props">
+                        <div class="row items-center full-width">
+                          <span>{{ props.row.summary }}</span>
+                          <div class="q-ml-auto">
+                            <q-btn
+                              flat
+                              dense
+                              size="sm"
+                              color="negative"
+                              label="Delete"
+                              @click="requestDeleteWeightLog(props.row)"
+                            />
+                          </div>
+                        </div>
+                      </q-td>
+                    </q-tr>
+                  </template>
+                </q-table>
               </q-card>
+
+              <q-dialog v-model="confirmDeleteWeightLogOpen">
+                <q-card style="min-width: 320px">
+                  <q-card-section class="text-h6">Delete weight log entry?</q-card-section>
+                  <q-card-section>
+                    Delete {{ pendingDeleteWeightRow?.description || 'this entry' }} from your
+                    weight log?
+                  </q-card-section>
+                  <q-card-actions align="right">
+                    <q-btn flat label="No" color="primary" @click="cancelDeleteWeightLog" />
+                    <q-btn label="Yes" color="negative" @click="confirmDeleteWeightLog" />
+                  </q-card-actions>
+                </q-card>
+              </q-dialog>
             </q-tab-panel>
           </q-tab-panels>
         </q-card>
@@ -460,6 +560,7 @@ import { useWorkoutsStore } from 'stores/workouts'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { useSupplimentsStore } from 'stores/suppliments'
 import { useSupplimentsLogStore } from 'stores/suppliments_log'
+import { useWeightLogsStore } from 'stores/weight-logs'
 import { calculateFoodCalories } from '../utils/rules'
 
 const usersStore = useUsersStore()
@@ -469,6 +570,7 @@ const workoutsStore = useWorkoutsStore()
 const workoutLogsStore = useWorkoutLogsStore()
 const supplimentsStore = useSupplimentsStore()
 const supplementLogsStore = useSupplimentsLogStore()
+const weightLogsStore = useWeightLogsStore()
 const activeTab = ref('food')
 
 function getCurrentLocalDateTime() {
@@ -510,12 +612,19 @@ const supplementLog = reactive({
   date: getCurrentLocalDate(),
 })
 
+const weightLog = reactive({
+  weight: '',
+  date: getCurrentLocalDate(),
+})
+
 const confirmDeleteOpen = ref(false)
 const pendingDeleteRow = ref(null)
 const confirmDeleteWorkoutLogOpen = ref(false)
 const pendingDeleteWorkoutRow = ref(null)
 const confirmDeleteSupplementLogOpen = ref(false)
 const pendingDeleteSupplementRow = ref(null)
+const confirmDeleteWeightLogOpen = ref(false)
+const pendingDeleteWeightRow = ref(null)
 
 const columns = [
   {
@@ -536,6 +645,15 @@ const workoutColumns = [
 ]
 
 const supplementColumns = [
+  {
+    name: 'summary',
+    label: 'Summary',
+    field: 'summary',
+    align: 'right',
+  },
+]
+
+const weightColumns = [
   {
     name: 'summary',
     label: 'Summary',
@@ -713,6 +831,32 @@ const supplementTableRows = computed(() => {
     })
 })
 
+const weightTableRows = computed(() => {
+  return [...(weightLogsStore.logs || [])]
+    .sort((leftLog, rightLog) => {
+      const leftDate = String(leftLog?.date || '')
+      const rightDate = String(rightLog?.date || '')
+
+      if (leftDate !== rightDate) {
+        return rightDate.localeCompare(leftDate)
+      }
+
+      const leftWeight = Number(leftLog?.weight) || 0
+      const rightWeight = Number(rightLog?.weight) || 0
+
+      return rightWeight - leftWeight
+    })
+    .map((log) => {
+      const weightValue = Number(log.weight) || 0
+
+      return {
+        ...log,
+        description: weightValue.toFixed(2),
+        summary: `${weightValue.toFixed(2)} | ${log.date || ''}`,
+      }
+    })
+})
+
 onMounted(() => {
   if (usersStore.currentUser?.user_id) {
     loadDataForUser(usersStore.currentUser.user_id)
@@ -733,6 +877,7 @@ watch(
     workoutLogsStore.logs = []
     supplimentsStore.supplements = []
     supplementLogsStore.logs = []
+    weightLogsStore.logs = []
   },
 )
 
@@ -785,6 +930,7 @@ async function loadDataForUser(userId) {
     workoutLogsStore.loadWorkoutLogs(userId),
     supplimentsStore.loadSupplements(userId),
     supplementLogsStore.loadSupplementLogs(userId),
+    weightLogsStore.loadWeightLogs(userId),
   ])
 }
 
@@ -875,6 +1021,25 @@ async function submitSupplementLog() {
   }
 }
 
+async function submitWeightLog() {
+  if (!usersStore.currentUser?.user_id) {
+    weightLogsStore.error = 'No current user is available.'
+    return
+  }
+
+  const payload = {
+    weight: weightLog.weight,
+    date: weightLog.date,
+  }
+
+  const saved = await weightLogsStore.createWeightLog(usersStore.currentUser.user_id, payload)
+  if (saved) {
+    weightLog.weight = ''
+    weightLog.date = getCurrentLocalDate()
+    await weightLogsStore.loadWeightLogs(usersStore.currentUser.user_id)
+  }
+}
+
 function requestDelete(row) {
   pendingDeleteRow.value = row
   confirmDeleteOpen.value = true
@@ -960,6 +1125,39 @@ async function confirmDeleteSupplementLog() {
 
   if (!error) {
     await supplementLogsStore.loadSupplementLogs(usersStore.currentUser.user_id)
+  }
+}
+
+function requestDeleteWeightLog(row) {
+  pendingDeleteWorkoutRow.value = null
+  pendingDeleteSupplementRow.value = null
+  pendingDeleteRow.value = null
+  pendingDeleteWeightRow.value = row
+  confirmDeleteWeightLogOpen.value = true
+}
+
+function cancelDeleteWeightLog() {
+  pendingDeleteWeightRow.value = null
+  confirmDeleteWeightLogOpen.value = false
+}
+
+async function confirmDeleteWeightLog() {
+  const row = pendingDeleteWeightRow.value
+  pendingDeleteWeightRow.value = null
+  confirmDeleteWeightLogOpen.value = false
+
+  if (!usersStore.currentUser?.user_id || !row?.weight_log_id) {
+    weightLogsStore.error = 'No current user is available.'
+    return
+  }
+
+  const { error } = await weightLogsStore.deleteWeightLog(
+    usersStore.currentUser.user_id,
+    row.weight_log_id,
+  )
+
+  if (!error) {
+    await weightLogsStore.loadWeightLogs(usersStore.currentUser.user_id)
   }
 }
 </script>
