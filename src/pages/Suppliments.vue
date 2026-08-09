@@ -145,14 +145,16 @@
                         Shared
                       </q-chip>
 
-                      <div class="row items-center q-gutter-xs q-ml-auto no-wrap">
+                      <div
+                        v-if="isOwnedByCurrentUser(props.row)"
+                        class="row items-center q-gutter-xs q-ml-auto no-wrap"
+                      >
                         <q-btn
                           flat
                           dense
                           size="sm"
                           color="negative"
                           label="Edit"
-                          :disable="!isOwnedByCurrentUser(props.row)"
                           @click="editSuppliment(props.row)"
                         />
 
@@ -162,7 +164,6 @@
                           size="sm"
                           color="negative"
                           label="Delete"
-                          :disable="!isOwnedByCurrentUser(props.row)"
                           @click="requestDeleteSuppliment(props.row)"
                         />
                       </div>
