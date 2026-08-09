@@ -41,7 +41,7 @@
       Track your meals, exercise routines, and supplements.
     </h5>
     <div class="q-pa-md text-center" style="max-width: 720px; width: 100%">
-      <q-btn color="secondary" label="Get Started" to="/profiles" style="margin-top: 16px" />
+      <q-btn color="secondary" label="Get Started" to="/resources" style="margin-top: 16px" />
     </div>
   </q-page>
 </template>

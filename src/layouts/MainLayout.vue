@@ -88,11 +88,11 @@
           <q-btn
             flat
             label="Resources"
-            to="/theary"
+            to="/resources"
             class="q-mx-sm"
             style="min-width: 126px"
-            :style="buttonStyle('/theary')"
-            @mouseover="hoveredPath = '/theary'"
+            :style="buttonStyle('/resources')"
+            @mouseover="hoveredPath = '/resourcesresources'"
             @mouseleave="hoveredPath = null"
           />
           <q-btn
@@ -126,7 +126,7 @@
         <q-item clickable v-ripple @click="navigateAndClose('/')">
           <q-item-section>Intro</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/theary')">
+        <q-item clickable v-ripple @click="navigateAndClose('/resources')">
           <q-item-section>Resources</q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/profiles')">

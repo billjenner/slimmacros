@@ -209,14 +209,16 @@
                       </q-chip>
 
                       <!-- Push buttons to right -->
-                      <div class="row items-center q-gutter-xs q-ml-auto">
+                      <div
+                        v-if="isOwnedByCurrentUser(props.row)"
+                        class="row items-center q-gutter-xs q-ml-auto"
+                      >
                         <q-btn
                           flat
                           dense
                           size="sm"
                           color="negative"
                           label="Edit"
-                          :disable="!isOwnedByCurrentUser(props.row)"
                           @click="editFood(props.row)"
                         />
 
@@ -226,7 +228,6 @@
                           size="sm"
                           color="negative"
                           label="Delete"
-                          :disable="!isOwnedByCurrentUser(props.row)"
                           @click="requestDeleteFood(props.row)"
                         />
                       </div>

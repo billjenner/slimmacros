@@ -14,7 +14,7 @@
           >
             <q-tab name="food" label="Food" />
             <q-tab name="workouts" label="Workouts" />
-            <q-tab name="suplliments" label="Suplliments" />
+            <q-tab name="suppliments" label="Suppliments" />
             <q-tab name="weight" label="Weight" />
           </q-tabs>
 
@@ -302,7 +302,7 @@
               </q-dialog>
             </q-tab-panel>
 
-            <q-tab-panel name="suplliments" class="q-pa-none">
+            <q-tab-panel name="suppliments" class="q-pa-none">
               <q-banner
                 v-if="supplementLogsStore.error"
                 class="bg-negative text-white q-mb-md"
