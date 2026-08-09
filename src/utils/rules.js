@@ -62,11 +62,19 @@ export function calculateBodyMassIndex({ weight, height }) {
   return Math.round(bmi * 100) / 100
 }
 
-export function calculateTotalCaloriesForPerson({ totalDailyCalories, dailyCalorieDeficit }) {
+export function calculateTotalCaloriesForPerson({
+  totalDailyCalories,
+  dailyCalorieDeficit,
+  caloriesBurnedToday,
+}) {
   const numericTotalDailyCalories = toNumber(totalDailyCalories) ?? 2000
   const numericDailyCalorieDeficit = toNumber(dailyCalorieDeficit) ?? 0
+  const numericCaloriesBurnedToday = toNumber(caloriesBurnedToday) ?? 0
 
-  return Math.max(0, Math.round(numericTotalDailyCalories - numericDailyCalorieDeficit))
+  return Math.max(
+    0,
+    Math.round(numericTotalDailyCalories - numericDailyCalorieDeficit + numericCaloriesBurnedToday),
+  )
 }
 
 export function calculateFoodCalories({ carbs, protein, fat, extraCalories }) {

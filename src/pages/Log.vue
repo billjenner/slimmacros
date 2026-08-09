@@ -325,7 +325,7 @@
                     <div class="col-12 col-md-6">
                       <q-input
                         :model-value="workoutTotalCaloriesBurned"
-                        label="Total calories burned"
+                        label="Calories burned"
                         filled
                         dense
                         readonly
@@ -351,7 +351,13 @@
               </q-form>
 
               <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-                <div class="text-subtitle1 q-mb-sm">Logged workouts</div>
+                <div class="row items-center justify-between q-mb-sm">
+                  <div class="text-subtitle1">Logged workouts</div>
+                  <q-chip color="secondary" text-color="white" square>
+                    Today's calories burned:
+                    {{ Math.round(workoutLogsStore.totalCaloriesBurnedToday) }}
+                  </q-chip>
+                </div>
 
                 <q-table
                   :rows="workoutTableRows"
@@ -668,7 +674,7 @@ import { useFoodsStore } from 'stores/foods'
 import { useFoodLogsStore } from 'stores/food-logs'
 import { useProfilesStore } from 'stores/profiles'
 import { useWorkoutsStore } from 'stores/workouts'
-import { useWorkoutLogsStore } from 'stores/workout-logs'
+import { useWorkoutLogsStore } from 'stores/workouts_log'
 import { useSupplimentsStore } from 'stores/suppliments'
 import { useSupplimentsLogStore } from 'stores/suppliments_log'
 import { useWeightLogsStore } from 'stores/weight-logs'
@@ -677,6 +683,7 @@ import {
   calculateTotalCaloriesForPerson,
   calculateTotalDailyCalories,
 } from '../utils/rules'
+import { getCurrentLocalDate, getLocalDateKey } from '../utils/date'
 
 const usersStore = useUsersStore()
 const foodsStore = useFoodsStore()
@@ -704,36 +711,10 @@ function getCurrentLocalDateTime() {
   return `${year}-${month}-${day}T${hours}:${minutes}`
 }
 
-function getCurrentLocalDate() {
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const day = String(now.getDate()).padStart(2, '0')
-
-  return `${year}-${month}-${day}`
-}
-
 function getCurrentDayOfWeekKey() {
   const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
 
   return dayNames[new Date().getDay()] || 'sunday'
-}
-
-function getLocalDateKey(value) {
-  if (!value) {
-    return ''
-  }
-
-  const dateValue = new Date(value)
-  if (Number.isNaN(dateValue.getTime())) {
-    return ''
-  }
-
-  const year = dateValue.getFullYear()
-  const month = String(dateValue.getMonth() + 1).padStart(2, '0')
-  const day = String(dateValue.getDate()).padStart(2, '0')
-
-  return `${year}-${month}-${day}`
 }
 
 const foodLog = reactive({
@@ -949,6 +930,7 @@ const totalCaloriesForPerson = computed(() => {
   return calculateTotalCaloriesForPerson({
     totalDailyCalories: totalDailyCalories.value,
     dailyCalorieDeficit: currentProfile.value?.daily_calorie_deficit,
+    caloriesBurnedToday: workoutLogsStore.totalCaloriesBurnedToday,
   })
 })
 
@@ -1097,11 +1079,12 @@ const workoutTableRows = computed(() => {
     const workout = log.workout || {}
     const workoutLabel = workout.type || `Workout #${log.workout_id}`
     const workoutTime = log.workout_time ?? workout.average_workout_time ?? 'N/A'
+    const caloriesBurned = workoutLogsStore.caloriesBurnedForLog(log)
 
     return {
       ...log,
       description: workoutLabel,
-      summary: `${workoutLabel} | ${workoutTime} (minutes) | ${log.date || ''}`,
+      summary: `${workoutLabel} | ${workoutTime} (minutes) | ${caloriesBurned} calories | ${log.date || ''}`,
     }
   })
 })
@@ -1127,7 +1110,13 @@ const workoutTotalCaloriesBurned = computed(() => {
     return 0
   }
 
-  return Math.round((workoutTime / averageWorkoutTime) * caloriesBurned)
+  return workoutLogsStore.caloriesBurnedForLog({
+    workout_time: workoutTime,
+    workout: {
+      average_workout_time: averageWorkoutTime,
+      calories_burned: caloriesBurned,
+    },
+  })
 })
 
 const supplementTableRows = computed(() => {
@@ -1315,6 +1304,7 @@ async function submitWorkoutLog() {
   const payload = {
     workout_id: workoutLog.workout_id,
     workout_time: workoutLog.workout_time,
+    calories_burned: workoutTotalCaloriesBurned.value,
     date: workoutLog.date,
   }
 
