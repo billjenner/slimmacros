@@ -22,25 +22,14 @@
         line-height: 1.6;
       "
     >
-      Daily diary for your health and wellness. This app is designed to help you track your daily
-      habits, monitor your progress. Logs can help you gain a better understanding of your habbits
-      and make informed decisions to improve your lifestyle.
+      Your daily diary for health and wellness. This app is designed to help you track your daily
+      habits, monitor your progress, and gain a better understanding of your lifestyle. By keeping
+      consistent logs, you can identify patterns, make informed decisions, and take meaningful steps
+      toward improving your overall health and well-being.
     </h5>
 
-    <h5
-      style="
-        max-width: 720px;
-        width: 75%;
-        margin: 16px auto 24px;
-        text-align: justify;
-        font-size: 1.05rem;
-        line-height: 1.6;
-      "
-    >
-      Track your meals, exercise routines, and supplements.
-    </h5>
     <div class="q-pa-md text-center" style="max-width: 720px; width: 100%">
-      <q-btn color="secondary" label="Get Started" to="/resources" style="margin-top: 16px" />
+      <q-btn color="secondary" label="Let's Go!" to="/resources" style="margin-top: 16px" />
     </div>
   </q-page>
 </template>

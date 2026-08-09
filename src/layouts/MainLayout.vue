@@ -210,16 +210,11 @@ const deferredInstallPrompt = ref(null)
 const showInstallDialog = ref(false)
 
 async function navigate(path) {
-  if (!(usersStore.currentUser && usersStore.currentUser.email)) {
-    router.push('/login')
-    return
-  }
-
   router.push(path)
 }
 
-function logOff() {
-  usersStore.clearCurrentUser()
+async function logOff() {
+  await usersStore.clearCurrentUser()
   router.push('/login')
 }
 
@@ -233,9 +228,9 @@ async function navigateAndClose(path) {
   await navigate(path)
 }
 
-function logOffAndClose() {
+async function logOffAndClose() {
   leftDrawerOpen.value = false
-  logOff()
+  await logOff()
 }
 
 function buttonStyle(path) {

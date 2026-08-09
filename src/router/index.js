@@ -96,16 +96,20 @@ export default defineRouter(async (/* { store, ssrContext } */) => {
     const { useUsersStore } = await import('../stores/users')
     const store = useUsersStore()
 
-    Router.beforeEach((to, from, next) => {
-      const loggedIn = Boolean(store.currentUser?.user_id)
+    Router.beforeEach(async (to) => {
+      const loggedIn = Boolean(store.currentUser?.user_id || store.currentUser?.email)
       const requiresAuth = to.matched.some((record) => record.meta?.requiresAuth)
 
       if (requiresAuth && !loggedIn) {
-        return next({ path: '/login', query: { redirect: to.fullPath } })
+        const restoredUser = await store.restoreCurrentUserFromPublicIp()
+
+        if (!restoredUser) {
+          return { path: '/login', query: { redirect: to.fullPath } }
+        }
       }
 
       applySeoMeta(to)
-      return next()
+      return true
     })
   } catch {
     // If store cannot be loaded, skip adding the guard and rely on UI-level checks

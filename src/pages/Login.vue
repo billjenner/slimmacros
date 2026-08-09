@@ -51,7 +51,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useUsersStore } from 'stores/users'
 
 const email = ref('')
@@ -61,6 +61,7 @@ const message = ref('')
 const messageClass = ref('text-positive')
 
 const router = useRouter()
+const route = useRoute()
 const store = useUsersStore()
 
 async function handleSubmit() {
@@ -75,7 +76,8 @@ async function handleSubmit() {
   if (result) {
     message.value = `Logged in as ${store.currentUser?.email}`
     messageClass.value = 'text-positive'
-    router.push('/')
+    const redirectPath = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
+    router.push(redirectPath)
   } else {
     message.value = store.error || 'Unable to log in.'
     messageClass.value = 'text-negative'

@@ -114,7 +114,7 @@
                 <q-markup-table flat bordered dense separator="horizontal">
                   <tbody>
                     <tr>
-                      <td style="width: 80%">
+                      <td style="width: 84%">
                         <q-linear-progress
                           :value="foodLogProgress"
                           color="accent"
@@ -122,10 +122,10 @@
                           rounded
                         />
                       </td>
-                      <td style="width: 20%">
+                      <td style="width: 16%">
                         <q-chip color="secondary" text-color="white" square>
-                          Calories: {{ totalLoggedCalories }} /
-                          {{ totalCaloriesForPerson || 2000 }}
+                          Calories: {{ Math.round(totalLoggedCalories) }} /
+                          {{ Math.round(totalCaloriesForPerson || 2000) }}
                         </q-chip>
                       </td>
                     </tr>
@@ -140,8 +140,8 @@
                       </td>
                       <td>
                         <q-chip color="secondary" text-color="white" square>
-                          Protein: {{ totalProteinLoggedToday.toFixed(2) }} /
-                          {{ totalProteinBudgetForToday.toFixed(2) }}
+                          Protein: {{ Math.round(totalProteinLoggedToday) }} /
+                          {{ Math.round(totalProteinBudgetForToday) }}
                         </q-chip>
                       </td>
                     </tr>
@@ -156,8 +156,8 @@
                       </td>
                       <td>
                         <q-chip color="secondary" text-color="white" square>
-                          Carbs: {{ totalCarbsLoggedToday.toFixed(2) }} /
-                          {{ totalCarbBudgetForToday.toFixed(2) }}
+                          Carbs: {{ Math.round(totalCarbsLoggedToday) }} /
+                          {{ Math.round(totalCarbBudgetForToday) }}
                         </q-chip>
                       </td>
                     </tr>
@@ -172,8 +172,8 @@
                       </td>
                       <td>
                         <q-chip color="secondary" text-color="white" square>
-                          Fat: {{ totalFatLoggedToday.toFixed(2) }} /
-                          {{ totalFatBudgetForToday.toFixed(2) }}
+                          Fat: {{ Math.round(totalFatLoggedToday) }} /
+                          {{ Math.round(totalFatBudgetForToday) }}
                         </q-chip>
                       </td>
                     </tr>
@@ -185,7 +185,7 @@
                 <div class="row items-center justify-between q-mb-sm">
                   <div class="text-subtitle1">Logged foods</div>
                   <q-chip color="secondary" text-color="white" square>
-                    Total logged calories today: {{ totalLoggedCalories }}
+                    Total logged calories today: {{ Math.round(totalLoggedCalories) }}
                   </q-chip>
                 </div>
 
@@ -892,7 +892,7 @@ const totalFatLoggedToday = computed(() => {
 })
 
 const totalFatBudgetForToday = computed(() => {
-  return (totalCaloriesForPerson.value * fatBudgetPercentForToday.value) / 100 / 4
+  return (totalCaloriesForPerson.value * fatBudgetPercentForToday.value) / 100 / 9
 })
 
 const selectedFoodCalories = computed(() => {

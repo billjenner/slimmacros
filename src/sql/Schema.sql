@@ -175,6 +175,18 @@ CREATE TABLE public.weight_log (
 );
 
 -- ============================================================ 
+-- users_logged_in
+-- ============================================================ 
+CREATE TABLE public.users_logged_in (
+    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    users_email text NOT NULL UNIQUE,
+    public_ip text NOT NULL UNIQUE,
+	is_logged_in boolean NOT NULL DEFAULT true,
+    date date NOT NULL DEFAULT CURRENT_DATE
+);
+
+
+-- ============================================================ 
 -- INDEXES 
 -- ============================================================ 
 -- PROFILE 

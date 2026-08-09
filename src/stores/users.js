@@ -2,6 +2,13 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
 
 const CURRENT_USER_STORAGE_KEY = 'slimbelly.currentUser'
+const USERS_LOGGED_IN_FUNCTION = 'users-logged-in'
+
+function normalizeEmail(email) {
+  return String(email || '')
+    .trim()
+    .toLowerCase()
+}
 
 function getPersistedCurrentUser() {
   if (typeof window === 'undefined') {
@@ -42,6 +49,18 @@ function sanitizeCurrentUser(user) {
   return safeUser
 }
 
+function toLoggedInCurrentUser(user) {
+  const safeUser = sanitizeCurrentUser(user)
+  if (!safeUser) {
+    return null
+  }
+
+  return {
+    ...safeUser,
+    is_logged_in: true,
+  }
+}
+
 export const useUsersStore = defineStore('Users', {
   state: () => ({
     users: [],
@@ -61,7 +80,7 @@ export const useUsersStore = defineStore('Users', {
         return null
       }
 
-      const normalizedEmail = email.trim().toLowerCase()
+      const normalizedEmail = normalizeEmail(email)
       const user = {
         email: normalizedEmail,
         password,
@@ -105,6 +124,7 @@ export const useUsersStore = defineStore('Users', {
       this.users.push(savedUser)
       this.currentUser = savedUser
       persistCurrentUser(savedUser)
+      await this.syncLoggedInSession(normalizedEmail, true)
       return data
     },
 
@@ -116,7 +136,7 @@ export const useUsersStore = defineStore('Users', {
         return null
       }
 
-      const normalizedEmail = email.trim().toLowerCase()
+      const normalizedEmail = normalizeEmail(email)
       const { data, error } = await supabase
         .from('users')
         .select('email, password')
@@ -144,7 +164,7 @@ export const useUsersStore = defineStore('Users', {
         return null
       }
 
-      const normalizedEmail = email.trim().toLowerCase()
+      const normalizedEmail = normalizeEmail(email)
       const { data, error } = await supabase
         .from('users')
         .select('*')
@@ -172,7 +192,91 @@ export const useUsersStore = defineStore('Users', {
       this.users = this.users.filter((u) => u.email !== normalizedEmail)
       this.users.push(savedUser)
       persistCurrentUser(savedUser)
+      await this.syncLoggedInSession(normalizedEmail, true)
       return data
+    },
+
+    async getUserByEmail(email) {
+      this.error = null
+
+      if (!supabase) {
+        this.error = 'Supabase client is not configured.'
+        return null
+      }
+
+      const normalizedEmail = normalizeEmail(email)
+      if (!normalizedEmail) {
+        return null
+      }
+
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', normalizedEmail)
+        .maybeSingle()
+
+      if (error) {
+        this.error = error.message
+        return null
+      }
+
+      return sanitizeCurrentUser(data)
+    },
+
+    async syncLoggedInSession(email, isLoggedIn) {
+      if (!supabase) {
+        return false
+      }
+
+      const normalizedEmail = normalizeEmail(email)
+      if (!normalizedEmail) {
+        return false
+      }
+
+      const { error } = await supabase.functions.invoke(USERS_LOGGED_IN_FUNCTION, {
+        body: {
+          action: isLoggedIn ? 'login' : 'logout',
+          email: normalizedEmail,
+        },
+      })
+
+      return !error
+    },
+
+    async restoreCurrentUserFromPublicIp() {
+      this.error = null
+
+      if (!supabase) {
+        this.error = 'Supabase client is not configured.'
+        return null
+      }
+
+      const { data, error } = await supabase.functions.invoke(USERS_LOGGED_IN_FUNCTION, {
+        body: {
+          action: 'restore',
+        },
+      })
+
+      if (error) {
+        this.error = error.message
+        return null
+      }
+
+      if (!data?.users_email || !data.is_logged_in) {
+        return null
+      }
+
+      const restoredUser = await this.getUserByEmail(data.users_email)
+      if (!restoredUser) {
+        return null
+      }
+
+      const currentUser = toLoggedInCurrentUser(restoredUser)
+      this.currentUser = currentUser
+      this.users = this.users.filter((user) => user.email !== currentUser.email)
+      this.users.push(currentUser)
+      persistCurrentUser(currentUser)
+      return currentUser
     },
 
     async loadUsers() {
@@ -327,7 +431,12 @@ export const useUsersStore = defineStore('Users', {
       return data
     },
 
-    clearCurrentUser() {
+    async clearCurrentUser() {
+      const currentEmail = this.currentUser?.email
+      if (currentEmail) {
+        await this.syncLoggedInSession(currentEmail, false)
+      }
+
       this.currentUser = null
       this.activeAnswerId = null
       this.activeAnswerDateTime = null
