@@ -7,28 +7,36 @@ type SessionRow = {
   users_email: string
   public_ip: string
   is_logged_in: boolean
-  date: string
+  updated_at: string
 }
 
-const supabaseUrl = Deno.env.get('SUPABASE_URL')
-const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-
-if (!supabaseUrl || !supabaseServiceRoleKey) {
-  throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
-
-const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-})
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       'Content-Type': 'application/json',
+      ...corsHeaders,
+    },
+  })
+}
+
+function buildSupabaseClient() {
+  const url = Deno.env.get('SUPABASE_URL')
+  const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+
+  if (!url || !key) {
+    return null
+  }
+
+  return createClient(url, key, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
     },
   })
 }
@@ -59,14 +67,10 @@ function getRequestIp(request: Request) {
   return null
 }
 
-function getTodayDate() {
-  return new Date().toISOString().slice(0, 10)
-}
-
-async function fetchSessionByEmail(usersEmail: string) {
+async function fetchSessionByEmail(supabase: ReturnType<typeof createClient>, usersEmail: string) {
   const { data, error } = await supabase
     .from('users_logged_in')
-    .select('id, users_email, public_ip, is_logged_in, date')
+    .select('id, users_email, public_ip, is_logged_in, updated_at')
     .eq('users_email', usersEmail)
     .maybeSingle<SessionRow>()
 
@@ -77,10 +81,10 @@ async function fetchSessionByEmail(usersEmail: string) {
   return data || null
 }
 
-async function fetchSessionByIp(publicIp: string) {
+async function fetchSessionByIp(supabase: ReturnType<typeof createClient>, publicIp: string) {
   const { data, error } = await supabase
     .from('users_logged_in')
-    .select('id, users_email, public_ip, is_logged_in, date')
+    .select('id, users_email, public_ip, is_logged_in, updated_at')
     .eq('public_ip', publicIp)
     .maybeSingle<SessionRow>()
 
@@ -91,10 +95,14 @@ async function fetchSessionByIp(publicIp: string) {
   return data || null
 }
 
-async function upsertSession(usersEmail: string, publicIp: string, isLoggedIn: boolean) {
-  const today = getTodayDate()
-  const sessionByEmail = await fetchSessionByEmail(usersEmail)
-  const sessionByIp = await fetchSessionByIp(publicIp)
+async function upsertSession(
+  supabase: ReturnType<typeof createClient>,
+  usersEmail: string,
+  publicIp: string,
+  isLoggedIn: boolean,
+) {
+  const sessionByEmail = await fetchSessionByEmail(supabase, usersEmail)
+  const sessionByIp = await fetchSessionByIp(supabase, publicIp)
 
   if (sessionByEmail?.id && sessionByIp?.id && sessionByEmail.id !== sessionByIp.id) {
     const { error: deleteError } = await supabase
@@ -112,7 +120,7 @@ async function upsertSession(usersEmail: string, publicIp: string, isLoggedIn: b
     users_email: usersEmail,
     public_ip: publicIp,
     is_logged_in: isLoggedIn,
-    date: today,
+    updated_at: new Date().toISOString(),
   }
 
   if (targetId) {
@@ -120,7 +128,7 @@ async function upsertSession(usersEmail: string, publicIp: string, isLoggedIn: b
       .from('users_logged_in')
       .update(payload)
       .eq('id', targetId)
-      .select('id, users_email, public_ip, is_logged_in, date')
+      .select('id, users_email, public_ip, is_logged_in, updated_at')
       .single<SessionRow>()
 
     if (error) {
@@ -133,7 +141,7 @@ async function upsertSession(usersEmail: string, publicIp: string, isLoggedIn: b
   const { data, error } = await supabase
     .from('users_logged_in')
     .insert(payload)
-    .select('id, users_email, public_ip, is_logged_in, date')
+    .select('id, users_email, public_ip, is_logged_in, updated_at')
     .single<SessionRow>()
 
   if (error) {
@@ -144,8 +152,17 @@ async function upsertSession(usersEmail: string, publicIp: string, isLoggedIn: b
 }
 
 Deno.serve(async (request) => {
+  if (request.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
   if (request.method !== 'POST') {
     return jsonResponse({ error: 'Method not allowed' }, 405)
+  }
+
+  const supabase = buildSupabaseClient()
+  if (!supabase) {
+    return jsonResponse({ error: 'Server configuration error.' }, 500)
   }
 
   const body = (await request.json().catch(() => ({}))) as {
@@ -162,7 +179,7 @@ Deno.serve(async (request) => {
 
   try {
     if (action === 'restore') {
-      const sessionRow = await fetchSessionByIp(publicIp)
+      const sessionRow = await fetchSessionByIp(supabase, publicIp)
 
       if (!sessionRow || !sessionRow.is_logged_in) {
         return jsonResponse({
@@ -173,10 +190,10 @@ Deno.serve(async (request) => {
         })
       }
 
-      const today = getTodayDate()
+      const now = new Date().toISOString()
       const { error } = await supabase
         .from('users_logged_in')
-        .update({ date: today })
+        .update({ updated_at: now })
         .eq('id', sessionRow.id)
 
       if (error) {
@@ -187,7 +204,7 @@ Deno.serve(async (request) => {
         public_ip: publicIp,
         users_email: sessionRow.users_email,
         is_logged_in: true,
-        date: today,
+        updated_at: now,
       })
     }
 
@@ -198,13 +215,13 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: 'Email is required for login and logout actions.' }, 400)
     }
 
-    const sessionRow = await upsertSession(usersEmail, publicIp, action === 'login')
+    const sessionRow = await upsertSession(supabase, usersEmail, publicIp, action === 'login')
 
     return jsonResponse({
       public_ip: sessionRow.public_ip,
       users_email: sessionRow.users_email,
       is_logged_in: sessionRow.is_logged_in,
-      date: sessionRow.date,
+      updated_at: sessionRow.updated_at,
     })
   } catch (error) {
     return jsonResponse(
