@@ -107,7 +107,7 @@
             transition-hide="jump-up"
           >
             <template v-slot:header>
-              <q-chip>Over all Plan</q-chip>
+              <q-chip>Over All Plan</q-chip>
             </template>
 
             <q-card-section>
@@ -183,6 +183,12 @@
                       <strong>Supplements</strong>
                     </td>
                     <td style="padding: 10px; color: #666">Fill specific nutritional gaps</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px">
+                      <strong>Log daily</strong>
+                    </td>
+                    <td style="padding: 10px; color: #666">Track nutrition, exercise, and habits. Monitor progress regularly and make adjustments as needed.</td>
                   </tr>
                 </tbody>
               </table>
@@ -405,11 +411,47 @@
         </q-card>
       </div>
 
-      <div class="col-12 col-md-4">
-        <q-card flat bordered style="width: 90%; max-width: 90%; margin: 0 auto">
+      <div class="col-12 col-sm-6 col-md-6 col-lg-6 flex justify-center">
+        <q-card style="width: 95%">
+          <q-card-section class="bg-accent text-center"> HIIT Training Exercises </q-card-section>
+
+          <q-expansion-item
+            expand-icon="keyboard_arrow_down"
+            expanded-icon="keyboard_arrow_up"
+            transition-show="jump-down"
+            transition-hide="jump-up"
+          >
+            <template v-slot:header>
+              <q-chip>Beginner</q-chip>
+            </template>
+
           <q-card-section>
-            <p>HITT Training Exercises</p>
+                    <div style="padding: 12px; border-bottom: 1px solid #eee">
+                      <strong>Beginner routine using 40 seconds work / 20 seconds rest:</strong><br />
+                    </div>
+                    <div style="padding: 12px; border-bottom: 1px solid #eee">
+                      <ul style="margin: 8px 0 0 20px; padding: 0">
+                        <li>Bodyweight squats</li>
+                        <li>Knee push-ups</li>
+                        <li>Standing knee raises</li>
+                        <li>Glute bridges</li>
+                        <li>Mountain climbers</li>
+                        <li>Plank</li>
+                      </ul>
+                    </div>
+                    <div style="padding: 12px; border-bottom: 1px solid #eee">
+                      <strong>Phase & Time:</strong><br />
+                      <ul style="margin: 8px 0 0 20px; padding: 0">
+                        <li>Warm-up — 5 minutes</li>
+                        <li>HIIT Round 1 — 5 minutes</li>
+                        <li>Rest between rounds — 1–2 minutes</li>
+                        <li>HIIT Round 2 — 5 minutes</li>
+                        <li>Cool-down — 3–5 minutes</li>
+                        <li><strong>Total — 19–22 minutes</strong></li>
+                      </ul>
+                    </div>
           </q-card-section>
+          </q-expansion-item>
         </q-card>
       </div>
 
@@ -440,3 +482,4 @@ export default {
   name: 'ResourcesPage',
 }
 </script>
+

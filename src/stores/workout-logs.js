@@ -1,10 +1,5 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
-import { getCurrentLocalDate } from '../utils/date'
-import {
-  calculateWorkoutLogCaloriesBurned,
-  sumWorkoutLogCaloriesBurnedForDate,
-} from '../utils/workout-calories'
 
 export const useWorkoutLogsStore = defineStore('WorkoutLogs', {
   state: () => ({
@@ -13,20 +8,6 @@ export const useWorkoutLogsStore = defineStore('WorkoutLogs', {
     error: null,
     loading: false,
   }),
-
-  getters: {
-    totalCaloriesBurnedToday(state) {
-      return sumWorkoutLogCaloriesBurnedForDate(state.logs, getCurrentLocalDate())
-    },
-
-    caloriesBurnedForDate(state) {
-      return (localDateKey) => sumWorkoutLogCaloriesBurnedForDate(state.logs, localDateKey)
-    },
-
-    caloriesBurnedForLog() {
-      return (log) => calculateWorkoutLogCaloriesBurned(log)
-    },
-  },
 
   actions: {
     toNullableNonNegativeInteger(value) {
@@ -42,17 +23,21 @@ export const useWorkoutLogsStore = defineStore('WorkoutLogs', {
       return Math.trunc(numericValue)
     },
 
-    buildWorkoutLogPayload(userId, workoutLog = {}) {
-      const providedCaloriesBurned = Number(workoutLog.calories_burned)
+    toNonNegativeInteger(value) {
+      const numericValue = Number(value)
+      if (!Number.isFinite(numericValue) || numericValue < 0) {
+        return 0
+      }
 
+      return Math.trunc(numericValue)
+    },
+
+    buildWorkoutLogPayload(userId, workoutLog = {}) {
       const payload = {
         user_id: userId,
         workout_id: workoutLog.workout_id,
         workout_time: this.toNullableNonNegativeInteger(workoutLog.workout_time),
-        calories_burned:
-          Number.isFinite(providedCaloriesBurned) && providedCaloriesBurned >= 0
-            ? Math.round(providedCaloriesBurned)
-            : Math.max(0, calculateWorkoutLogCaloriesBurned(workoutLog)),
+        calories_burned: this.toNonNegativeInteger(workoutLog.calories_burned),
       }
 
       if (workoutLog.date) {

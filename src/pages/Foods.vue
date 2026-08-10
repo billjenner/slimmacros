@@ -301,7 +301,11 @@
                               protein: props.row.protein,
                               fat: props.row.fat,
                               extraCalories: props.row.calories_extra,
-                            }) || 0) / caloriesBudgetForProgress,
+                            }) || 0) /
+                              (calculateTotalCaloriesForPerson({
+                                totalDailyCalories: 2000,
+                                dailyCalorieDeficit: 0,
+                              }) || 1),
                           )
                         "
                         color="accent"
@@ -324,12 +328,10 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
 import { useFoodsStore } from 'stores/foods'
-import { useWorkoutLogsStore } from 'stores/workouts_log'
 import { calculateFoodCalories, calculateTotalCaloriesForPerson } from '../utils/rules'
 
 const usersStore = useUsersStore()
 const store = useFoodsStore()
-const workoutLogsStore = useWorkoutLogsStore()
 
 const servingUnitOptions = [
   { label: 'Cup', value: 'cup' },
@@ -384,16 +386,6 @@ const foodRows = computed(() => {
       .includes(searchText),
   )
 })
-const caloriesBurnedToday = computed(() => workoutLogsStore.totalCaloriesBurnedToday)
-const caloriesBudgetForProgress = computed(() => {
-  return (
-    calculateTotalCaloriesForPerson({
-      totalDailyCalories: 2000,
-      dailyCalorieDeficit: 0,
-      caloriesBurnedToday: caloriesBurnedToday.value,
-    }) || 1
-  )
-})
 const showFoodForm = ref(false)
 const showSharedFoods = ref(false)
 const confirmDeleteOpen = ref(false)
@@ -414,7 +406,6 @@ watch(
       loadFoodsForCurrentUser(userId)
     } else {
       store.foods = []
-      workoutLogsStore.logs = []
     }
   },
 )
@@ -424,7 +415,7 @@ async function loadFoodsForCurrentUser(userId) {
     return
   }
 
-  await Promise.all([store.loadFoods(userId), workoutLogsStore.loadWorkoutLogs(userId)])
+  await store.loadFoods(userId)
 }
 
 function isOwnedByCurrentUser(row) {

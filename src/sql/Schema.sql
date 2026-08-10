@@ -161,6 +161,7 @@ CREATE TABLE public.workout_log (
 	workout_id bigint NOT NULL REFERENCES public.workout(workout_id) ON DELETE CASCADE, 
 	user_id uuid NOT NULL REFERENCES public.users(user_id) ON DELETE CASCADE, 
 	workout_time integer CHECK ( workout_time IS NULL OR workout_time >= 0 ), 
+	calories_burned integer NOT NULL DEFAULT 0 CHECK (calories_burned >= 0), 
 	date date NOT NULL DEFAULT CURRENT_DATE 
 );
 

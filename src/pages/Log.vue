@@ -354,8 +354,7 @@
                 <div class="row items-center justify-between q-mb-sm">
                   <div class="text-subtitle1">Logged workouts</div>
                   <q-chip color="secondary" text-color="white" square>
-                    Today's calories burned:
-                    {{ Math.round(workoutLogsStore.totalCaloriesBurnedToday) }}
+                    Today's calories burned: {{ Math.round(totalWorkoutCaloriesBurnedToday) }}
                   </q-chip>
                 </div>
 
@@ -674,7 +673,7 @@ import { useFoodsStore } from 'stores/foods'
 import { useFoodLogsStore } from 'stores/food-logs'
 import { useProfilesStore } from 'stores/profiles'
 import { useWorkoutsStore } from 'stores/workouts'
-import { useWorkoutLogsStore } from 'stores/workouts_log'
+import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { useSupplimentsStore } from 'stores/suppliments'
 import { useSupplimentsLogStore } from 'stores/suppliments_log'
 import { useWeightLogsStore } from 'stores/weight-logs'
@@ -683,7 +682,6 @@ import {
   calculateTotalCaloriesForPerson,
   calculateTotalDailyCalories,
 } from '../utils/rules'
-import { getCurrentLocalDate, getLocalDateKey } from '../utils/date'
 
 const usersStore = useUsersStore()
 const foodsStore = useFoodsStore()
@@ -711,10 +709,36 @@ function getCurrentLocalDateTime() {
   return `${year}-${month}-${day}T${hours}:${minutes}`
 }
 
+function getCurrentLocalDate() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 function getCurrentDayOfWeekKey() {
   const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
 
   return dayNames[new Date().getDay()] || 'sunday'
+}
+
+function getLocalDateKey(value) {
+  if (!value) {
+    return ''
+  }
+
+  const dateValue = new Date(value)
+  if (Number.isNaN(dateValue.getTime())) {
+    return ''
+  }
+
+  const year = dateValue.getFullYear()
+  const month = String(dateValue.getMonth() + 1).padStart(2, '0')
+  const day = String(dateValue.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
 }
 
 const foodLog = reactive({
@@ -930,7 +954,7 @@ const totalCaloriesForPerson = computed(() => {
   return calculateTotalCaloriesForPerson({
     totalDailyCalories: totalDailyCalories.value,
     dailyCalorieDeficit: currentProfile.value?.daily_calorie_deficit,
-    caloriesBurnedToday: workoutLogsStore.totalCaloriesBurnedToday,
+    totalWorkoutCaloriesBurnedToday: totalWorkoutCaloriesBurnedToday.value,
   })
 })
 
@@ -1079,14 +1103,27 @@ const workoutTableRows = computed(() => {
     const workout = log.workout || {}
     const workoutLabel = workout.type || `Workout #${log.workout_id}`
     const workoutTime = log.workout_time ?? workout.average_workout_time ?? 'N/A'
-    const caloriesBurned = workoutLogsStore.caloriesBurnedForLog(log)
+    const workoutCaloriesBurned = Number(log.calories_burned) || 0
 
     return {
       ...log,
       description: workoutLabel,
-      summary: `${workoutLabel} | ${workoutTime} (minutes) | ${caloriesBurned} calories | ${log.date || ''}`,
+      summary: `${workoutLabel} | ${workoutTime} (minutes) | ${workoutCaloriesBurned} (calories burned) | ${log.date || ''}`,
     }
   })
+})
+
+const totalWorkoutCaloriesBurnedToday = computed(() => {
+  const today = getCurrentLocalDate()
+
+  return (workoutLogsStore.logs || []).reduce((sum, log) => {
+    const logDate = String(log?.date || '').slice(0, 10)
+    if (logDate !== today) {
+      return sum
+    }
+
+    return sum + (Number(log?.calories_burned) || 0)
+  }, 0)
 })
 
 const workoutTotalCaloriesBurned = computed(() => {
@@ -1110,13 +1147,7 @@ const workoutTotalCaloriesBurned = computed(() => {
     return 0
   }
 
-  return workoutLogsStore.caloriesBurnedForLog({
-    workout_time: workoutTime,
-    workout: {
-      average_workout_time: averageWorkoutTime,
-      calories_burned: caloriesBurned,
-    },
-  })
+  return Math.round((workoutTime / averageWorkoutTime) * caloriesBurned)
 })
 
 const supplementTableRows = computed(() => {
