@@ -172,6 +172,7 @@ CREATE TABLE public.weight_log (
 	weight_log_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
 	user_id uuid NOT NULL REFERENCES public.users(user_id) ON DELETE CASCADE, 
 	weight numeric(8,2) NOT NULL CHECK (weight > 0), 
+	bmi numeric(5,2),
 	date date NOT NULL DEFAULT CURRENT_DATE 
 );
 
@@ -216,3 +217,27 @@ CREATE INDEX workout_log_date_idx ON public.workout_log(date);
 -- WEIGHT LOG 
 CREATE INDEX weight_log_user_id_idx ON public.weight_log(user_id); 
 CREATE INDEX weight_log_date_idx ON public.weight_log(date);
+
+
+
+-- ============================================================ 
+-- Working
+-- ============================================================ 
+
+ALTER TABLE weight_log RENAME TO weight_log_bak;
+
+drop table weight_log;
+
+INSERT INTO weight_log (user_id, weight, date)
+SELECT user_id, weight, date
+FROM weight_log_bak;
+
+select * from weight_log
+
+CREATE TABLE public.weight_log ( 
+	weight_log_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+	user_id uuid NOT NULL REFERENCES public.users(user_id) ON DELETE CASCADE, 
+	weight numeric(8,2) NOT NULL CHECK (weight > 0), 
+	bmi numeric(5,2),
+	date date NOT NULL DEFAULT CURRENT_DATE 
+);

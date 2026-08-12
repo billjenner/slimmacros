@@ -29,6 +29,11 @@ export const useWeightLogsStore = defineStore('WeightLogs', {
         weight: this.toPositiveNumber(weightLog.weight),
       }
 
+      const bmi = this.toPositiveNumber(weightLog.bmi)
+      if (bmi !== null) {
+        payload.bmi = bmi
+      }
+
       if (weightLog.date) {
         payload.date = weightLog.date
       }
@@ -94,6 +99,7 @@ export const useWeightLogsStore = defineStore('WeightLogs', {
               weight_log_id,
               user_id,
               weight,
+              bmi,
               date
             `,
           )

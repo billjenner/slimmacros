@@ -131,7 +131,20 @@
               </q-form>
 
               <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-                <div class="text-center text-subtitle2 q-mb-sm">Today's budget</div>
+                <div class="row items-center q-mb-sm">
+                  <div class="col text-subtitle2 text-center">{{ selectedFoodLogDayOfWeek }}</div>
+                  <div class="row items-center no-wrap q-gutter-xs">
+                    <q-btn flat dense type="button" label="<" @click="goToPreviousFoodLogDate" />
+                    <q-input
+                      v-model="selectedFoodLogDate"
+                      type="date"
+                      filled
+                      dense
+                      style="max-width: 220px"
+                    />
+                    <q-btn flat dense type="button" label=">" @click="goToNextFoodLogDate" />
+                  </div>
+                </div>
                 <q-markup-table flat bordered dense separator="horizontal">
                   <tbody>
                     <tr>
@@ -224,7 +237,10 @@
                   no-data-label="No food log records yet."
                 >
                   <template #body="props">
-                    <q-tr :props="props">
+                    <q-tr
+                      :props="props"
+                      :style="!props.row.isToday ? 'background-color: #E8E8E8' : ''"
+                    >
                       <q-td key="summary" :props="props">
                         <div class="row items-center full-width">
                           <span>{{ props.row.summary }}</span>
@@ -569,7 +585,7 @@
                 <q-card flat bordered class="q-pa-md bg-grey-1">
                   <div class="text-subtitle1 q-mb-sm">Log Weight</div>
                   <div class="row q-col-gutter-md">
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-4">
                       <q-input
                         v-model="weightLog.weight"
                         type="number"
@@ -579,11 +595,24 @@
                         filled
                         dense
                         :disable="!usersStore.currentUser"
-                        :rules="[(value) => Number(value) > 0 || 'Weight must be greater than 0']"
+                        :rules="[
+                          (value) =>
+                            value === '' || Number(value) > 0 || 'Weight must be greater than 0',
+                        ]"
                       />
                     </div>
 
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-4">
+                      <q-input
+                        :model-value="weightLogBodyMassIndex"
+                        label="BMI"
+                        filled
+                        dense
+                        readonly
+                      />
+                    </div>
+
+                    <div class="col-12 col-md-4">
                       <q-input
                         v-model="weightLog.date"
                         type="date"
@@ -606,6 +635,28 @@
                   </div>
                 </q-card>
               </q-form>
+
+              <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
+                <div class="row items-center justify-between q-mb-sm">
+                  <div class="text-subtitle1">Weight progress</div>
+                  <div class="row items-center q-gutter-sm">
+                    <q-chip color="secondary" text-color="white" square>
+                      {{ Math.round(weightProgressCurrentValue ?? 0) }} /
+                      {{ Math.round(weightProgressGoalValue ?? 0) }}
+                    </q-chip>
+                    <q-chip color="secondary" text-color="white" square>
+                      {{ projectedGoalDateLabel }}
+                    </q-chip>
+                  </div>
+                </div>
+
+                <q-linear-progress
+                  :value="weightProgressValue"
+                  color="accent"
+                  size="10px"
+                  rounded
+                />
+              </q-card>
 
               <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
                 <div class="text-subtitle1 q-mb-sm">Logged weight</div>
@@ -678,6 +729,7 @@ import { useSupplimentsStore } from 'stores/suppliments'
 import { useSupplimentsLogStore } from 'stores/suppliments_log'
 import { useWeightLogsStore } from 'stores/weight-logs'
 import {
+  calculateBodyMassIndex,
   calculateFoodCalories,
   calculateTotalCaloriesForPerson,
   calculateTotalDailyCalories,
@@ -697,6 +749,7 @@ const isFoodLogExpanded = ref(false)
 const includeSharedFoods = ref(false)
 const includeSharedWorkouts = ref(false)
 const includeSharedSuppliments = ref(false)
+const selectedFoodLogDate = ref(getCurrentLocalDate())
 
 function getCurrentLocalDateTime() {
   const now = new Date()
@@ -717,6 +770,51 @@ function getCurrentLocalDate() {
 
   return `${year}-${month}-${day}`
 }
+
+function shiftLocalDate(dateKey, dayDelta) {
+  const [yearString, monthString, dayString] = String(dateKey || '').split('-')
+  const year = Number(yearString)
+  const month = Number(monthString)
+  const day = Number(dayString)
+
+  if (!year || !month || !day) {
+    return getCurrentLocalDate()
+  }
+
+  const shiftedDate = new Date(year, month - 1, day + dayDelta)
+  const shiftedYear = shiftedDate.getFullYear()
+  const shiftedMonth = String(shiftedDate.getMonth() + 1).padStart(2, '0')
+  const shiftedDay = String(shiftedDate.getDate()).padStart(2, '0')
+
+  return `${shiftedYear}-${shiftedMonth}-${shiftedDay}`
+}
+
+function goToPreviousFoodLogDate() {
+  selectedFoodLogDate.value = shiftLocalDate(selectedFoodLogDate.value, -1)
+}
+
+function goToNextFoodLogDate() {
+  selectedFoodLogDate.value = shiftLocalDate(selectedFoodLogDate.value, 1)
+}
+
+const selectedFoodLogDayOfWeek = computed(() => {
+  const [yearString, monthString, dayString] = String(selectedFoodLogDate.value || '').split('-')
+  const year = Number(yearString)
+  const month = Number(monthString)
+  const day = Number(dayString)
+
+  if (!year || !month || !day) {
+    return ''
+  }
+
+  const selectedDate = new Date(year, month - 1, day)
+
+  if (Number.isNaN(selectedDate.getTime())) {
+    return ''
+  }
+
+  return selectedDate.toLocaleDateString(undefined, { weekday: 'long' })
+})
 
 function getCurrentDayOfWeekKey() {
   const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
@@ -739,6 +837,25 @@ function getLocalDateKey(value) {
   const day = String(dateValue.getDate()).padStart(2, '0')
 
   return `${year}-${month}-${day}`
+}
+
+function formatLocalDateTimeLabel(value) {
+  if (!value) {
+    return ''
+  }
+
+  const dateValue = new Date(value)
+  if (Number.isNaN(dateValue.getTime())) {
+    return ''
+  }
+
+  const year = dateValue.getFullYear()
+  const month = String(dateValue.getMonth() + 1).padStart(2, '0')
+  const day = String(dateValue.getDate()).padStart(2, '0')
+  const hours = String(dateValue.getHours()).padStart(2, '0')
+  const minutes = String(dateValue.getMinutes()).padStart(2, '0')
+
+  return `${year}-${month}-${day}   ${hours}:${minutes}`
 }
 
 const foodLog = reactive({
@@ -938,6 +1055,175 @@ const selectedSupplement = computed(() => {
 
 const currentProfile = computed(() => profilesStore.currentProfile || null)
 
+const latestWeightLogForToday = computed(() => {
+  const today = getCurrentLocalDate()
+
+  return (weightLogsStore.logs || []).reduce((latestLog, log) => {
+    const dateKey = String(log?.date || '').slice(0, 10)
+    if (!dateKey || dateKey > today) {
+      return latestLog
+    }
+
+    const weight = Number(log?.weight)
+    if (!Number.isFinite(weight) || weight <= 0) {
+      return latestLog
+    }
+
+    if (!latestLog) {
+      return log
+    }
+
+    const latestDateKey = String(latestLog?.date || '').slice(0, 10)
+    if (dateKey > latestDateKey) {
+      return log
+    }
+
+    return latestLog
+  }, null)
+})
+
+const oldestWeightLogForToday = computed(() => {
+  const today = getCurrentLocalDate()
+
+  return (weightLogsStore.logs || []).reduce((oldestLog, log) => {
+    const dateKey = String(log?.date || '').slice(0, 10)
+    if (!dateKey || dateKey > today) {
+      return oldestLog
+    }
+
+    const weight = Number(log?.weight)
+    if (!Number.isFinite(weight) || weight <= 0) {
+      return oldestLog
+    }
+
+    if (!oldestLog) {
+      return log
+    }
+
+    const oldestDateKey = String(oldestLog?.date || '').slice(0, 10)
+    if (dateKey < oldestDateKey) {
+      return log
+    }
+
+    return oldestLog
+  }, null)
+})
+
+const weightProgressCurrentValue = computed(() => {
+  const loggedWeight = Number(latestWeightLogForToday.value?.weight)
+  if (Number.isFinite(loggedWeight) && loggedWeight > 0) {
+    return loggedWeight
+  }
+
+  const startWeight = Number(currentProfile.value?.start_weight)
+  if (Number.isFinite(startWeight) && startWeight > 0) {
+    return startWeight
+  }
+
+  return null
+})
+
+const weightLogBodyMassIndex = computed(() => {
+  const enteredWeight = Number(weightLog.weight)
+  const latestLoggedWeight = Number(latestWeightLogForToday.value?.weight)
+  const startWeight = Number(currentProfile.value?.start_weight)
+
+  let effectiveWeight = null
+  if (Number.isFinite(enteredWeight) && enteredWeight > 0) {
+    effectiveWeight = enteredWeight
+  } else if (Number.isFinite(latestLoggedWeight) && latestLoggedWeight > 0) {
+    effectiveWeight = latestLoggedWeight
+  } else if (Number.isFinite(startWeight) && startWeight > 0) {
+    effectiveWeight = startWeight
+  }
+
+  const bmi = calculateBodyMassIndex({
+    weight: effectiveWeight,
+    height: currentProfile.value?.height,
+  })
+
+  return bmi ?? ''
+})
+
+const weightProgressGoalValue = computed(() => {
+  const goalWeight = Number(currentProfile.value?.goal_weight)
+  if (Number.isFinite(goalWeight) && goalWeight > 0) {
+    return goalWeight
+  }
+
+  return null
+})
+
+const weightProgressValue = computed(() => {
+  const startWeight = Number(currentProfile.value?.start_weight)
+  const goalWeight = weightProgressGoalValue.value
+  const currentWeight = weightProgressCurrentValue.value
+
+  if (
+    !Number.isFinite(startWeight) ||
+    !Number.isFinite(goalWeight) ||
+    !Number.isFinite(currentWeight) ||
+    startWeight <= 0 ||
+    goalWeight <= 0 ||
+    startWeight === goalWeight
+  ) {
+    return 0
+  }
+
+  const rawProgress = (currentWeight - startWeight) / (goalWeight - startWeight)
+  return Math.min(1, Math.max(0, rawProgress))
+})
+
+const projectedGoalDateLabel = computed(() => {
+  const profileWeight = Number(currentProfile.value?.start_weight)
+  const goalWeight = Number(weightProgressGoalValue.value)
+  const currentWeight = Number(weightProgressCurrentValue.value)
+
+  const latestDateText = String(latestWeightLogForToday.value?.date || '').slice(0, 10)
+  const oldestDateText = String(oldestWeightLogForToday.value?.date || '').slice(0, 10)
+
+  if (!latestDateText || !oldestDateText) {
+    return 'N/A'
+  }
+
+  const latestDate = new Date(`${latestDateText}T00:00:00`)
+  const oldestDate = new Date(`${oldestDateText}T00:00:00`)
+
+  if (Number.isNaN(latestDate.getTime()) || Number.isNaN(oldestDate.getTime())) {
+    return 'N/A'
+  }
+
+  if (
+    !Number.isFinite(profileWeight) ||
+    !Number.isFinite(goalWeight) ||
+    !Number.isFinite(currentWeight) ||
+    profileWeight === currentWeight
+  ) {
+    return 'N/A'
+  }
+
+  const elapsedDays = (latestDate.getTime() - oldestDate.getTime()) / (1000 * 60 * 60 * 24)
+  if (!Number.isFinite(elapsedDays) || elapsedDays < 0) {
+    return 'N/A'
+  }
+
+  const projectedDays =
+    elapsedDays * ((profileWeight - goalWeight) / (profileWeight - currentWeight)) * 1.41
+
+  if (!Number.isFinite(projectedDays)) {
+    return 'N/A'
+  }
+
+  const projectedDate = new Date(oldestDate)
+  projectedDate.setDate(projectedDate.getDate() + Math.round(projectedDays))
+
+  const year = projectedDate.getFullYear()
+  const month = String(projectedDate.getMonth() + 1).padStart(2, '0')
+  const day = String(projectedDate.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+})
+
 const totalDailyCalories = computed(() => {
   const calories = calculateTotalDailyCalories({
     weight: currentProfile.value?.start_weight,
@@ -1038,10 +1324,10 @@ const entryTotalCalories = computed(() => {
 })
 
 const tableRows = computed(() => {
-  const today = getCurrentLocalDate()
+  const selectedDate = selectedFoodLogDate.value || getCurrentLocalDate()
 
   return (foodLogsStore.logs || [])
-    .filter((log) => getLocalDateKey(log.datetime) === today)
+    .filter((log) => getLocalDateKey(log.datetime) === selectedDate)
     .map((log) => {
       const food = log.food || {}
       const perServingCalories = calculateFoodCalories({
@@ -1052,12 +1338,18 @@ const tableRows = computed(() => {
       })
 
       const servings = Number(log.servings) || 0
+      const foodServingSize = Number(food.serving_size) || 1
+      const foodServingUnit = food.serving_unit || 'other'
+      const logDate = getLocalDateKey(log.datetime)
+      const logDateTimeLabel = formatLocalDateTimeLabel(log.datetime)
+
       return {
         ...log,
         description: food.description || `Food #${log.food_id}`,
         servingsLabel: servings.toFixed(2),
         totalCalories: Math.round(perServingCalories * servings),
-        summary: `${food.description || `Food #${log.food_id}`} | ${servings.toFixed(2)} | ${Math.round(perServingCalories * servings)}`,
+        isToday: logDate === selectedDate,
+        summary: `${food.description || `Food #${log.food_id}`} | ${foodServingSize} ${foodServingUnit} | ${servings.toFixed(2)} | ${Math.round(perServingCalories * servings)} | ${logDateTimeLabel}`,
       }
     })
 })
@@ -1196,11 +1488,13 @@ const weightTableRows = computed(() => {
     })
     .map((log) => {
       const weightValue = Number(log.weight) || 0
+      const bmiValue = Number(log.bmi)
+      const bmiLabel = Number.isFinite(bmiValue) && bmiValue > 0 ? bmiValue.toFixed(2) : 'N/A'
 
       return {
         ...log,
         description: weightValue.toFixed(2),
-        summary: `${weightValue.toFixed(2)} | ${log.date || ''}`,
+        summary: `${weightValue.toFixed(2)} | ${bmiLabel} | ${log.date || ''}`,
       }
     })
 })
@@ -1380,6 +1674,7 @@ async function submitWeightLog() {
 
   const payload = {
     weight: weightLog.weight,
+    bmi: weightLogBodyMassIndex.value,
     date: weightLog.date,
   }
 
