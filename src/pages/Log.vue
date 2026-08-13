@@ -817,9 +817,20 @@ const selectedFoodLogDayOfWeek = computed(() => {
 })
 
 function getCurrentDayOfWeekKey() {
-  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+  const dateKey = selectedFoodLogDate.value || getCurrentLocalDate()
+  const [yearString, monthString, dayString] = String(dateKey).split('-')
+  const year = Number(yearString)
+  const month = Number(monthString)
+  const day = Number(dayString)
 
-  return dayNames[new Date().getDay()] || 'sunday'
+  if (!year || !month || !day) {
+    return 'sunday'
+  }
+
+  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+  const selectedDate = new Date(year, month - 1, day)
+
+  return dayNames[selectedDate.getDay()] || 'sunday'
 }
 
 function getLocalDateKey(value) {
@@ -1225,8 +1236,46 @@ const projectedGoalDateLabel = computed(() => {
 })
 
 const totalDailyCalories = computed(() => {
+  const selectedDateKey = selectedFoodLogDate.value || getCurrentLocalDate()
+
+  const latestWeightLogForSelectedFoodDate = (weightLogsStore.logs || []).reduce(
+    (latestLog, log) => {
+      const dateKey = String(log?.date || '').slice(0, 10)
+      const weight = Number(log?.weight)
+
+      if (!dateKey || !Number.isFinite(weight) || weight <= 0 || dateKey > selectedDateKey) {
+        return latestLog
+      }
+
+      if (!latestLog) {
+        return log
+      }
+
+      const latestDateKey = String(latestLog?.date || '').slice(0, 10)
+      const latestWeightLogId = Number(latestLog?.weight_log_id) || 0
+      const currentWeightLogId = Number(log?.weight_log_id) || 0
+
+      if (dateKey > latestDateKey) {
+        return log
+      }
+
+      if (dateKey === latestDateKey && currentWeightLogId > latestWeightLogId) {
+        return log
+      }
+
+      return latestLog
+    },
+    null,
+  )
+
+  const resolvedWeight = Number(latestWeightLogForSelectedFoodDate?.weight)
+  const weight =
+    Number.isFinite(resolvedWeight) && resolvedWeight > 0
+      ? resolvedWeight
+      : Number(currentProfile.value?.start_weight)
+
   const calories = calculateTotalDailyCalories({
-    weight: currentProfile.value?.start_weight,
+    weight: Number.isFinite(weight) && weight > 0 ? weight : null,
     height: currentProfile.value?.height,
     age: usersStore.currentUser?.age,
     sex: usersStore.currentUser?.sex,
