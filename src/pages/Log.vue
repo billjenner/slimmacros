@@ -637,25 +637,28 @@
               </q-form>
 
               <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-                <div class="row items-center justify-between q-mb-sm">
-                  <div class="text-subtitle1">Weight progress</div>
-                  <div class="row items-center q-gutter-sm">
-                    <q-chip color="secondary" text-color="white" square>
-                      {{ Math.round(weightProgressCurrentValue ?? 0) }} /
-                      {{ Math.round(weightProgressGoalValue ?? 0) }}
-                    </q-chip>
-                    <q-chip color="secondary" text-color="white" square>
-                      {{ projectedGoalDateLabel }}
-                    </q-chip>
-                  </div>
+                <div class="row items-center q-mb-sm no-wrap q-gutter-sm">
+                  <q-chip color="secondary" text-color="white" square>
+                    {{ Math.round(weightProgressCurrentValue ?? 0) }}
+                  </q-chip>
+                  <div class="col text-subtitle1 text-center">Weight progress</div>
+                  <q-chip color="secondary" text-color="white" square>
+                    {{ Math.round(weightProgressGoalValue ?? 0) }}
+                  </q-chip>
                 </div>
 
-                <q-linear-progress
-                  :value="weightProgressValue"
-                  color="accent"
-                  size="10px"
-                  rounded
-                />
+                <div class="row items-center no-wrap q-gutter-sm">
+                  <q-linear-progress
+                    class="col"
+                    :value="weightProgressValue"
+                    color="accent"
+                    size="10px"
+                    rounded
+                  />
+                  <q-chip color="secondary" text-color="white" square>
+                    {{ projectedGoalDateLabel }}
+                  </q-chip>
+                </div>
               </q-card>
 
               <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
