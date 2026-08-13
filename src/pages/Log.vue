@@ -639,7 +639,7 @@
               <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
                 <div class="row items-center q-mb-sm no-wrap q-gutter-sm">
                   <q-chip color="secondary" text-color="white" square>
-                    {{ Math.round(weightProgressCurrentValue ?? 0) }}
+                    {{ Math.round(currentProfile?.start_weight ?? 0) }}
                   </q-chip>
                   <div class="col text-subtitle1 text-center">Weight progress</div>
                   <q-chip color="secondary" text-color="white" square>
@@ -655,7 +655,7 @@
                     size="10px"
                     rounded
                   />
-                  <q-chip color="secondary" text-color="white" square>
+                  <q-chip color="accent" text-color="white" square>
                     {{ projectedGoalDateLabel }}
                   </q-chip>
                 </div>
