@@ -388,7 +388,20 @@
 
               <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
                 <div class="row items-center justify-between q-mb-sm">
-                  <div class="text-subtitle1">Logged workouts</div>
+                  <div class="row items-center no-wrap q-gutter-xs">
+                    <div class="text-subtitle1">Logged workouts</div>
+                  </div>
+                  <div class="row items-center no-wrap q-gutter-xs" style="justify-content: center; flex: 1;">
+                    <q-btn flat dense type="button" label="<" @click="goToPreviousWorkoutLogDate" />
+                    <q-input
+                      v-model="selectedWorkoutLogDate"
+                      type="date"
+                      filled
+                      dense
+                      style="max-width: 220px"
+                    />
+                    <q-btn flat dense type="button" label=">" @click="goToNextWorkoutLogDate" />
+                  </div>
                   <q-chip color="secondary" text-color="white" square>
                     Today's calories burned: {{ Math.round(totalWorkoutCaloriesBurnedToday) }}
                   </q-chip>
@@ -408,7 +421,10 @@
                   no-data-label="No workout log records yet."
                 >
                   <template #body="props">
-                    <q-tr :props="props">
+                    <q-tr
+                      :props="props"
+                      :style="props.row.isSelectedWorkoutLogDate ? 'background-color: #D0D0D0' : ''"
+                    >
                       <q-td key="summary" :props="props">
                         <div class="row items-center full-width">
                           <span>{{ props.row.summary }}</span>
@@ -773,6 +789,7 @@ const includeSharedFoods = ref(false)
 const includeSharedWorkouts = ref(false)
 const includeSharedSuppliments = ref(false)
 const selectedFoodLogDate = ref(getCurrentLocalDate())
+const selectedWorkoutLogDate = ref(getCurrentLocalDate())
 
 function getCurrentLocalDateTime() {
   const now = new Date()
@@ -818,6 +835,14 @@ function goToPreviousFoodLogDate() {
 
 function goToNextFoodLogDate() {
   selectedFoodLogDate.value = shiftLocalDate(selectedFoodLogDate.value, 1)
+}
+
+function goToPreviousWorkoutLogDate() {
+  selectedWorkoutLogDate.value = shiftLocalDate(selectedWorkoutLogDate.value, -1)
+}
+
+function goToNextWorkoutLogDate() {
+  selectedWorkoutLogDate.value = shiftLocalDate(selectedWorkoutLogDate.value, 1)
 }
 
 const selectedFoodLogDayOfWeek = computed(() => {
@@ -1456,22 +1481,26 @@ const foodFatProgress = computed(() => {
 })
 
 const workoutTableRows = computed(() => {
+  const selectedDateKey = selectedWorkoutLogDate.value || getCurrentLocalDate()
+
   return (workoutLogsStore.logs || []).map((log) => {
     const workout = log.workout || {}
     const workoutLabel = workout.type || `Workout #${log.workout_id}`
     const workoutTime = log.workout_time ?? workout.average_workout_time ?? 'N/A'
     const workoutCaloriesBurned = Number(log.calories_burned) || 0
+    const logDate = String(log?.date || '').slice(0, 10)
 
     return {
       ...log,
       description: workoutLabel,
+      isSelectedWorkoutLogDate: logDate === selectedDateKey,
       summary: `${workoutLabel} | ${workoutTime} (minutes) | ${workoutCaloriesBurned} (calories burned) | ${log.date || ''}`,
     }
   })
 })
 
 const totalWorkoutCaloriesBurnedToday = computed(() => {
-  const selectedDateKey = selectedFoodLogDate.value || getCurrentLocalDate()
+  const selectedDateKey = selectedWorkoutLogDate.value || getCurrentLocalDate()
 
   return (workoutLogsStore.logs || []).reduce((sum, log) => {
     const logDate = String(log?.date || '').slice(0, 10)
