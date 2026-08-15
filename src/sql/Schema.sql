@@ -1,10 +1,14 @@
 -- ============================================================ 
 -- ENUM TYPES 
 -- ============================================================ 
-CREATE TYPE public.diet_type AS ENUM ( 'Low Cal', 'Low Carb', 'Lean Muscle', 'High Metabolic' ); 
-CREATE TYPE public.food_serving_unit AS ENUM ( 'cup', 'oz', 'grams', 'slice', 'bar', 'unit' ); 
+DROP TYPE IF EXISTS public.diet_type;
+CREATE TYPE public.diet_type AS ENUM ( 'Balanced', 'Low Carb', 'High Protein', 'High Metabolic' ); 
+CREATE TYPE public.food_serving_unit AS ENUM ( 'oz', 'gram', 'cup', 'scoop', 'bar', 'can', 'count',
+'item', 'piece', 'pinch', 'serving', 'slice', 'tab', 'tbsp', 'tsp' ); 
+
+DROP TYPE IF EXISTS public.supplement_serving_unit;
 CREATE TYPE public.supplement_serving_unit AS ENUM ( 'pills', 'oz', 'scoop', 'glasses', 'other' );
-CREATE TYPE public.activity_level AS ENUM ( 'Low', 'Medium', 'High' );
+
 
 -- ============================================================ 
 -- USERS 
@@ -23,20 +27,59 @@ CREATE TABLE public.users (
   CONSTRAINT users_pkey PRIMARY KEY (user_id)
 );
 
-DROP TABLE IF EXISTS public.profile;
+-- ============================================================ 
+-- PROFILES
+-- ============================================================
+
+
+CREATE TYPE public.activity_level AS ENUM ( 'Low', 'Medium', 'High', 'Sedentary', 'LightlyActive', 'VeryActive', 'ExtremelyActive' );
+CREATE TYPE public.activity_level_new AS ENUM (
+  'Low', 
+  'Medium', 
+  'High', 
+  'Sedentary',
+  'LightlyActive',
+  'ModeratelyActive',
+  'VeryActive',
+  'ExtremelyActive'
+);
+
+ALTER TABLE public.profile
+ALTER COLUMN activity_level
+TYPE public.activity_level_new
+USING activity_level::text::public.activity_level_new;
+
+Update profile
+  set activity_level = 'LightlyActive'
+where activity_level = 'Low'
+
+Update profile
+  set activity_level = 'ModeratelyActive'
+where activity_level = 'Medium'
+
+DROP TYPE IF EXISTS public.activity_level;
+
+CREATE TYPE public.activity_level AS ENUM ( 'Sedentary', 'LightlyActive', 'ModeratelyActive', 'VeryActive', 'ExtremelyActive' );
+
+ALTER TABLE public.profile
+ALTER COLUMN activity_level
+TYPE public.activity_level
+USING activity_level::text::public.activity_level;
+
+
 
 CREATE TABLE public.profile (
     profile_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 
     user_id uuid NOT NULL UNIQUE,
 
-	weight numeric(6,2) CHECK (weight >= 0), 
+    start_weight numeric(6,2) CHECK (start_weight >= 0), 
 
-	goal_weight numeric(6,2) CHECK (goal_weight >= 0),
-	
-	height numeric(6,2) CHECK (height >= 0), 
+    goal_weight numeric(6,2) CHECK (goal_weight >= 0),
 
-    activity_level public.activity_level,		
+    height numeric(6,2) CHECK (height >= 0), 
+
+		activity_level public.activity_level,	
 
     daily_calorie_deficit integer NOT NULL DEFAULT 0
         CHECK (daily_calorie_deficit >= 0),
@@ -84,13 +127,38 @@ CREATE TABLE public.profile (
 -- ============================================================ 
 -- FOOD 
 -- ============================================================ 
+
+SET DEFAULT 'serving'::public.food_serving_unit_new;
+
+ALTER TABLE public.food
+ALTER COLUMN serving_unit
+TYPE public.food_serving_unit
+USING serving_unit::text::public.food_serving_unit;
+
+ALTER TABLE public.food
+  ALTER COLUMN serving_unit DROP DEFAULT;
+
+
+  select * from food
+
+update food
+  set serving_unit = 'serving'
+where serving_unit = 'unit'
+
+update food
+  set serving_unit = 'gram'
+where serving_unit = 'grams'
+
+ALTER TABLE public.food
+ALTER COLUMN serving_unit
+SET DEFAULT 'serving';
+
 CREATE TABLE public.food ( 
 	food_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
 	user_id uuid NOT NULL REFERENCES public.users(user_id) ON DELETE CASCADE, 
-	description text NOT NULL, 
-	protein numeric(8,2) NOT NULL DEFAULT 0 CHECK (protein >= 0), 
-	carb numeric(8,2) NOT NULL DEFAULT 0 CHECK (carb >= 0), 
+	description text NOT NULL, protein numeric(8,2) NOT NULL DEFAULT 0 CHECK (protein >= 0), 
 	fat numeric(8,2) NOT NULL DEFAULT 0 CHECK (fat >= 0), 
+	carb numeric(8,2) NOT NULL DEFAULT 0 CHECK (carb >= 0), 
 	calories_extra numeric(8,2) NOT NULL DEFAULT 0 CHECK (calories_extra >= 0), 
 	my_food boolean NOT NULL DEFAULT true, 
 	favorite_food boolean NOT NULL DEFAULT false, 
@@ -119,6 +187,8 @@ CREATE TABLE public.food_log (
 -- user_id was added here so each supplement can belong 
 -- to a specific user, consistent with Food and Workout. 
 -- ============================================================ 
+DROP TABLE IF EXISTS public.supplement;
+
 CREATE TABLE public.supplement ( 
 	supplement_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
 	user_id uuid NOT NULL REFERENCES public.users(user_id) ON DELETE CASCADE, 
@@ -132,6 +202,8 @@ CREATE TABLE public.supplement (
 -- ============================================================ 
 -- SUPPLEMENT LOG 
 -- ============================================================ 
+DROP TABLE IF EXISTS public.supplement_log;
+
 CREATE TABLE public.supplement_log ( 
 	supplement_log_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
 	supplement_id bigint NOT NULL REFERENCES public.supplement(supplement_id) ON DELETE CASCADE, 
@@ -156,6 +228,8 @@ CREATE TABLE public.workout (
 -- ============================================================ 
 -- WORKOUT LOG 
 -- ============================================================ 
+DROP TABLE IF EXISTS public.workout_log;
+
 CREATE TABLE public.workout_log ( 
 	workout_log_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
 	workout_id bigint NOT NULL REFERENCES public.workout(workout_id) ON DELETE CASCADE, 
@@ -179,14 +253,15 @@ CREATE TABLE public.weight_log (
 -- ============================================================ 
 -- users_logged_in
 -- ============================================================ 
-CREATE TABLE public.users_logged_in (
-    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    users_email text NOT NULL UNIQUE,
-    public_ip text NOT NULL UNIQUE,
-	is_logged_in boolean NOT NULL DEFAULT true,
-    date date NOT NULL DEFAULT CURRENT_DATE
-);
+DROP TABLE IF EXISTS public.users_logged_in;
 
+CREATE TABLE public.users_logged_in (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  users_email text NOT NULL UNIQUE,
+  public_ip text NOT NULL UNIQUE,
+  is_logged_in boolean NOT NULL DEFAULT true,
+  updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
 
 -- ============================================================ 
 -- INDEXES 
@@ -218,26 +293,24 @@ CREATE INDEX workout_log_date_idx ON public.workout_log(date);
 CREATE INDEX weight_log_user_id_idx ON public.weight_log(user_id); 
 CREATE INDEX weight_log_date_idx ON public.weight_log(date);
 
+select * from public.ue
+select * from public.profile
+select * from public.supplement
+select * from public.supplement_log
+select * from public.workout_log 
+select * from public.workout
+select * from public.food
+select * from public.food_log 
+order by datetime desc
+select *
+from public.food where food_id = 15
+select * from public.users_logged_in
 
-
--- ============================================================ 
--- Working
--- ============================================================ 
-
-ALTER TABLE weight_log RENAME TO weight_log_bak;
-
-drop table weight_log;
-
-INSERT INTO weight_log (user_id, weight, date)
-SELECT user_id, weight, date
-FROM weight_log_bak;
-
-select * from weight_log
-
-CREATE TABLE public.weight_log ( 
-	weight_log_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
-	user_id uuid NOT NULL REFERENCES public.users(user_id) ON DELETE CASCADE, 
-	weight numeric(8,2) NOT NULL CHECK (weight > 0), 
-	bmi numeric(5,2),
-	date date NOT NULL DEFAULT CURRENT_DATE 
-);
+SELECT
+  column_name,
+  data_type,
+  udt_name
+FROM information_schema.columns
+WHERE table_schema = 'public'
+  AND table_name = 'profile'
+ORDER BY ordinal_position;
