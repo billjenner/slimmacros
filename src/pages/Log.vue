@@ -91,7 +91,27 @@
                         />
                       </div>
 
-                      <div class="col-12 col-md-6">
+                      <div class="col-12 col-md-3">
+                        <q-input
+                          :model-value="selectedFood?.serving_size ?? 1"
+                          label="Serving size"
+                          readonly
+                          filled
+                          dense
+                        />
+                      </div>
+
+                      <div class="col-12 col-md-3">
+                        <q-input
+                          :model-value="selectedFood?.serving_unit || 'unit'"
+                          label="Serving unit"
+                          readonly
+                          filled
+                          dense
+                        />
+                      </div>
+
+                      <div class="col-12 col-md-3">
                         <q-input
                           :model-value="selectedFoodCalories"
                           label="Calories per serving"
