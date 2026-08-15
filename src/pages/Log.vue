@@ -150,8 +150,8 @@
                 </q-card>
               </q-form>
 
-              <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-                <div class="row items-center q-mb-sm">
+              <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
+                <div class="row items-center q-px-md q-py-sm">
                   <div class="col text-subtitle2 text-center">{{ selectedFoodLogDayOfWeek }}</div>
                   <div class="row items-center no-wrap q-gutter-xs">
                     <q-btn flat dense type="button" label="<" @click="goToPreviousFoodLogDate" />
@@ -235,8 +235,8 @@
                 </q-markup-table>
               </q-card>
 
-              <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-                <div class="row items-center justify-between q-mb-sm">
+              <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
+                <div class="row items-center justify-between q-px-md q-py-sm">
                   <div class="text-subtitle1">Logged foods</div>
                   <q-chip color="secondary" text-color="white" square>
                     Total logged calories today: {{ Math.round(totalLoggedCalories) }}
@@ -253,6 +253,8 @@
                   bordered
                   dense
                   hide-header
+                  square
+                  class="full-width no-border"
                   :loading="foodLogsStore.loading"
                   no-data-label="No food log records yet."
                 >
@@ -386,8 +388,8 @@
                 </q-card>
               </q-form>
 
-              <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-                <div class="row items-center justify-between q-mb-sm">
+              <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
+                <div class="row items-center justify-between q-px-md q-py-sm">
                   <div class="row items-center no-wrap q-gutter-xs">
                     <div class="text-subtitle1">Logged workouts</div>
                   </div>
@@ -420,6 +422,8 @@
                   bordered
                   dense
                   hide-header
+                  square
+                  class="full-width no-border"
                   :loading="workoutLogsStore.loading"
                   no-data-label="No workout log records yet."
                 >
@@ -554,8 +558,8 @@
                 </q-card>
               </q-form>
 
-              <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-                <div class="row items-center justify-between q-mb-sm">
+              <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
+                <div class="row items-center justify-between q-px-md q-py-sm">
                   <div class="row items-center no-wrap q-gutter-xs">
                     <div class="text-subtitle1">Logged suppliments</div>
                   </div>
@@ -594,6 +598,8 @@
                   bordered
                   dense
                   hide-header
+                  square
+                  class="full-width no-border"
                   :loading="supplementLogsStore.loading"
                   no-data-label="No suppliment log records yet."
                 >
@@ -707,8 +713,8 @@
                 </q-card>
               </q-form>
 
-              <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-                <div class="row items-center q-mb-sm no-wrap q-gutter-sm">
+              <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
+                <div class="row items-center q-px-md q-py-sm no-wrap q-gutter-sm">
                   <q-chip color="secondary" text-color="white" square>
                     {{ Math.round(currentProfile?.start_weight ?? 0) }}
                   </q-chip>
@@ -718,7 +724,7 @@
                   </q-chip>
                 </div>
 
-                <div class="row items-center no-wrap q-gutter-sm">
+                <div class="row items-center no-wrap q-gutter-sm q-px-md q-pb-md">
                   <q-linear-progress
                     class="col"
                     :value="weightProgressValue"
@@ -732,8 +738,8 @@
                 </div>
               </q-card>
 
-              <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-                <div class="text-subtitle1 q-mb-sm">Logged weight</div>
+              <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
+                <div class="text-subtitle1 q-px-md q-pt-md q-pb-sm">Logged weight</div>
 
                 <q-table
                   :rows="weightTableRows"
@@ -745,6 +751,8 @@
                   bordered
                   dense
                   hide-header
+                  square
+                  class="full-width no-border"
                   :loading="weightLogsStore.loading"
                   no-data-label="No weight log records yet."
                 >

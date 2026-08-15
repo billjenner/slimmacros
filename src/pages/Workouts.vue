@@ -105,8 +105,8 @@
             </q-card>
           </q-dialog>
 
-          <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-            <div class="row items-center justify-between q-mb-sm">
+          <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
+            <div class="row items-center justify-between q-px-md q-py-sm">
               <div class="text-subtitle1">Saved workouts</div>
               <q-toggle v-model="showSharedWorkouts" label="Show shared workouts" />
             </div>
@@ -121,6 +121,8 @@
               bordered
               dense
               hide-header
+              square
+              class="full-width no-border"
               :loading="store.loading"
               no-data-label="No workout records yet."
             >
