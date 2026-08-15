@@ -391,7 +391,10 @@
                   <div class="row items-center no-wrap q-gutter-xs">
                     <div class="text-subtitle1">Logged workouts</div>
                   </div>
-                  <div class="row items-center no-wrap q-gutter-xs" style="justify-content: center; flex: 1;">
+                  <div
+                    class="row items-center no-wrap q-gutter-xs"
+                    style="justify-content: center; flex: 1"
+                  >
                     <q-btn flat dense type="button" label="<" @click="goToPreviousWorkoutLogDate" />
                     <q-input
                       v-model="selectedWorkoutLogDate"
@@ -552,7 +555,34 @@
               </q-form>
 
               <q-card flat bordered class="q-pa-md bg-grey-1 q-mt-md">
-                <div class="text-subtitle1 q-mb-sm">Logged suppliments</div>
+                <div class="row items-center justify-between q-mb-sm">
+                  <div class="row items-center no-wrap q-gutter-xs">
+                    <div class="text-subtitle1">Logged suppliments</div>
+                  </div>
+                  <div
+                    class="row items-center no-wrap q-gutter-xs"
+                    style="justify-content: center; flex: 1"
+                  >
+                    <q-btn
+                      flat
+                      dense
+                      type="button"
+                      label="<"
+                      @click="goToPreviousSupplementLogDate"
+                    />
+                    <q-input
+                      v-model="selectedSupplimentLogDate"
+                      type="date"
+                      filled
+                      dense
+                      style="max-width: 220px"
+                    />
+                    <q-btn flat dense type="button" label=">" @click="goToNextSupplementLogDate" />
+                  </div>
+                  <q-chip color="secondary" text-color="white" square>
+                    Suppliment Count: {{ supplementCountForSelectedDate }}
+                  </q-chip>
+                </div>
 
                 <q-table
                   :rows="supplementTableRows"
@@ -568,7 +598,12 @@
                   no-data-label="No suppliment log records yet."
                 >
                   <template #body="props">
-                    <q-tr :props="props">
+                    <q-tr
+                      :props="props"
+                      :style="
+                        props.row.isSelectedSupplementLogDate ? 'background-color: #D0D0D0' : ''
+                      "
+                    >
                       <q-td key="summary" :props="props">
                         <div class="row items-center full-width">
                           <span>{{ props.row.summary }}</span>
@@ -790,6 +825,7 @@ const includeSharedWorkouts = ref(false)
 const includeSharedSuppliments = ref(false)
 const selectedFoodLogDate = ref(getCurrentLocalDate())
 const selectedWorkoutLogDate = ref(getCurrentLocalDate())
+const selectedSupplimentLogDate = ref(getCurrentLocalDate())
 
 function getCurrentLocalDateTime() {
   const now = new Date()
@@ -843,6 +879,14 @@ function goToPreviousWorkoutLogDate() {
 
 function goToNextWorkoutLogDate() {
   selectedWorkoutLogDate.value = shiftLocalDate(selectedWorkoutLogDate.value, 1)
+}
+
+function goToPreviousSupplementLogDate() {
+  selectedSupplimentLogDate.value = shiftLocalDate(selectedSupplimentLogDate.value, -1)
+}
+
+function goToNextSupplementLogDate() {
+  selectedSupplimentLogDate.value = shiftLocalDate(selectedSupplimentLogDate.value, 1)
 }
 
 const selectedFoodLogDayOfWeek = computed(() => {
@@ -1536,7 +1580,22 @@ const workoutTotalCaloriesBurned = computed(() => {
   return Math.round((workoutTime / averageWorkoutTime) * caloriesBurned)
 })
 
+const supplementCountForSelectedDate = computed(() => {
+  const selectedDateKey = selectedSupplimentLogDate.value || getCurrentLocalDate()
+
+  return (supplementLogsStore.logs || []).reduce((sum, log) => {
+    const logDate = String(log?.date || '').slice(0, 10)
+    if (logDate !== selectedDateKey) {
+      return sum
+    }
+
+    return sum + 1
+  }, 0)
+})
+
 const supplementTableRows = computed(() => {
+  const selectedDateKey = selectedSupplimentLogDate.value || getCurrentLocalDate()
+
   return [...(supplementLogsStore.logs || [])]
     .sort((leftLog, rightLog) => {
       const leftDate = String(leftLog?.date || '')
@@ -1556,10 +1615,12 @@ const supplementTableRows = computed(() => {
       const label = supplement.description || `Suppliment #${log.supplement_id}`
       const servings = Number(log.servings) || 0
       const servingType = supplement.serving_unit || 'other'
+      const logDate = String(log?.date || '').slice(0, 10)
 
       return {
         ...log,
         description: label,
+        isSelectedSupplementLogDate: logDate === selectedDateKey,
         summary: `${label} | ${servings.toFixed(2)} | ${servingType} | ${log.date || ''}`,
       }
     })
