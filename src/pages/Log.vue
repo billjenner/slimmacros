@@ -239,7 +239,7 @@
                 <div class="row items-center justify-between q-px-md q-py-sm">
                   <div class="text-subtitle1">Logged foods</div>
                   <q-chip color="secondary" text-color="white" square>
-                    Total logged calories today: {{ Math.round(totalLoggedCalories) }}
+                    Today's logged calories: {{ Math.round(totalLoggedCalories) }}
                   </q-chip>
                 </div>
 
