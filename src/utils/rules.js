@@ -67,11 +67,11 @@ export function calculateBodyMassIndex({ weight, height }) {
 export function calculateTotalCaloriesForPerson({
   totalDailyCalories,
   dailyCalorieDeficit,
-  totalWorkoutCaloriesBurnedToday,
+  totalWorkoutCaloriesBurnedbyFoodDay,
 }) {
   const numericTotalDailyCalories = toNumber(totalDailyCalories) ?? 2000
   const numericDailyCalorieDeficit = toNumber(dailyCalorieDeficit) ?? 0
-  const numericWorkoutCaloriesBurnedToday = toNumber(totalWorkoutCaloriesBurnedToday) ?? 0
+  const numericWorkoutCaloriesBurnedToday = toNumber(totalWorkoutCaloriesBurnedbyFoodDay) ?? 0
 
   return Math.max(
     0,

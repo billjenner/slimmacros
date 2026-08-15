@@ -406,7 +406,7 @@
                     <q-btn flat dense type="button" label=">" @click="goToNextWorkoutLogDate" />
                   </div>
                   <q-chip color="secondary" text-color="white" square>
-                    Today's calories burned: {{ Math.round(totalWorkoutCaloriesBurnedToday) }}
+                    Today's calories burned: {{ Math.round(totalWorkoutCaloriesBurnedbyDay) }}
                   </q-chip>
                 </div>
 
@@ -1374,7 +1374,7 @@ const totalCaloriesForPerson = computed(() => {
   return calculateTotalCaloriesForPerson({
     totalDailyCalories: totalDailyCalories.value,
     dailyCalorieDeficit: currentProfile.value?.daily_calorie_deficit,
-    totalWorkoutCaloriesBurnedToday: totalWorkoutCaloriesBurnedToday.value,
+    totalWorkoutCaloriesBurnedbyFoodDay: totalWorkoutCaloriesBurnedbyFoodDay.value,
   })
 })
 
@@ -1543,8 +1543,21 @@ const workoutTableRows = computed(() => {
   })
 })
 
-const totalWorkoutCaloriesBurnedToday = computed(() => {
+const totalWorkoutCaloriesBurnedbyDay = computed(() => {
   const selectedDateKey = selectedWorkoutLogDate.value || getCurrentLocalDate()
+
+  return (workoutLogsStore.logs || []).reduce((sum, log) => {
+    const logDate = String(log?.date || '').slice(0, 10)
+    if (logDate !== selectedDateKey) {
+      return sum
+    }
+
+    return sum + (Number(log?.calories_burned) || 0)
+  }, 0)
+})
+
+const totalWorkoutCaloriesBurnedbyFoodDay = computed(() => {
+  const selectedDateKey = selectedFoodLogDate.value || getCurrentLocalDate()
 
   return (workoutLogsStore.logs || []).reduce((sum, log) => {
     const logDate = String(log?.date || '').slice(0, 10)
