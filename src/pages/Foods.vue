@@ -320,6 +320,36 @@
                         size="8px"
                         rounded
                       />
+
+                      <div class="q-mt-sm">
+                        <div class="text-caption text-grey-7 q-mb-xs">Protein calories</div>
+                        <q-linear-progress
+                          :value="getMacroProgress(props.row, 'protein')"
+                          color="green"
+                          size="8px"
+                          rounded
+                        />
+                      </div>
+
+                      <div class="q-mt-sm">
+                        <div class="text-caption text-grey-7 q-mb-xs">Carb calories</div>
+                        <q-linear-progress
+                          :value="getMacroProgress(props.row, 'carbs')"
+                          color="yellow"
+                          size="8px"
+                          rounded
+                        />
+                      </div>
+
+                      <div class="q-mt-sm">
+                        <div class="text-caption text-grey-7 q-mb-xs">Fat calories</div>
+                        <q-linear-progress
+                          :value="getMacroProgress(props.row, 'fat')"
+                          color="blue"
+                          size="8px"
+                          rounded
+                        />
+                      </div>
                     </div>
                   </q-td>
                 </q-tr>
@@ -468,6 +498,38 @@ function sharedRowClass(row) {
 
 function isExpanded(row) {
   return expandedFoodIds.value.includes(row?.food_id)
+}
+
+function getMacroBreakdown(row) {
+  const proteinCalories = (Number(row?.protein) || 0) * 4
+  const carbCalories = (Number(row?.carb) || 0) * 4
+  const fatCalories = (Number(row?.fat) || 0) * 9
+  const totalCalories = proteinCalories + carbCalories + fatCalories
+
+  return {
+    proteinCalories,
+    carbCalories,
+    fatCalories,
+    totalCalories,
+  }
+}
+
+function getMacroProgress(row, macroName) {
+  const breakdown = getMacroBreakdown(row)
+  const macroCalorieMap = {
+    protein: breakdown.proteinCalories,
+    carbs: breakdown.carbCalories,
+    fat: breakdown.fatCalories,
+  }
+
+  const macroCalories = Number(macroCalorieMap[macroName]) || 0
+  const totalCalories = Number(breakdown.totalCalories) || 0
+
+  if (!totalCalories) {
+    return 0
+  }
+
+  return Math.min(1, Math.max(0, macroCalories / totalCalories))
 }
 
 function toggleExpanded(row) {
