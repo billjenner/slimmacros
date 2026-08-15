@@ -1,7 +1,9 @@
 const ACTIVITY_LEVEL_MULTIPLIERS = {
-  Low: 1.35,
-  Medium: 1.55,
-  High: 1.75,
+  Sedentary: 1.2,
+  LightlyActive: 1.27,
+  ModeratelyActive: 1.55,
+  VeryActive: 1.725,
+  ExtremelyActive: 1.9,
 }
 
 function normalizeSex(sex) {
@@ -74,9 +76,7 @@ export function calculateTotalCaloriesForPerson({
   return Math.max(
     0,
     Math.round(
-      numericTotalDailyCalories -
-        numericDailyCalorieDeficit +
-        numericWorkoutCaloriesBurnedToday,
+      numericTotalDailyCalories - numericDailyCalorieDeficit + numericWorkoutCaloriesBurnedToday,
     ),
   )
 }

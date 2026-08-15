@@ -44,7 +44,7 @@
                     type="number"
                     label="Start weight (lbs)"
                     min="0"
-                    step="0.01"
+                    step="0.1"
                     filled
                     dense
                   />
@@ -56,7 +56,7 @@
                     type="number"
                     label="Goal weight (lbs)"
                     min="0"
-                    step="0.01"
+                    step="1.0"
                     filled
                     dense
                   />
@@ -68,7 +68,7 @@
                     type="number"
                     label="Height (inches)"
                     min="0"
-                    step="0.01"
+                    step="1.0"
                     filled
                     dense
                   />
@@ -208,9 +208,11 @@ const dietTypeOptions = [
 ]
 
 const activityLevelOptions = [
-  { label: 'Low', value: 'Low' },
-  { label: 'Medium', value: 'Medium' },
-  { label: 'High', value: 'High' },
+  { label: 'Sedentary', value: 'Sedentary' },
+  { label: 'Lightly active', value: 'LightlyActive' },
+  { label: 'Moderately active', value: 'ModeratelyActive' },
+  { label: 'Very active', value: 'VeryActive' },
+  { label: 'Extremely active', value: 'ExtremelyActive' },
 ]
 
 const dayGroups = [
