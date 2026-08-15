@@ -121,7 +121,7 @@
                         />
                       </div>
 
-                      <div class="col-12 col-md-6">
+                      <div class="col-12 col-md-3">
                         <q-input
                           :model-value="entryTotalCalories"
                           label="Total calories"
