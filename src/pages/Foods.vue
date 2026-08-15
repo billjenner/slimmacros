@@ -384,15 +384,17 @@ const foodRows = computed(() => {
     .trim()
     .toLowerCase()
 
-  if (!searchText) {
-    return rowsWithoutShared
-  }
+  const filteredRows = !searchText
+    ? rowsWithoutShared
+    : rowsWithoutShared.filter((row) =>
+        String(row?.description || '')
+          .toLowerCase()
+          .includes(searchText),
+      )
 
-  return rowsWithoutShared.filter((row) =>
-    String(row?.description || '')
-      .toLowerCase()
-      .includes(searchText),
-  )
+  return [...filteredRows].sort((leftRow, rightRow) => {
+    return String(leftRow?.description || '').localeCompare(String(rightRow?.description || ''))
+  })
 })
 const showFoodForm = ref(false)
 const showSharedFoods = ref(false)
