@@ -1471,11 +1471,11 @@ const workoutTableRows = computed(() => {
 })
 
 const totalWorkoutCaloriesBurnedToday = computed(() => {
-  const today = getCurrentLocalDate()
+  const selectedDateKey = selectedFoodLogDate.value || getCurrentLocalDate()
 
   return (workoutLogsStore.logs || []).reduce((sum, log) => {
     const logDate = String(log?.date || '').slice(0, 10)
-    if (logDate !== today) {
+    if (logDate !== selectedDateKey) {
       return sum
     }
 
