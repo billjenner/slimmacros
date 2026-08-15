@@ -342,12 +342,21 @@ const usersStore = useUsersStore()
 const store = useFoodsStore()
 
 const servingUnitOptions = [
-  { label: 'Cup', value: 'cup' },
   { label: 'Ounce', value: 'oz' },
-  { label: 'Grams', value: 'grams' },
-  { label: 'Slice', value: 'slice' },
+  { label: 'Gram', value: 'gram' },
+  { label: 'Cup', value: 'cup' },
+  { label: 'Scoop', value: 'scoop' },
   { label: 'Bar', value: 'bar' },
-  { label: 'Unit', value: 'unit' },
+  { label: 'Can', value: 'can' },
+  { label: 'Count', value: 'count' },
+  { label: 'Item', value: 'item' },
+  { label: 'Piece', value: 'piece' },
+  { label: 'Pinch', value: 'pinch' },
+  { label: 'Serving', value: 'serving' },
+  { label: 'Slice', value: 'slice' },
+  { label: 'Tab', value: 'tab' },
+  { label: 'Tablespoon', value: 'tbsp' },
+  { label: 'Teaspoon', value: 'tsp' },
 ]
 
 const food = reactive({
