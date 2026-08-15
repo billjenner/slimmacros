@@ -208,7 +208,7 @@
                       />
 
                       <span class="q-ml-lg">
-                        {{ props.row.description }}
+                        {{ formatFoodRowSummary(props.row) }}
                       </span>
 
                       <q-chip
@@ -437,6 +437,18 @@ async function loadFoodsForCurrentUser(userId) {
 
 function isOwnedByCurrentUser(row) {
   return Boolean(usersStore.currentUser?.user_id && row?.user_id === usersStore.currentUser.user_id)
+}
+
+function formatFoodRowSummary(row) {
+  const description = String(row?.description || '').trim()
+  const servingSize = Number(row?.serving_size) || 1
+  const servingUnit = String(row?.serving_unit || 'unit').trim() || 'unit'
+  const favoriteMarker = row?.favorite_food ? ' | *' : ''
+
+  return `${description || 'Food'} | ${servingSize
+    .toFixed(2)
+    .replace(/\.00$/, '')
+    .replace(/(\.\d)0$/, '$1')} | ${servingUnit}${favoriteMarker}`
 }
 
 function sharedRowClass(row) {

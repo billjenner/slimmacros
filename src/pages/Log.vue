@@ -943,18 +943,11 @@ const weightColumns = [
 
 function sortFoodsForOptionList(foods = []) {
   return [...foods].sort((leftFood, rightFood) => {
-    const leftIsFavorite = leftFood?.favorite_food ? 1 : 0
-    const rightIsFavorite = rightFood?.favorite_food ? 1 : 0
+    const leftIsFavorite = Boolean(leftFood?.favorite_food)
+    const rightIsFavorite = Boolean(rightFood?.favorite_food)
 
     if (leftIsFavorite !== rightIsFavorite) {
-      return rightIsFavorite - leftIsFavorite
-    }
-
-    const leftCreatedAt = new Date(leftFood?.created_at || 0).getTime()
-    const rightCreatedAt = new Date(rightFood?.created_at || 0).getTime()
-
-    if (leftCreatedAt !== rightCreatedAt) {
-      return rightCreatedAt - leftCreatedAt
+      return Number(rightIsFavorite) - Number(leftIsFavorite)
     }
 
     return String(leftFood?.description || '').localeCompare(String(rightFood?.description || ''))
@@ -970,7 +963,7 @@ const foodOptions = computed(() => {
 
   if (!includeSharedFoods.value) {
     return ownFoods.map((food) => ({
-      label: food.description,
+      label: `${food.description}${food.favorite_food ? ' | *' : ''}`,
       value: food.food_id,
     }))
   }
@@ -980,7 +973,7 @@ const foodOptions = computed(() => {
   )
 
   return [...ownFoods, ...sharedFoods].map((food) => ({
-    label: food.description,
+    label: `${food.description}${food.favorite_food ? ' | *' : ''}`,
     value: food.food_id,
   }))
 })
