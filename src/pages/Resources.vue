@@ -503,9 +503,11 @@
 import { Chart } from 'chart.js/auto'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
+import { useProfilesStore } from 'stores/profiles'
 import { useWeightLogsStore } from 'stores/weight-logs'
 
 const usersStore = useUsersStore()
+const profilesStore = useProfilesStore()
 const weightLogsStore = useWeightLogsStore()
 const weightLogChart = ref(null)
 let chart = null
@@ -514,6 +516,18 @@ const chartLogs = computed(() => {
   return [...(weightLogsStore.logs || [])]
     .filter((log) => log?.date && Number.isFinite(Number(log?.weight)))
     .sort((leftLog, rightLog) => String(leftLog.date).localeCompare(String(rightLog.date)))
+})
+
+const weightAxisBounds = computed(() => {
+  const min = Number(profilesStore.currentProfile?.goal_weight)
+  const startWeight = Number(profilesStore.currentProfile?.start_weight)
+  const max = startWeight + 5
+
+  if (!Number.isFinite(min) || !Number.isFinite(max) || min >= max) {
+    return {}
+  }
+
+  return { min, max }
 })
 
 function destroyChart() {
@@ -541,6 +555,7 @@ async function renderChart() {
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           fill: false,
           tension: 0.3,
+          yAxisID: 'yWeight',
         },
         {
           label: 'BMI',
@@ -553,12 +568,40 @@ async function renderChart() {
           fill: false,
           tension: 0.3,
           spanGaps: true,
+          yAxisID: 'yBMI',
         },
       ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+
+      scales: {
+        yWeight: {
+          type: 'linear',
+          position: 'left',
+          ...weightAxisBounds.value,
+          title: {
+            display: true,
+            text: 'Weight (lbs)',
+          },
+        },
+
+        yBMI: {
+          type: 'linear',
+          position: 'right',
+          title: {
+            display: true,
+            text: 'BMI',
+          },
+
+          // Prevent the BMI grid lines from being drawn over
+          // the Weight grid lines.
+          grid: {
+            drawOnChartArea: false,
+          },
+        },
+      },
     },
   })
 }
@@ -570,16 +613,21 @@ watch(
 
     if (!userId) {
       weightLogsStore.logs = []
+      profilesStore.currentProfile = null
       return
     }
 
-    await weightLogsStore.loadWeightLogs(userId)
+    await Promise.all([
+      weightLogsStore.loadWeightLogs(userId),
+      profilesStore.loadCurrentProfile(userId),
+    ])
     await renderChart()
   },
   { immediate: true },
 )
 
 watch(chartLogs, renderChart)
+watch(weightAxisBounds, renderChart)
 
 onBeforeUnmount(destroyChart)
 </script>
