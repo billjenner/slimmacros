@@ -587,7 +587,7 @@
                     <q-btn flat dense type="button" label=">" @click="goToNextSupplementLogDate" />
                   </div>
                   <q-chip color="secondary" text-color="white" square>
-                    Suppliment Count: {{ supplementCountForSelectedDate }}
+                    Supp. Count: {{ supplementCountForSelectedDate }}
                   </q-chip>
                 </div>
 
@@ -981,7 +981,7 @@ const weightChangeChip = computed(() => {
   }
 
   if (change === 0) {
-    return { label: '----', color: 'grey' }
+    return { label: '-- 0 --', color: 'grey' }
   }
 
   const absoluteChange = Math.abs(change)

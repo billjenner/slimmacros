@@ -1,4 +1,4 @@
-# 🥗 Slim Belly
+# <img src="./public/icons/favicon.ico" alt="Slim Belly" width="32" height="32" /> Slim Belly
 
 > **Your daily companion for smarter nutrition, healthier habits, and measurable progress.**
 
@@ -16,10 +16,10 @@ Follow a nutrition profile that fits your goals and keep track of your daily mac
 
 Choose from:
 
-* **Balanced** — A well-rounded approach to daily nutrition
-* **Low Carb** — Reduce carbohydrate intake while focusing on nutritious foods
-* **High Protein** — Prioritize protein-rich foods to support your goals
-* **High Metabolic** — Follow a metabolism-focused nutrition approach
+- **Balanced** — A well-rounded approach to daily nutrition
+- **Low Carb** — Reduce carbohydrate intake while focusing on nutritious foods
+- **High Protein** — Prioritize protein-rich foods to support your goals
+- **High Metabolic** — Follow a metabolism-focused nutrition approach
 
 ### 🍽️ Manage Your Meals
 
@@ -47,7 +47,7 @@ Slim Belly brings the important pieces of your wellness routine together in one 
 
 | Feature            | Description                                                       |
 | ------------------ | ----------------------------------------------------------------- |
-| 🍽️ **Meals**      | Track what you eat throughout the day                             |
+| 🍽️ **Meals**       | Track what you eat throughout the day                             |
 | 🥗 **Macros**      | Monitor protein, carbohydrates, fats, and other nutritional goals |
 | 🏃 **Exercise**    | Keep track of your exercise and daily activity                    |
 | 💊 **Supplements** | Record your daily supplements                                     |
@@ -63,12 +63,12 @@ Small, consistent actions can make a big difference.
 
 Use **Slim Belly** regularly to:
 
-* Understand your eating patterns
-* Stay accountable to your nutrition goals
-* Monitor your progress
-* Track exercise and supplements
-* Identify trends in your wellness journey
-* Make more informed lifestyle decisions
+- Understand your eating patterns
+- Stay accountable to your nutrition goals
+- Monitor your progress
+- Track exercise and supplements
+- Identify trends in your wellness journey
+- Make more informed lifestyle decisions
 
 ---
 
