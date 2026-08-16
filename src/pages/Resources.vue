@@ -7,7 +7,7 @@
         expanded-icon="keyboard_arrow_up"
         transition-show="jump-down"
         transition-hide="jump-up"
-        @after-show="renderChart"
+        @after-show="renderWeightChart"
       >
         <q-card-section>
           <q-banner v-if="weightLogsStore.error" class="bg-negative text-white" rounded>
@@ -16,7 +16,10 @@
           <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
             Sign in to view your weight and BMI progress.
           </q-banner>
-          <q-banner v-else-if="!weightLogsStore.loading && !chartLogs.length" class="bg-grey-2">
+          <q-banner
+            v-else-if="!weightLogsStore.loading && !weightChartLogs.length"
+            class="bg-grey-2"
+          >
             Add weight entries to see your progress chart.
           </q-banner>
           <div v-else class="weight-log-chart">
@@ -643,12 +646,12 @@ const weightLogChart = ref(null)
 const workoutCaloriesChart = ref(null)
 const foodCaloriesChart = ref(null)
 const supplementCountChart = ref(null)
-let chart = null
+let weightChart = null
 let workoutChart = null
 let foodChart = null
 let supplementChart = null
 
-const chartLogs = computed(() => {
+const weightChartLogs = computed(() => {
   return [...(weightLogsStore.logs || [])]
     .filter((log) => log?.date && Number.isFinite(Number(log?.weight)))
     .sort((leftLog, rightLog) => String(leftLog.date).localeCompare(String(rightLog.date)))
@@ -726,9 +729,9 @@ const weightAxisBounds = computed(() => {
   return { min, max }
 })
 
-function destroyChart() {
-  chart?.destroy()
-  chart = null
+function destroyWeightChart() {
+  weightChart?.destroy()
+  weightChart = null
 }
 
 function destroyWorkoutChart() {
@@ -746,22 +749,22 @@ function destroySupplementChart() {
   supplementChart = null
 }
 
-async function renderChart() {
+async function renderWeightChart() {
   await nextTick()
-  destroyChart()
+  destroyWeightChart()
 
-  if (!weightLogChart.value || !chartLogs.value.length) {
+  if (!weightLogChart.value || !weightChartLogs.value.length) {
     return
   }
 
-  chart = new Chart(weightLogChart.value, {
+  weightChart = new Chart(weightLogChart.value, {
     type: 'line',
     data: {
-      labels: chartLogs.value.map((log) => log.date),
+      labels: weightChartLogs.value.map((log) => log.date),
       datasets: [
         {
           label: 'Weight',
-          data: chartLogs.value.map((log) => Number(log.weight)),
+          data: weightChartLogs.value.map((log) => Number(log.weight)),
           borderColor: 'rgba(255, 99, 132, 1)',
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           fill: false,
@@ -770,7 +773,7 @@ async function renderChart() {
         },
         {
           label: 'BMI',
-          data: chartLogs.value.map((log) => {
+          data: weightChartLogs.value.map((log) => {
             const bmi = Number(log.bmi)
             return Number.isFinite(bmi) ? bmi : null
           }),
@@ -810,44 +813,6 @@ async function renderChart() {
           // the Weight grid lines.
           grid: {
             drawOnChartArea: false,
-          },
-        },
-      },
-    },
-  })
-}
-
-async function renderWorkoutChart() {
-  await nextTick()
-  destroyWorkoutChart()
-
-  if (!workoutCaloriesChart.value || !workoutCaloriesByDay.value.length) {
-    return
-  }
-
-  workoutChart = new Chart(workoutCaloriesChart.value, {
-    type: 'bar',
-    data: {
-      labels: workoutCaloriesByDay.value.map((day) => day.date),
-      datasets: [
-        {
-          label: 'Calories burned',
-          data: workoutCaloriesByDay.value.map((day) => day.caloriesBurned),
-          backgroundColor: 'rgba(255, 112, 67, 0.65)',
-          borderColor: 'rgba(255, 159, 64, 1)',
-          borderWidth: 1,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Calories burned',
           },
         },
       },
@@ -905,6 +870,44 @@ async function renderFoodChart() {
   })
 }
 
+async function renderWorkoutChart() {
+  await nextTick()
+  destroyWorkoutChart()
+
+  if (!workoutCaloriesChart.value || !workoutCaloriesByDay.value.length) {
+    return
+  }
+
+  workoutChart = new Chart(workoutCaloriesChart.value, {
+    type: 'bar',
+    data: {
+      labels: workoutCaloriesByDay.value.map((day) => day.date),
+      datasets: [
+        {
+          label: 'Calories burned',
+          data: workoutCaloriesByDay.value.map((day) => day.caloriesBurned),
+          backgroundColor: 'rgba(255, 112, 67, 0.65)',
+          borderColor: 'rgba(255, 159, 64, 1)',
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Calories burned',
+          },
+        },
+      },
+    },
+  })
+}
+
 async function renderSupplementChart() {
   await nextTick()
   destroySupplementChart()
@@ -949,15 +952,15 @@ async function renderSupplementChart() {
 watch(
   () => usersStore.currentUser?.user_id,
   async (userId) => {
-    destroyChart()
-    destroyWorkoutChart()
+    destroyWeightChart()
     destroyFoodChart()
+    destroyWorkoutChart()
     destroySupplementChart()
 
     if (!userId) {
       weightLogsStore.logs = []
-      workoutLogsStore.logs = []
       foodLogsStore.logs = []
+      workoutLogsStore.logs = []
       supplementLogsStore.logs = []
       profilesStore.currentProfile = null
       return
@@ -965,12 +968,12 @@ watch(
 
     await Promise.all([
       weightLogsStore.loadWeightLogs(userId),
-      workoutLogsStore.loadWorkoutLogs(userId),
       foodLogsStore.loadFoodLogs(userId),
+      workoutLogsStore.loadWorkoutLogs(userId),
       supplementLogsStore.loadSupplementLogs(userId),
       profilesStore.loadCurrentProfile(userId),
     ])
-    await renderChart()
+    await renderWeightChart()
     await renderWorkoutChart()
     await renderFoodChart()
     await renderSupplementChart()
@@ -978,14 +981,14 @@ watch(
   { immediate: true },
 )
 
-watch(chartLogs, renderChart)
-watch(weightAxisBounds, renderChart)
+watch(weightChartLogs, renderWeightChart)
+watch(weightAxisBounds, renderWeightChart)
 watch(workoutCaloriesByDay, renderWorkoutChart)
 watch(foodCaloriesByDay, renderFoodChart)
 watch(supplementCountsByDay, renderSupplementChart)
 
 onBeforeUnmount(() => {
-  destroyChart()
+  destroyWeightChart()
   destroyWorkoutChart()
   destroyFoodChart()
   destroySupplementChart()
