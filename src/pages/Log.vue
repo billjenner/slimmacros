@@ -408,7 +408,7 @@
                     <q-btn flat dense type="button" label=">" @click="goToNextWorkoutLogDate" />
                   </div>
                   <q-chip color="secondary" text-color="white" square>
-                    Today's calories burned: {{ Math.round(totalWorkoutCaloriesBurnedbyDay) }}
+                    Calories burned: {{ Math.round(totalWorkoutCaloriesBurnedbyDay) }}
                   </q-chip>
                 </div>
 

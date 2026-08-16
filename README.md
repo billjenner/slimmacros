@@ -33,6 +33,30 @@ Organize and review the foods that make up your daily nutrition plan.
 
 ![Food List](./public/FoodList.jpg)
 
+### 📊 View Your Charts
+
+Visualize your progress and daily habits with easy-to-read charts.
+
+![Charts](./public/Charts.jpg)
+
+#### ⚖️ Weight & BMI
+
+Track changes in your weight and BMI over time to better understand your progress and identify trends.
+
+#### 🍽️ Food Calories
+
+Monitor your daily food calorie consumption and compare your intake against your daily calorie goals.
+
+#### 🔥 Workout Calories Burned
+
+Track the calories you burn through your daily workouts and monitor your exercise activity over time.
+
+#### 💊 Daily Supplements
+
+Track your daily supplement intake and monitor your supplement habits over time.
+
+---
+
 ### ⚖️ Monitor Your Progress
 
 Track changes over time and visualize your weight progress to better understand your journey.
@@ -52,7 +76,7 @@ Slim Belly brings the important pieces of your wellness routine together in one 
 | 🏃 **Exercise**    | Keep track of your exercise and daily activity                    |
 | 💊 **Supplements** | Record your daily supplements                                     |
 | ⚖️ **Weight**      | Monitor weight changes over time                                  |
-| 📈 **Progress**    | Visualize your progress and identify trends                       |
+| 📈 **Charts**      | Visualize weight, BMI, food calories, and supplement activity     |
 | 🎯 **Goals**       | Stay focused on your personal wellness objectives                 |
 
 ---
@@ -67,6 +91,9 @@ Use **Slim Belly** regularly to:
 - Stay accountable to your nutrition goals
 - Monitor your progress
 - Track exercise and supplements
+- Visualize your weight and BMI trends
+- Monitor daily calorie consumption
+- Track your daily supplement habits
 - Identify trends in your wellness journey
 - Make more informed lifestyle decisions
 
@@ -77,8 +104,10 @@ Use **Slim Belly** regularly to:
 1. Choose the nutrition profile that best fits your goals.
 2. Track your meals and daily macros.
 3. Record your exercise and supplements.
-4. Monitor your weight and progress.
-5. Review your habits regularly and adjust as needed.
+4. Monitor your weight and BMI.
+5. Review your food calorie consumption.
+6. Review your daily supplement activity.
+7. Use the charts to identify trends and monitor your progress.
 
 ---
 

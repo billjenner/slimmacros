@@ -128,7 +128,7 @@
         <div class="row q-col-gutter-md q-pa-md">
           <div class="col-12 col-sm-6 col-md-6 col-lg-6 flex justify-center">
             <q-card style="width: 95%">
-              <q-card-section class="bg-accent text-center">
+              <q-card-section class="bg-secondary text-white text-center">
                 Start your journey to a healthier lifestyle here.
               </q-card-section>
               <q-expansion-item
@@ -326,7 +326,9 @@
 
           <div class="col-12 col-sm-6 col-md-6 col-lg-6 flex justify-center">
             <q-card style="width: 95%">
-              <q-card-section class="bg-accent text-center"> Suppliments </q-card-section>
+              <q-card-section class="bg-secondary text-white text-center">
+                Suppliments
+              </q-card-section>
 
               <q-expansion-item
                 expand-icon="keyboard_arrow_down"
@@ -551,7 +553,7 @@
 
           <div class="col-12 col-sm-6 col-md-6 col-lg-6 flex justify-center">
             <q-card style="width: 95%">
-              <q-card-section class="bg-accent text-center">
+              <q-card-section class="bg-secondary text-white text-center">
                 HIIT Training Exercises
               </q-card-section>
 
