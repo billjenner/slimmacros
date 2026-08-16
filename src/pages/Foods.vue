@@ -45,7 +45,51 @@
                       :rules="[(value) => !!value?.trim() || 'Description is required']"
                     />
                   </div>
+                </div>
+              </q-card>
 
+              <q-card flat bordered class="q-pa-md bg-grey-1">
+                <div class="row items-center justify-between q-mb-sm">
+                  <div class="text-subtitle1">Serving information</div>
+                  <q-btn
+                    type="button"
+                    color="secondary"
+                    label="Get Macros"
+                    :loading="isGettingMacros"
+                    :disable="!canGetMacros || store.loading"
+                    @click="getMacrosFromAi"
+                  />
+                </div>
+                <div class="row q-col-gutter-md">
+                  <div class="col-12 col-md-6">
+                    <q-input
+                      v-model="food.serving_size"
+                      type="number"
+                      label="Serving size"
+                      min="0.01"
+                      step="0.01"
+                      filled
+                      dense
+                    />
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <q-select
+                      v-model="food.serving_unit"
+                      :options="servingUnitOptions"
+                      label="Serving unit"
+                      filled
+                      dense
+                      emit-value
+                      map-options
+                    />
+                  </div>
+                </div>
+              </q-card>
+
+              <q-card flat bordered class="q-pa-md bg-grey-1">
+                <div class="text-subtitle1 q-mb-sm">Nutrition information</div>
+                <div class="row q-col-gutter-md">
                   <div class="col-12 col-md-6">
                     <q-input
                       v-model="food.protein"
@@ -97,35 +141,6 @@
               </q-card>
 
               <q-card flat bordered class="q-pa-md bg-grey-1">
-                <div class="text-subtitle1 q-mb-sm">Serving information</div>
-                <div class="row q-col-gutter-md">
-                  <div class="col-12 col-md-6">
-                    <q-input
-                      v-model="food.serving_size"
-                      type="number"
-                      label="Serving size"
-                      min="0.01"
-                      step="0.01"
-                      filled
-                      dense
-                    />
-                  </div>
-
-                  <div class="col-12 col-md-6">
-                    <q-select
-                      v-model="food.serving_unit"
-                      :options="servingUnitOptions"
-                      label="Serving unit"
-                      filled
-                      dense
-                      emit-value
-                      map-options
-                    />
-                  </div>
-                </div>
-              </q-card>
-
-              <q-card flat bordered class="q-pa-md bg-grey-1">
                 <div class="text-subtitle1 q-mb-sm">Preferences</div>
                 <div class="row q-col-gutter-md">
                   <div class="col-12 col-md-4">
@@ -143,14 +158,6 @@
               </q-card>
 
               <div class="row justify-end q-gutter-sm">
-                <q-btn
-                  type="button"
-                  color="secondary"
-                  label="Get Macros"
-                  :loading="isGettingMacros"
-                  :disable="!canGetMacros || store.loading"
-                  @click="getMacrosFromAi"
-                />
                 <q-btn
                   type="submit"
                   color="primary"
