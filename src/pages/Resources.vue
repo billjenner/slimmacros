@@ -878,14 +878,40 @@ async function renderWorkoutChart() {
     return
   }
 
+  const workoutByDate = Object.fromEntries(
+    workoutCaloriesByDay.value.map((day) => [day.date, day.caloriesBurned]),
+  )
+
+  const firstDate = new Date(`${workoutCaloriesByDay.value[0].date}T00:00:00`)
+  const lastDate = new Date(
+    `${workoutCaloriesByDay.value[workoutCaloriesByDay.value.length - 1].date}T00:00:00`,
+  )
+
+  const labels = []
+  const data = []
+
+  const currentDate = new Date(firstDate)
+
+  while (currentDate <= lastDate) {
+    const year = currentDate.getFullYear()
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0')
+    const day = String(currentDate.getDate()).padStart(2, '0')
+    const dateKey = `${year}-${month}-${day}`
+
+    labels.push(dateKey)
+    data.push(workoutByDate[dateKey] || 0)
+
+    currentDate.setDate(currentDate.getDate() + 1)
+  }
+
   workoutChart = new Chart(workoutCaloriesChart.value, {
     type: 'bar',
     data: {
-      labels: workoutCaloriesByDay.value.map((day) => day.date),
+      labels,
       datasets: [
         {
           label: 'Calories burned',
-          data: workoutCaloriesByDay.value.map((day) => day.caloriesBurned),
+          data,
           backgroundColor: 'rgba(255, 112, 67, 0.65)',
           borderColor: 'rgba(255, 159, 64, 1)',
           borderWidth: 1,
