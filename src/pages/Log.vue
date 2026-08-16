@@ -244,7 +244,7 @@
                 </div>
 
                 <q-table
-                  :rows="tableRows"
+                  :rows="foodTableRows"
                   :columns="columns"
                   :pagination="{ rowsPerPage: 50 }"
                   :rows-per-page-options="[20, 50, 200, 0]"
@@ -433,9 +433,12 @@
                       :style="props.row.isSelectedWorkoutLogDate ? 'background-color: #D0D0D0' : ''"
                     >
                       <q-td key="summary" :props="props">
-                        <div class="row items-center full-width">
-                          <span>{{ props.row.summary }}</span>
-                          <div class="q-ml-auto">
+                        <div class="row items-end full-width no-wrap q-col-gutter-sm">
+                          <div class="col text-left">
+                            <p class="q-ma-none">{{ props.row.summary.split('\n')[0] }}</p>
+                            <p class="q-ma-none">{{ props.row.summary.split('\n')[1] || '' }}</p>
+                          </div>
+                          <div class="col-auto self-end">
                             <q-btn
                               flat
                               dense
@@ -960,13 +963,13 @@ function formatLocalDateTimeLabel(value) {
     return ''
   }
 
-  const year = dateValue.getFullYear()
-  const month = String(dateValue.getMonth() + 1).padStart(2, '0')
-  const day = String(dateValue.getDate()).padStart(2, '0')
+  //const year = dateValue.getFullYear()
+  //const month = String(dateValue.getMonth() + 1).padStart(2, '0')
+  //const day = String(dateValue.getDate()).padStart(2, '0')
   const hours = String(dateValue.getHours()).padStart(2, '0')
   const minutes = String(dateValue.getMinutes()).padStart(2, '0')
 
-  return `${year}-${month}-${day}   ${hours}:${minutes}`
+  return `${hours}:${minutes}`
 }
 
 const foodLog = reactive({
@@ -1392,7 +1395,7 @@ const carbBudgetPercentForToday = computed(() => {
 })
 
 const totalCarbsLoggedToday = computed(() => {
-  return (tableRows.value || []).reduce((sum, row) => {
+  return (foodTableRows.value || []).reduce((sum, row) => {
     const food = row.food || {}
     const carbsPerServing = Number(food.carb) || 0
     const servings = Number(row.servings) || 0
@@ -1416,7 +1419,7 @@ const fatBudgetPercentForToday = computed(() => {
 })
 
 const totalProteinLoggedToday = computed(() => {
-  return (tableRows.value || []).reduce((sum, row) => {
+  return (foodTableRows.value || []).reduce((sum, row) => {
     const food = row.food || {}
     const proteinPerServing = Number(food.protein) || 0
     const servings = Number(row.servings) || 0
@@ -1430,7 +1433,7 @@ const totalProteinBudgetForToday = computed(() => {
 })
 
 const totalFatLoggedToday = computed(() => {
-  return (tableRows.value || []).reduce((sum, row) => {
+  return (foodTableRows.value || []).reduce((sum, row) => {
     const food = row.food || {}
     const fatPerServing = Number(food.fat) || 0
     const servings = Number(row.servings) || 0
@@ -1465,7 +1468,7 @@ const entryTotalCalories = computed(() => {
   return Math.round(selectedFoodCalories.value * servings)
 })
 
-const tableRows = computed(() => {
+const foodTableRows = computed(() => {
   const selectedDate = selectedFoodLogDate.value || getCurrentLocalDate()
 
   return (foodLogsStore.logs || [])
@@ -1491,13 +1494,13 @@ const tableRows = computed(() => {
         servingsLabel: servings.toFixed(2),
         totalCalories: Math.round(perServingCalories * servings),
         isToday: logDate === selectedDate,
-        summary: `${food.description || `Food #${log.food_id}`} | ${foodServingSize} ${foodServingUnit} | ${servings.toFixed(2)} | ${Math.round(perServingCalories * servings)} | ${logDateTimeLabel}`,
+        summary: `${food.description || `Food #${log.food_id}`} | ${servings.toFixed(2)} | ${foodServingSize} ${foodServingUnit} | ${Math.round(perServingCalories * servings)} | ${logDateTimeLabel}`,
       }
     })
 })
 
 const totalLoggedCalories = computed(() => {
-  return tableRows.value.reduce((sum, row) => sum + (Number(row.totalCalories) || 0), 0)
+  return foodTableRows.value.reduce((sum, row) => sum + (Number(row.totalCalories) || 0), 0)
 })
 
 const foodLogProgress = computed(() => {
@@ -1546,7 +1549,7 @@ const workoutTableRows = computed(() => {
       ...log,
       description: workoutLabel,
       isSelectedWorkoutLogDate: logDate === selectedDateKey,
-      summary: `${workoutLabel} | ${workoutTime} (minutes) | ${workoutCaloriesBurned} (calories burned) | ${log.date || ''}`,
+      summary: `${workoutLabel.trim()} | ${String(workoutTime).trim()} (minutes)\n${String(workoutCaloriesBurned).trim()} (calories burned) | ${log.date || ''}`,
     }
   })
 })
