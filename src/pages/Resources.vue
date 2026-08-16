@@ -1,89 +1,116 @@
 <template>
   <q-page>
     <q-card flat bordered class="q-ma-md">
-      <q-card-section>
-        <div class="text-h6">Weight and BMI progress</div>
-      </q-card-section>
-      <q-card-section>
-        <q-banner v-if="weightLogsStore.error" class="bg-negative text-white" rounded>
-          {{ weightLogsStore.error }}
-        </q-banner>
-        <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
-          Sign in to view your weight and BMI progress.
-        </q-banner>
-        <q-banner v-else-if="!weightLogsStore.loading && !chartLogs.length" class="bg-grey-2">
-          Add weight entries to see your progress chart.
-        </q-banner>
-        <div v-else class="weight-log-chart">
-          <canvas ref="weightLogChart"></canvas>
-        </div>
-      </q-card-section>
+      <q-expansion-item
+        label="Weight and BMI progress"
+        expand-icon="keyboard_arrow_down"
+        expanded-icon="keyboard_arrow_up"
+        transition-show="jump-down"
+        transition-hide="jump-up"
+        @after-show="renderChart"
+      >
+        <q-card-section>
+          <q-banner v-if="weightLogsStore.error" class="bg-negative text-white" rounded>
+            {{ weightLogsStore.error }}
+          </q-banner>
+          <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
+            Sign in to view your weight and BMI progress.
+          </q-banner>
+          <q-banner v-else-if="!weightLogsStore.loading && !chartLogs.length" class="bg-grey-2">
+            Add weight entries to see your progress chart.
+          </q-banner>
+          <div v-else class="weight-log-chart">
+            <canvas ref="weightLogChart"></canvas>
+          </div>
+        </q-card-section>
+      </q-expansion-item>
     </q-card>
 
     <q-card flat bordered class="q-ma-md">
-      <q-card-section>
-        <div class="text-h6">Workout calories burned</div>
-      </q-card-section>
-      <q-card-section>
-        <q-banner v-if="workoutLogsStore.error" class="bg-negative text-white" rounded>
-          {{ workoutLogsStore.error }}
-        </q-banner>
-        <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
-          Sign in to view your workout calories.
-        </q-banner>
-        <q-banner
-          v-else-if="!workoutLogsStore.loading && !workoutCaloriesByDay.length"
-          class="bg-grey-2"
-        >
-          Add workout entries to see your daily calories burned.
-        </q-banner>
-        <div v-else class="workout-calories-chart">
-          <canvas ref="workoutCaloriesChart"></canvas>
-        </div>
-      </q-card-section>
+      <q-expansion-item
+        label="Food Calories"
+        expand-icon="keyboard_arrow_down"
+        expanded-icon="keyboard_arrow_up"
+        transition-show="jump-down"
+        transition-hide="jump-up"
+        @after-show="renderFoodChart"
+      >
+        <q-card-section>
+          <q-banner v-if="foodLogsStore.error" class="bg-negative text-white" rounded>
+            {{ foodLogsStore.error }}
+          </q-banner>
+          <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
+            Sign in to view your food calories.
+          </q-banner>
+          <q-banner
+            v-else-if="!foodLogsStore.loading && !foodCaloriesByDay.length"
+            class="bg-grey-2"
+          >
+            Add food entries to see your daily macro calories.
+          </q-banner>
+          <div v-else class="food-calories-chart">
+            <canvas ref="foodCaloriesChart"></canvas>
+          </div>
+        </q-card-section>
+      </q-expansion-item>
     </q-card>
 
     <q-card flat bordered class="q-ma-md">
-      <q-card-section>
-        <div class="text-h6">Food Calories</div>
-      </q-card-section>
-      <q-card-section>
-        <q-banner v-if="foodLogsStore.error" class="bg-negative text-white" rounded>
-          {{ foodLogsStore.error }}
-        </q-banner>
-        <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
-          Sign in to view your food calories.
-        </q-banner>
-        <q-banner v-else-if="!foodLogsStore.loading && !foodCaloriesByDay.length" class="bg-grey-2">
-          Add food entries to see your daily macro calories.
-        </q-banner>
-        <div v-else class="food-calories-chart">
-          <canvas ref="foodCaloriesChart"></canvas>
-        </div>
-      </q-card-section>
+      <q-expansion-item
+        label="Workout calories burned"
+        expand-icon="keyboard_arrow_down"
+        expanded-icon="keyboard_arrow_up"
+        transition-show="jump-down"
+        transition-hide="jump-up"
+        @after-show="renderWorkoutChart"
+      >
+        <q-card-section>
+          <q-banner v-if="workoutLogsStore.error" class="bg-negative text-white" rounded>
+            {{ workoutLogsStore.error }}
+          </q-banner>
+          <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
+            Sign in to view your workout calories.
+          </q-banner>
+          <q-banner
+            v-else-if="!workoutLogsStore.loading && !workoutCaloriesByDay.length"
+            class="bg-grey-2"
+          >
+            Add workout entries to see your daily calories burned.
+          </q-banner>
+          <div v-else class="workout-calories-chart">
+            <canvas ref="workoutCaloriesChart"></canvas>
+          </div>
+        </q-card-section>
+      </q-expansion-item>
     </q-card>
 
     <q-card flat bordered class="q-ma-md">
-      <q-card-section>
-        <div class="text-h6">Daily Supplements</div>
-      </q-card-section>
-      <q-card-section>
-        <q-banner v-if="supplementLogsStore.error" class="bg-negative text-white" rounded>
-          {{ supplementLogsStore.error }}
-        </q-banner>
-        <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
-          Sign in to view your daily supplements.
-        </q-banner>
-        <q-banner
-          v-else-if="!supplementLogsStore.loading && !supplementCountsByDay.length"
-          class="bg-grey-2"
-        >
-          Add supplement entries to see your daily supplement count.
-        </q-banner>
-        <div v-else class="supplement-count-chart">
-          <canvas ref="supplementCountChart"></canvas>
-        </div>
-      </q-card-section>
+      <q-expansion-item
+        label="Daily Supplements"
+        expand-icon="keyboard_arrow_down"
+        expanded-icon="keyboard_arrow_up"
+        transition-show="jump-down"
+        transition-hide="jump-up"
+        @after-show="renderSupplementChart"
+      >
+        <q-card-section>
+          <q-banner v-if="supplementLogsStore.error" class="bg-negative text-white" rounded>
+            {{ supplementLogsStore.error }}
+          </q-banner>
+          <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
+            Sign in to view your daily supplements.
+          </q-banner>
+          <q-banner
+            v-else-if="!supplementLogsStore.loading && !supplementCountsByDay.length"
+            class="bg-grey-2"
+          >
+            Add supplement entries to see your daily supplement count.
+          </q-banner>
+          <div v-else class="supplement-count-chart">
+            <canvas ref="supplementCountChart"></canvas>
+          </div>
+        </q-card-section>
+      </q-expansion-item>
     </q-card>
 
     <div class="text-h4 q-mb-lg text-center">Resources</div>
