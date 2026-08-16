@@ -43,6 +43,26 @@
       </q-card-section>
     </q-card>
 
+    <q-card flat bordered class="q-ma-md">
+      <q-card-section>
+        <div class="text-h6">Food Calories</div>
+      </q-card-section>
+      <q-card-section>
+        <q-banner v-if="foodLogsStore.error" class="bg-negative text-white" rounded>
+          {{ foodLogsStore.error }}
+        </q-banner>
+        <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
+          Sign in to view your food calories.
+        </q-banner>
+        <q-banner v-else-if="!foodLogsStore.loading && !foodCaloriesByDay.length" class="bg-grey-2">
+          Add food entries to see your daily macro calories.
+        </q-banner>
+        <div v-else class="food-calories-chart">
+          <canvas ref="foodCaloriesChart"></canvas>
+        </div>
+      </q-card-section>
+    </q-card>
+
     <div class="text-h4 q-mb-lg text-center">Resources</div>
 
     <div
@@ -527,18 +547,22 @@
 import { Chart } from 'chart.js/auto'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
+import { useFoodLogsStore } from 'stores/food-logs'
 import { useProfilesStore } from 'stores/profiles'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { useWeightLogsStore } from 'stores/weight-logs'
 
 const usersStore = useUsersStore()
+const foodLogsStore = useFoodLogsStore()
 const profilesStore = useProfilesStore()
 const workoutLogsStore = useWorkoutLogsStore()
 const weightLogsStore = useWeightLogsStore()
 const weightLogChart = ref(null)
 const workoutCaloriesChart = ref(null)
+const foodCaloriesChart = ref(null)
 let chart = null
 let workoutChart = null
+let foodChart = null
 
 const chartLogs = computed(() => {
   return [...(weightLogsStore.logs || [])]
@@ -564,6 +588,31 @@ const workoutCaloriesByDay = computed(() => {
     .sort((leftDay, rightDay) => leftDay.date.localeCompare(rightDay.date))
 })
 
+const foodCaloriesByDay = computed(() => {
+  const caloriesByDay = (foodLogsStore.logs || []).reduce((totals, log) => {
+    const date = String(log?.datetime || '').slice(0, 10)
+    const servings = Number(log?.servings)
+    const food = log?.food || {}
+
+    if (!date || !Number.isFinite(servings) || servings <= 0) {
+      return totals
+    }
+
+    if (!totals[date]) {
+      totals[date] = { proteinCalories: 0, carbCalories: 0, fatCalories: 0 }
+    }
+
+    totals[date].proteinCalories += (Number(food.protein) || 0) * servings * 4
+    totals[date].carbCalories += (Number(food.carb) || 0) * servings * 4
+    totals[date].fatCalories += (Number(food.fat) || 0) * servings * 9
+    return totals
+  }, {})
+
+  return Object.entries(caloriesByDay)
+    .map(([date, calories]) => ({ date, ...calories }))
+    .sort((leftDay, rightDay) => leftDay.date.localeCompare(rightDay.date))
+})
+
 const weightAxisBounds = computed(() => {
   const min = Number(profilesStore.currentProfile?.goal_weight)
   const startWeight = Number(profilesStore.currentProfile?.start_weight)
@@ -584,6 +633,11 @@ function destroyChart() {
 function destroyWorkoutChart() {
   workoutChart?.destroy()
   workoutChart = null
+}
+
+function destroyFoodChart() {
+  foodChart?.destroy()
+  foodChart = null
 }
 
 async function renderChart() {
@@ -695,15 +749,67 @@ async function renderWorkoutChart() {
   })
 }
 
+async function renderFoodChart() {
+  await nextTick()
+  destroyFoodChart()
+
+  if (!foodCaloriesChart.value || !foodCaloriesByDay.value.length) {
+    return
+  }
+
+  foodChart = new Chart(foodCaloriesChart.value, {
+    type: 'bar',
+    data: {
+      labels: foodCaloriesByDay.value.map((day) => day.date),
+      datasets: [
+        {
+          label: 'Protein Calories',
+          data: foodCaloriesByDay.value.map((day) => day.proteinCalories),
+          backgroundColor: 'rgba(76, 175, 80, 0.7)',
+        },
+        {
+          label: 'Carb Calories',
+          data: foodCaloriesByDay.value.map((day) => day.carbCalories),
+          backgroundColor: 'rgba(255, 206, 86, 0.7)',
+        },
+        {
+          label: 'Fat Calories',
+          data: foodCaloriesByDay.value.map((day) => day.fatCalories),
+          backgroundColor: 'rgba(54, 162, 235, 0.7)',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          stacked: true,
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Calories',
+          },
+        },
+      },
+    },
+  })
+}
+
 watch(
   () => usersStore.currentUser?.user_id,
   async (userId) => {
     destroyChart()
     destroyWorkoutChart()
+    destroyFoodChart()
 
     if (!userId) {
       weightLogsStore.logs = []
       workoutLogsStore.logs = []
+      foodLogsStore.logs = []
       profilesStore.currentProfile = null
       return
     }
@@ -711,10 +817,12 @@ watch(
     await Promise.all([
       weightLogsStore.loadWeightLogs(userId),
       workoutLogsStore.loadWorkoutLogs(userId),
+      foodLogsStore.loadFoodLogs(userId),
       profilesStore.loadCurrentProfile(userId),
     ])
     await renderChart()
     await renderWorkoutChart()
+    await renderFoodChart()
   },
   { immediate: true },
 )
@@ -722,16 +830,19 @@ watch(
 watch(chartLogs, renderChart)
 watch(weightAxisBounds, renderChart)
 watch(workoutCaloriesByDay, renderWorkoutChart)
+watch(foodCaloriesByDay, renderFoodChart)
 
 onBeforeUnmount(() => {
   destroyChart()
   destroyWorkoutChart()
+  destroyFoodChart()
 })
 </script>
 
 <style scoped>
 .weight-log-chart,
-.workout-calories-chart {
+.workout-calories-chart,
+.food-calories-chart {
   height: 320px;
 }
 </style>
