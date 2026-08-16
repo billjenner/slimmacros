@@ -145,57 +145,30 @@ export const useSupplimentsLogStore = defineStore('SupplimentsLog', {
           return []
         }
 
-        const { data: ownLogs, error: ownError } = await supabase
+        const { data, error } = await supabase
           .from('supplement_log')
           .select(
             `
-              supplement_log_id,
-              supplement_id,
-              user_id,
-              servings,
-              date,
-              supplement:supplement_id (
-                *
-              )
-            `,
+        supplement_log_id,
+        supplement_id,
+        user_id,
+        servings,
+        date,
+        supplement:supplement_id (
+          *
+        )
+      `,
           )
           .eq('user_id', userId)
           .order('date', { ascending: false })
           .order('supplement_log_id', { ascending: false })
 
-        if (ownError) {
-          this.error = ownError.message
+        if (error) {
+          this.error = error.message
           return []
         }
 
-        const { data: otherLogs, error: otherError } = await supabase
-          .from('supplement_log')
-          .select(
-            `
-              supplement_log_id,
-              supplement_id,
-              user_id,
-              servings,
-              date,
-              supplement:supplement_id (
-                *
-              )
-            `,
-          )
-          .neq('user_id', userId)
-          .order('date', { ascending: false })
-          .order('supplement_log_id', { ascending: false })
-
-        if (otherError) {
-          this.error = otherError.message
-          return []
-        }
-
-        const sharedLogs = (otherLogs || []).filter((item) => this.isSharedLog(item))
-        const sortedOwnLogs = this.sortByDescription(ownLogs || [])
-        const sortedSharedLogs = this.sortByDescription(sharedLogs)
-
-        this.logs = [...sortedOwnLogs, ...sortedSharedLogs]
+        this.logs = data || []
         return this.logs
       } finally {
         this.loading = false
