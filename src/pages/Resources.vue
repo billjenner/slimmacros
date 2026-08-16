@@ -1,5 +1,24 @@
 <template>
-  <q-page padding>
+  <q-page>
+    <q-card flat bordered class="q-ma-md">
+      <q-card-section>
+        <div class="text-h6">Weight and BMI progress</div>
+      </q-card-section>
+      <q-card-section>
+        <q-banner v-if="weightLogsStore.error" class="bg-negative text-white" rounded>
+          {{ weightLogsStore.error }}
+        </q-banner>
+        <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
+          Sign in to view your weight and BMI progress.
+        </q-banner>
+        <q-banner v-else-if="!weightLogsStore.loading && !chartLogs.length" class="bg-grey-2">
+          Add weight entries to see your progress chart.
+        </q-banner>
+        <div v-else class="weight-log-chart">
+          <canvas ref="weightLogChart"></canvas>
+        </div>
+      </q-card-section>
+    </q-card>
     <div class="text-h4 q-mb-lg text-center">Resources</div>
 
     <div
@@ -188,7 +207,10 @@
                     <td style="padding: 10px">
                       <strong>Log daily</strong>
                     </td>
-                    <td style="padding: 10px; color: #666">Track nutrition, exercise, and habits. Monitor progress regularly and make adjustments as needed.</td>
+                    <td style="padding: 10px; color: #666">
+                      Track nutrition, exercise, and habits. Monitor progress regularly and make
+                      adjustments as needed.
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -425,32 +447,32 @@
               <q-chip>Beginner</q-chip>
             </template>
 
-          <q-card-section>
-                    <div style="padding: 12px; border-bottom: 1px solid #eee">
-                      <strong>Beginner routine using 40 seconds work / 20 seconds rest:</strong><br />
-                    </div>
-                    <div style="padding: 12px; border-bottom: 1px solid #eee">
-                      <ul style="margin: 8px 0 0 20px; padding: 0">
-                        <li>Bodyweight squats</li>
-                        <li>Knee push-ups</li>
-                        <li>Standing knee raises</li>
-                        <li>Glute bridges</li>
-                        <li>Mountain climbers</li>
-                        <li>Plank</li>
-                      </ul>
-                    </div>
-                    <div style="padding: 12px; border-bottom: 1px solid #eee">
-                      <strong>Phase & Time:</strong><br />
-                      <ul style="margin: 8px 0 0 20px; padding: 0">
-                        <li>Warm-up — 5 minutes</li>
-                        <li>HIIT Round 1 — 5 minutes</li>
-                        <li>Rest between rounds — 1–2 minutes</li>
-                        <li>HIIT Round 2 — 5 minutes</li>
-                        <li>Cool-down — 3–5 minutes</li>
-                        <li><strong>Total — 19–22 minutes</strong></li>
-                      </ul>
-                    </div>
-          </q-card-section>
+            <q-card-section>
+              <div style="padding: 12px; border-bottom: 1px solid #eee">
+                <strong>Beginner routine using 40 seconds work / 20 seconds rest:</strong><br />
+              </div>
+              <div style="padding: 12px; border-bottom: 1px solid #eee">
+                <ul style="margin: 8px 0 0 20px; padding: 0">
+                  <li>Bodyweight squats</li>
+                  <li>Knee push-ups</li>
+                  <li>Standing knee raises</li>
+                  <li>Glute bridges</li>
+                  <li>Mountain climbers</li>
+                  <li>Plank</li>
+                </ul>
+              </div>
+              <div style="padding: 12px; border-bottom: 1px solid #eee">
+                <strong>Phase & Time:</strong><br />
+                <ul style="margin: 8px 0 0 20px; padding: 0">
+                  <li>Warm-up — 5 minutes</li>
+                  <li>HIIT Round 1 — 5 minutes</li>
+                  <li>Rest between rounds — 1–2 minutes</li>
+                  <li>HIIT Round 2 — 5 minutes</li>
+                  <li>Cool-down — 3–5 minutes</li>
+                  <li><strong>Total — 19–22 minutes</strong></li>
+                </ul>
+              </div>
+            </q-card-section>
           </q-expansion-item>
         </q-card>
       </div>
@@ -477,9 +499,93 @@
   </q-page>
 </template>
 
-<script>
-export default {
-  name: 'ResourcesPage',
+<script setup>
+import { Chart } from 'chart.js/auto'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { useUsersStore } from 'stores/users'
+import { useWeightLogsStore } from 'stores/weight-logs'
+
+const usersStore = useUsersStore()
+const weightLogsStore = useWeightLogsStore()
+const weightLogChart = ref(null)
+let chart = null
+
+const chartLogs = computed(() => {
+  return [...(weightLogsStore.logs || [])]
+    .filter((log) => log?.date && Number.isFinite(Number(log?.weight)))
+    .sort((leftLog, rightLog) => String(leftLog.date).localeCompare(String(rightLog.date)))
+})
+
+function destroyChart() {
+  chart?.destroy()
+  chart = null
 }
+
+async function renderChart() {
+  await nextTick()
+  destroyChart()
+
+  if (!weightLogChart.value || !chartLogs.value.length) {
+    return
+  }
+
+  chart = new Chart(weightLogChart.value, {
+    type: 'line',
+    data: {
+      labels: chartLogs.value.map((log) => log.date),
+      datasets: [
+        {
+          label: 'Weight',
+          data: chartLogs.value.map((log) => Number(log.weight)),
+          borderColor: 'rgba(255, 99, 132, 1)',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          fill: false,
+          tension: 0.3,
+        },
+        {
+          label: 'BMI',
+          data: chartLogs.value.map((log) => {
+            const bmi = Number(log.bmi)
+            return Number.isFinite(bmi) ? bmi : null
+          }),
+          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          fill: false,
+          tension: 0.3,
+          spanGaps: true,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+    },
+  })
+}
+
+watch(
+  () => usersStore.currentUser?.user_id,
+  async (userId) => {
+    destroyChart()
+
+    if (!userId) {
+      weightLogsStore.logs = []
+      return
+    }
+
+    await weightLogsStore.loadWeightLogs(userId)
+    await renderChart()
+  },
+  { immediate: true },
+)
+
+watch(chartLogs, renderChart)
+
+onBeforeUnmount(destroyChart)
 </script>
 
+<style scoped>
+.weight-log-chart {
+  height: 320px;
+}
+</style>
