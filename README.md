@@ -1,4 +1,4 @@
-# <img src="./public/icons/favicon.ico" alt="Slim Belly" width="32" height="32" /> Slim Belly
+# 🥗 Slim Belly
 
 > **Your daily companion for smarter nutrition, healthier habits, and measurable progress.**
 
