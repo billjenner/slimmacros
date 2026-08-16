@@ -121,13 +121,11 @@
         transition-hide="jump-up"
       >
         <template v-slot:header>
-          <q-space />
-
-          <div class="text-h4 text-center">Food & Fitness Guide</div>
-
-          <q-space />
+          <q-item-section class="text-center">
+            <div class="text-h4">Food & Fitness Guide</div>
+          </q-item-section>
         </template>
-        <div class="row q-col-gutter-md">
+        <div class="row q-col-gutter-md q-pa-md">
           <div class="col-12 col-sm-6 col-md-6 col-lg-6 flex justify-center">
             <q-card style="width: 95%">
               <q-card-section class="bg-accent text-center">
