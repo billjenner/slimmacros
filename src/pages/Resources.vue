@@ -882,17 +882,21 @@ async function renderWorkoutChart() {
     workoutCaloriesByDay.value.map((day) => [day.date, day.caloriesBurned]),
   )
 
-  const firstDate = new Date(`${workoutCaloriesByDay.value[0].date}T00:00:00`)
-  const lastDate = new Date(
-    `${workoutCaloriesByDay.value[workoutCaloriesByDay.value.length - 1].date}T00:00:00`,
+  const firstDate = new Date(
+    profilesStore.currentProfile?.created_at ?? `${workoutCaloriesByDay.value[0].date}T00:00:00`,
   )
+
+  // Today's date
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
 
   const labels = []
   const data = []
 
   const currentDate = new Date(firstDate)
 
-  while (currentDate <= lastDate) {
+  // Generate dates from first workout date through today
+  while (currentDate <= today) {
     const year = currentDate.getFullYear()
     const month = String(currentDate.getMonth() + 1).padStart(2, '0')
     const day = String(currentDate.getDate()).padStart(2, '0')
@@ -906,8 +910,10 @@ async function renderWorkoutChart() {
 
   workoutChart = new Chart(workoutCaloriesChart.value, {
     type: 'bar',
+
     data: {
       labels,
+
       datasets: [
         {
           label: 'Calories burned',
@@ -918,9 +924,11 @@ async function renderWorkoutChart() {
         },
       ],
     },
+
     options: {
       responsive: true,
       maintainAspectRatio: false,
+
       scales: {
         y: {
           beginAtZero: true,
