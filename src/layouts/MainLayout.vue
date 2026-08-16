@@ -66,12 +66,12 @@
           />
           <q-btn
             flat
-            label="Suppliments"
-            to="/suppliments"
+            label="supplements"
+            to="/supplements"
             class="q-mx-sm"
             style="min-width: 126px"
-            :style="buttonStyle('/suppliments')"
-            @mouseover="hoveredPath = '/suppliments'"
+            :style="buttonStyle('/supplements')"
+            @mouseover="hoveredPath = '/supplements'"
             @mouseleave="hoveredPath = null"
           />
           <q-btn
@@ -138,8 +138,8 @@
         <q-item clickable v-ripple @click="navigateAndClose('/workouts')">
           <q-item-section>Workouts</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/suppliments')">
-          <q-item-section>Suppliments</q-item-section>
+        <q-item clickable v-ripple @click="navigateAndClose('/supplements')">
+          <q-item-section>supplements</q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/food-log')">
           <q-item-section>Log</q-item-section>

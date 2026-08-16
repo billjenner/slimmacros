@@ -10,7 +10,7 @@ import routes from './routes'
 const defaultSeo = {
   title: 'Slim Belly',
   description:
-    'Explore Slim Belly, an diary for tracking your health and wellness. Log your meals, monitor your progress. Track Macros, Workouts, Suppliments, and Weight.',
+    'Explore Slim Belly, an diary for tracking your health and wellness. Log your meals, monitor your progress. Track Macros, Workouts, supplements, and Weight.',
   image: '/icons/icon-512x512.png',
   type: 'website',
   robots: 'index,follow',

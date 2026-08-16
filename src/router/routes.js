@@ -106,14 +106,14 @@ const routes = [
         },
       },
       {
-        path: 'suppliments',
-        component: () => import('pages/Suppliments.vue'),
+        path: 'supplements',
+        component: () => import('pages/supplements.vue'),
         meta: {
           requiresAuth: true,
           seo: {
-            title: 'Suppliments',
-            description: 'Create and manage your Slim Belly suppliment log entries.',
-            canonicalPath: '/suppliments',
+            title: 'supplements',
+            description: 'Create and manage your Slim Belly supplement log entries.',
+            canonicalPath: '/supplements',
           },
         },
       },

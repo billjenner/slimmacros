@@ -330,7 +330,7 @@
           <div class="col-12 col-sm-6 col-md-6 col-lg-6 flex justify-center">
             <q-card style="width: 95%">
               <q-card-section class="bg-secondary text-white text-center">
-                Suppliments
+                supplements
               </q-card-section>
 
               <q-expansion-item
@@ -340,7 +340,7 @@
                 transition-hide="jump-up"
               >
                 <template v-slot:header>
-                  <q-chip>Suppliment Recomendations</q-chip>
+                  <q-chip>supplement Recomendations</q-chip>
                 </template>
 
                 <q-card-section>
@@ -632,14 +632,14 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
 import { useFoodLogsStore } from 'stores/food-logs'
 import { useProfilesStore } from 'stores/profiles'
-import { useSupplimentsLogStore } from 'stores/suppliments_log'
+import { usesupplementsLogStore } from 'stores/supplements_log'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { useWeightLogsStore } from 'stores/weight-logs'
 
 const usersStore = useUsersStore()
 const foodLogsStore = useFoodLogsStore()
 const profilesStore = useProfilesStore()
-const supplementLogsStore = useSupplimentsLogStore()
+const supplementLogsStore = usesupplementsLogStore()
 const workoutLogsStore = useWorkoutLogsStore()
 const weightLogsStore = useWeightLogsStore()
 const weightLogChart = ref(null)

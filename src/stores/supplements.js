@@ -1,7 +1,7 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
 
-export const useSupplimentsStore = defineStore('Suppliments', {
+export const usesupplementsStore = defineStore('supplements', {
   state: () => ({
     supplements: [],
     currentSupplement: null,
@@ -60,7 +60,7 @@ export const useSupplimentsStore = defineStore('Suppliments', {
         const payload = this.buildSupplementPayload(userId, supplement)
 
         if (!payload.description) {
-          this.error = 'Suppliment description is required.'
+          this.error = 'supplement description is required.'
           return null
         }
 
@@ -98,7 +98,7 @@ export const useSupplimentsStore = defineStore('Suppliments', {
         delete payload.user_id
 
         if (!payload.description) {
-          this.error = 'Suppliment description is required.'
+          this.error = 'supplement description is required.'
           return null
         }
 
@@ -211,5 +211,5 @@ export const useSupplimentsStore = defineStore('Suppliments', {
 })
 
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useSupplimentsStore, import.meta.hot))
+  import.meta.hot.accept(acceptHMRUpdate(usesupplementsStore, import.meta.hot))
 }

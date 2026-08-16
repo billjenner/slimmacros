@@ -14,7 +14,7 @@
           >
             <q-tab name="food" label="Food" />
             <q-tab name="workouts" label="Workouts" />
-            <q-tab name="suppliments" label="Suppliments" />
+            <q-tab name="supplements" label="supplements" />
             <q-tab name="weight" label="Weight" />
           </q-tabs>
 
@@ -470,7 +470,7 @@
               </q-dialog>
             </q-tab-panel>
 
-            <q-tab-panel name="suppliments" class="q-pa-none">
+            <q-tab-panel name="supplements" class="q-pa-none">
               <q-banner
                 v-if="supplementLogsStore.error"
                 class="bg-negative text-white q-mb-md"
@@ -484,24 +484,24 @@
                 class="bg-warning text-dark q-mb-md"
                 rounded
               >
-                Sign in to record suppliments.
+                Sign in to record supplements.
               </q-banner>
 
               <q-form @submit.prevent="submitSupplementLog" class="q-gutter-md">
                 <q-card flat bordered class="q-pa-md bg-grey-1">
-                  <div class="text-subtitle1 q-mb-sm">Log Suppliment</div>
+                  <div class="text-subtitle1 q-mb-sm">Log supplement</div>
                   <div class="row q-col-gutter-md">
                     <div class="col-12 col-md-6">
                       <q-select
                         v-model="supplementLog.supplement_id"
                         :options="supplementOptions"
-                        label="Suppliment"
+                        label="supplement"
                         filled
                         dense
                         emit-value
                         map-options
                         :disable="!usersStore.currentUser"
-                        :rules="[(value) => !!value || 'Suppliment is required']"
+                        :rules="[(value) => !!value || 'supplement is required']"
                       />
                     </div>
 
@@ -546,8 +546,8 @@
 
                   <div class="row items-center justify-between q-mt-md">
                     <q-toggle
-                      v-model="includeSharedSuppliments"
-                      label="Include shared suppliments"
+                      v-model="includeSharedsupplements"
+                      label="Include shared supplements"
                       :disable="!usersStore.currentUser"
                     />
                     <q-btn
@@ -564,7 +564,7 @@
               <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
                 <div class="row items-center justify-between q-px-md q-py-sm">
                   <div class="row items-center no-wrap q-gutter-xs">
-                    <div class="text-subtitle1">Logged suppliments</div>
+                    <div class="text-subtitle1">Logged supplements</div>
                   </div>
                   <div
                     class="row items-center no-wrap q-gutter-xs"
@@ -578,7 +578,7 @@
                       @click="goToPreviousSupplementLogDate"
                     />
                     <q-input
-                      v-model="selectedSupplimentLogDate"
+                      v-model="selectedsupplementLogDate"
                       type="date"
                       filled
                       dense
@@ -604,7 +604,7 @@
                   square
                   class="full-width no-border"
                   :loading="supplementLogsStore.loading"
-                  no-data-label="No suppliment log records yet."
+                  no-data-label="No supplement log records yet."
                 >
                   <template #body="props">
                     <q-tr
@@ -635,10 +635,10 @@
 
               <q-dialog v-model="confirmDeleteSupplementLogOpen">
                 <q-card style="min-width: 320px">
-                  <q-card-section class="text-h6">Delete suppliment log entry?</q-card-section>
+                  <q-card-section class="text-h6">Delete supplement log entry?</q-card-section>
                   <q-card-section>
                     Delete {{ pendingDeleteSupplementRow?.description || 'this entry' }} from your
-                    suppliment log?
+                    supplement log?
                   </q-card-section>
                   <q-card-actions align="right">
                     <q-btn flat label="No" color="primary" @click="cancelDeleteSupplementLog" />
@@ -810,8 +810,8 @@ import { useFoodLogsStore } from 'stores/food-logs'
 import { useProfilesStore } from 'stores/profiles'
 import { useWorkoutsStore } from 'stores/workouts'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
-import { useSupplimentsStore } from 'stores/suppliments'
-import { useSupplimentsLogStore } from 'stores/suppliments_log'
+import { usesupplementsStore } from 'stores/supplements'
+import { usesupplementsLogStore } from 'stores/supplements_log'
 import { useWeightLogsStore } from 'stores/weight-logs'
 import {
   calculateBodyMassIndex,
@@ -826,17 +826,17 @@ const foodLogsStore = useFoodLogsStore()
 const profilesStore = useProfilesStore()
 const workoutsStore = useWorkoutsStore()
 const workoutLogsStore = useWorkoutLogsStore()
-const supplimentsStore = useSupplimentsStore()
-const supplementLogsStore = useSupplimentsLogStore()
+const supplementsStore = usesupplementsStore()
+const supplementLogsStore = usesupplementsLogStore()
 const weightLogsStore = useWeightLogsStore()
 const activeTab = ref('food')
 const isFoodLogExpanded = ref(false)
 const includeSharedFoods = ref(false)
 const includeSharedWorkouts = ref(false)
-const includeSharedSuppliments = ref(false)
+const includeSharedsupplements = ref(false)
 const selectedFoodLogDate = ref(getCurrentLocalDate())
 const selectedWorkoutLogDate = ref(getCurrentLocalDate())
-const selectedSupplimentLogDate = ref(getCurrentLocalDate())
+const selectedsupplementLogDate = ref(getCurrentLocalDate())
 
 function getCurrentLocalDateTime() {
   const now = new Date()
@@ -893,11 +893,11 @@ function goToNextWorkoutLogDate() {
 }
 
 function goToPreviousSupplementLogDate() {
-  selectedSupplimentLogDate.value = shiftLocalDate(selectedSupplimentLogDate.value, -1)
+  selectedsupplementLogDate.value = shiftLocalDate(selectedsupplementLogDate.value, -1)
 }
 
 function goToNextSupplementLogDate() {
-  selectedSupplimentLogDate.value = shiftLocalDate(selectedSupplimentLogDate.value, 1)
+  selectedsupplementLogDate.value = shiftLocalDate(selectedsupplementLogDate.value, 1)
 }
 
 const selectedFoodLogDayOfWeek = computed(() => {
@@ -1178,24 +1178,24 @@ const workoutOptions = computed(() => {
 })
 
 const supplementOptions = computed(() => {
-  const allSuppliments = supplimentsStore.supplements || []
+  const allsupplements = supplementsStore.supplements || []
   const currentUserId = usersStore.currentUser?.user_id
-  const ownSuppliments = allSuppliments.filter(
+  const ownsupplements = allsupplements.filter(
     (supplement) => String(supplement?.user_id || '') === String(currentUserId || ''),
   )
 
-  if (!includeSharedSuppliments.value) {
-    return ownSuppliments.map((supplement) => ({
+  if (!includeSharedsupplements.value) {
+    return ownsupplements.map((supplement) => ({
       label: `${supplement.description} (${supplement.serving_size ?? 1} ${supplement.serving_unit || 'other'})`,
       value: supplement.supplement_id,
     }))
   }
 
-  const sharedSuppliments = allSuppliments.filter(
+  const sharedsupplements = allsupplements.filter(
     (supplement) => String(supplement?.user_id || '') !== String(currentUserId || ''),
   )
 
-  return [...ownSuppliments, ...sharedSuppliments].map((supplement) => ({
+  return [...ownsupplements, ...sharedsupplements].map((supplement) => ({
     label: `${supplement.description} (${supplement.serving_size ?? 1} ${supplement.serving_unit || 'other'})`,
     value: supplement.supplement_id,
   }))
@@ -1229,7 +1229,7 @@ const selectedFood = computed(() => {
 
 const selectedSupplement = computed(() => {
   return (
-    (supplimentsStore.supplements || []).find((supplement) =>
+    (supplementsStore.supplements || []).find((supplement) =>
       areSameId(supplement.supplement_id, supplementLog.supplement_id),
     ) || null
   )
@@ -1680,7 +1680,7 @@ const workoutTotalCaloriesBurned = computed(() => {
 })
 
 const supplementCountForSelectedDate = computed(() => {
-  const selectedDateKey = selectedSupplimentLogDate.value || getCurrentLocalDate()
+  const selectedDateKey = selectedsupplementLogDate.value || getCurrentLocalDate()
 
   return (supplementLogsStore.logs || []).reduce((sum, log) => {
     const logDate = String(log?.date || '').slice(0, 10)
@@ -1693,7 +1693,7 @@ const supplementCountForSelectedDate = computed(() => {
 })
 
 const supplementTableRows = computed(() => {
-  const selectedDateKey = selectedSupplimentLogDate.value || getCurrentLocalDate()
+  const selectedDateKey = selectedsupplementLogDate.value || getCurrentLocalDate()
 
   return [...(supplementLogsStore.logs || [])]
     .sort((leftLog, rightLog) => {
@@ -1711,7 +1711,7 @@ const supplementTableRows = computed(() => {
     })
     .map((log) => {
       const supplement = log.supplement || {}
-      const label = supplement.description || `Suppliment #${log.supplement_id}`
+      const label = supplement.description || `supplement #${log.supplement_id}`
       const servings = Number(log.servings) || 0
       const servingType = supplement.serving_unit || 'other'
       const logDate = String(log?.date || '').slice(0, 10)
@@ -1772,7 +1772,7 @@ watch(
     profilesStore.currentProfile = null
     workoutsStore.workouts = []
     workoutLogsStore.logs = []
-    supplimentsStore.supplements = []
+    supplementsStore.supplements = []
     supplementLogsStore.logs = []
     weightLogsStore.logs = []
   },
@@ -1826,7 +1826,7 @@ async function loadDataForUser(userId) {
     profilesStore.loadCurrentProfile(userId),
     workoutsStore.loadWorkouts(userId),
     workoutLogsStore.loadWorkoutLogs(userId),
-    supplimentsStore.loadSupplements(userId),
+    supplementsStore.loadSupplements(userId),
     supplementLogsStore.loadSupplementLogs(userId),
     weightLogsStore.loadWeightLogs(userId),
   ])

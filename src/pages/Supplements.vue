@@ -4,13 +4,13 @@
       <div class="col-12 col-md-10 col-lg-8">
         <q-card flat bordered class="q-pa-md">
           <div class="row items-center justify-between q-mb-md">
-            <div class="text-h5">Suppliments</div>
+            <div class="text-h5">supplements</div>
             <q-btn
               color="primary"
               class="q-mb-sm"
               unelevated
-              :label="showSupplimentForm ? 'Hide Form' : 'Add Suppliment'"
-              @click="showSupplimentForm = !showSupplimentForm"
+              :label="showsupplementForm ? 'Hide Form' : 'Add supplement'"
+              @click="showsupplementForm = !showsupplementForm"
             />
           </div>
 
@@ -23,33 +23,33 @@
             class="bg-warning text-dark q-mb-md"
             rounded
           >
-            Sign in to manage suppliments.
+            Sign in to manage supplements.
           </q-banner>
 
           <transition name="form-slide" mode="out-in">
             <q-form
-              v-if="showSupplimentForm"
-              key="suppliment-form"
-              @submit.prevent="submitSuppliment"
+              v-if="showsupplementForm"
+              key="supplement-form"
+              @submit.prevent="submitsupplement"
               class="q-gutter-md"
             >
               <q-card flat bordered class="q-pa-md bg-grey-1">
-                <div class="text-subtitle1 q-mb-sm">Suppliment details</div>
+                <div class="text-subtitle1 q-mb-sm">supplement details</div>
                 <div class="row q-col-gutter-md">
                   <div class="col-12 col-md-6">
                     <q-input
-                      v-model="suppliment.description"
-                      label="Suppliment"
+                      v-model="supplement.description"
+                      label="supplement"
                       filled
                       dense
                       :disable="!usersStore.currentUser"
-                      :rules="[(value) => !!value?.trim() || 'Suppliment is required']"
+                      :rules="[(value) => !!value?.trim() || 'supplement is required']"
                     />
                   </div>
 
                   <div class="col-12 col-md-3">
                     <q-input
-                      v-model="suppliment.serving_size"
+                      v-model="supplement.serving_size"
                       type="number"
                       label="Serving size"
                       min="0.01"
@@ -65,7 +65,7 @@
 
                   <div class="col-12 col-md-3">
                     <q-select
-                      v-model="suppliment.serving_unit"
+                      v-model="supplement.serving_unit"
                       :options="servingUnitOptions"
                       label="Serving type"
                       filled
@@ -77,7 +77,7 @@
                   </div>
 
                   <div class="col-12 col-md-3">
-                    <q-toggle v-model="suppliment.share_with_others" label="Share with others" />
+                    <q-toggle v-model="supplement.share_with_others" label="Share with others" />
                   </div>
                 </div>
               </q-card>
@@ -86,7 +86,7 @@
                 <q-btn
                   type="submit"
                   color="primary"
-                  :label="editingSupplimentId ? 'Update suppliment' : 'Save suppliment'"
+                  :label="editingsupplementId ? 'Update supplement' : 'Save supplement'"
                   :loading="store.loading"
                 />
               </div>
@@ -95,24 +95,24 @@
 
           <q-dialog v-model="confirmDeleteOpen">
             <q-card style="min-width: 320px">
-              <q-card-section class="text-h6">Delete suppliment?</q-card-section>
-              <q-card-section> Are you sure you want to delete this suppliment? </q-card-section>
+              <q-card-section class="text-h6">Delete supplement?</q-card-section>
+              <q-card-section> Are you sure you want to delete this supplement? </q-card-section>
               <q-card-actions align="right">
-                <q-btn flat label="No" color="primary" @click="cancelDeleteSuppliment" />
-                <q-btn label="Yes" color="negative" @click="confirmDeleteSuppliment" />
+                <q-btn flat label="No" color="primary" @click="cancelDeletesupplement" />
+                <q-btn label="Yes" color="negative" @click="confirmDeletesupplement" />
               </q-card-actions>
             </q-card>
           </q-dialog>
 
           <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
             <div class="row items-center justify-between q-px-md q-py-sm">
-              <div class="text-subtitle1">Saved suppliments</div>
-              <q-toggle v-model="showSharedSuppliments" label="Show shared suppliments" />
+              <div class="text-subtitle1">Saved supplements</div>
+              <q-toggle v-model="showSharedsupplements" label="Show shared supplements" />
             </div>
 
             <q-table
-              :rows="supplimentRows"
-              :columns="supplimentColumns"
+              :rows="supplementRows"
+              :columns="supplementColumns"
               :pagination="{ rowsPerPage: 50 }"
               :rows-per-page-options="[20, 50, 200, 0]"
               row-key="supplement_id"
@@ -123,7 +123,7 @@
               square
               class="full-width no-border"
               :loading="store.loading"
-              no-data-label="No suppliments yet."
+              no-data-label="No supplements yet."
             >
               <template #body="props">
                 <q-tr :props="props" :class="sharedRowClass(props.row)">
@@ -162,7 +162,7 @@
                           size="sm"
                           color="negative"
                           label="Edit"
-                          @click="editSuppliment(props.row)"
+                          @click="editsupplement(props.row)"
                         />
 
                         <q-btn
@@ -171,7 +171,7 @@
                           size="sm"
                           color="negative"
                           label="Delete"
-                          @click="requestDeleteSuppliment(props.row)"
+                          @click="requestDeletesupplement(props.row)"
                         />
                       </div>
                     </div>
@@ -184,12 +184,12 @@
                   :class="sharedRowClass(props.row)"
                 >
                   <q-td
-                    :colspan="supplimentColumns.length"
+                    :colspan="supplementColumns.length"
                     :class="isOwnedByCurrentUser(props.row) ? 'bg-grey-2' : ''"
                   >
                     <div class="row q-col-gutter-sm q-py-sm">
                       <div class="col-12 col-sm-6 col-md-4">
-                        <div class="text-caption text-grey-7">Suppliment</div>
+                        <div class="text-caption text-grey-7">supplement</div>
                         <div class="text-body2">{{ props.row.description }}</div>
                       </div>
                       <div class="col-12 col-sm-6 col-md-4">
@@ -221,12 +221,12 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
-import { useSupplimentsStore } from 'stores/suppliments'
+import { usesupplementsStore } from 'stores/supplements'
 
 const usersStore = useUsersStore()
-const store = useSupplimentsStore()
+const store = usesupplementsStore()
 
-const suppliment = reactive({
+const supplement = reactive({
   description: '',
   serving_size: 1,
   serving_unit: 'other',
@@ -241,7 +241,7 @@ const servingUnitOptions = [
   { label: 'Other', value: 'other' },
 ]
 
-const supplimentColumns = [
+const supplementColumns = [
   {
     name: 'summary',
     label: 'Summary',
@@ -251,10 +251,10 @@ const supplimentColumns = [
   },
 ]
 
-const supplimentRows = computed(() => {
+const supplementRows = computed(() => {
   const allRows = store.supplements || []
   const currentUserId = usersStore.currentUser?.user_id
-  const visibleRows = showSharedSuppliments.value
+  const visibleRows = showSharedsupplements.value
     ? allRows
     : allRows.filter((supplement) => supplement?.user_id === currentUserId)
 
@@ -272,12 +272,12 @@ const supplimentRows = computed(() => {
   })
 })
 
-const showSupplimentForm = ref(false)
-const showSharedSuppliments = ref(false)
+const showsupplementForm = ref(false)
+const showSharedsupplements = ref(false)
 const confirmDeleteOpen = ref(false)
-const pendingDeleteSuppliment = ref(null)
-const editingSupplimentId = ref(null)
-const expandedSupplimentIds = ref([])
+const pendingDeletesupplement = ref(null)
+const editingsupplementId = ref(null)
+const expandedsupplementIds = ref([])
 
 onMounted(() => {
   if (usersStore.currentUser?.user_id) {
@@ -314,7 +314,7 @@ function sharedRowClass(row) {
 }
 
 function isExpanded(row) {
-  return expandedSupplimentIds.value.includes(row?.supplement_id)
+  return expandedsupplementIds.value.includes(row?.supplement_id)
 }
 
 function toggleExpanded(row) {
@@ -323,51 +323,51 @@ function toggleExpanded(row) {
   }
 
   if (isExpanded(row)) {
-    expandedSupplimentIds.value = expandedSupplimentIds.value.filter(
+    expandedsupplementIds.value = expandedsupplementIds.value.filter(
       (supplementId) => supplementId !== row.supplement_id,
     )
   } else {
-    expandedSupplimentIds.value = [...expandedSupplimentIds.value, row.supplement_id]
+    expandedsupplementIds.value = [...expandedsupplementIds.value, row.supplement_id]
   }
 }
 
-function editSuppliment(row) {
-  editingSupplimentId.value = row.supplement_id
+function editsupplement(row) {
+  editingsupplementId.value = row.supplement_id
 
-  Object.assign(suppliment, {
+  Object.assign(supplement, {
     description: row.description || '',
     serving_size: row.serving_size ?? 1,
     serving_unit: row.serving_unit || 'other',
     share_with_others: Boolean(row.share_with_others),
   })
 
-  showSupplimentForm.value = true
+  showsupplementForm.value = true
 }
 
-function resetSupplimentForm() {
-  Object.assign(suppliment, {
+function resetsupplementForm() {
+  Object.assign(supplement, {
     description: '',
     serving_size: 1,
     serving_unit: 'other',
     share_with_others: false,
   })
 
-  editingSupplimentId.value = null
+  editingsupplementId.value = null
 }
 
-function requestDeleteSuppliment(row) {
-  pendingDeleteSuppliment.value = row
+function requestDeletesupplement(row) {
+  pendingDeletesupplement.value = row
   confirmDeleteOpen.value = true
 }
 
-function cancelDeleteSuppliment() {
-  pendingDeleteSuppliment.value = null
+function cancelDeletesupplement() {
+  pendingDeletesupplement.value = null
   confirmDeleteOpen.value = false
 }
 
-async function confirmDeleteSuppliment() {
-  const row = pendingDeleteSuppliment.value
-  pendingDeleteSuppliment.value = null
+async function confirmDeletesupplement() {
+  const row = pendingDeletesupplement.value
+  pendingDeletesupplement.value = null
   confirmDeleteOpen.value = false
 
   if (!usersStore.currentUser?.user_id || !row?.supplement_id) {
@@ -384,36 +384,36 @@ async function confirmDeleteSuppliment() {
   }
 }
 
-async function submitSuppliment() {
+async function submitsupplement() {
   if (!usersStore.currentUser?.user_id) {
     store.error = 'No current user is available.'
     return
   }
 
-  const normalizedDescription = String(suppliment.description || '').trim()
+  const normalizedDescription = String(supplement.description || '').trim()
   if (!normalizedDescription) {
-    store.error = 'Suppliment is required.'
+    store.error = 'supplement is required.'
     return
   }
 
   const payload = {
     description: normalizedDescription,
-    serving_size: suppliment.serving_size,
-    serving_unit: suppliment.serving_unit || 'other',
-    share_with_others: Boolean(suppliment.share_with_others),
+    serving_size: supplement.serving_size,
+    serving_unit: supplement.serving_unit || 'other',
+    share_with_others: Boolean(supplement.share_with_others),
   }
 
-  const savedSuppliment = editingSupplimentId.value
+  const savedsupplement = editingsupplementId.value
     ? await store.updateSupplement(
         usersStore.currentUser.user_id,
-        editingSupplimentId.value,
+        editingsupplementId.value,
         payload,
       )
     : await store.createSupplement(usersStore.currentUser.user_id, payload)
 
-  if (savedSuppliment) {
-    resetSupplimentForm()
-    showSupplimentForm.value = false
+  if (savedsupplement) {
+    resetsupplementForm()
+    showsupplementForm.value = false
     await store.loadSupplements(usersStore.currentUser.user_id)
   }
 }

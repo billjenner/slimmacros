@@ -171,8 +171,8 @@ CREATE TABLE public.food_log (
 	datetime timestamptz NOT NULL DEFAULT now() 
 );
 
-Suppliment
-	SupplimentID integer
+supplement
+	supplementID integer
 	Description
 	ServingSize [pills, oz, other]
 	IsActive bool
@@ -195,9 +195,9 @@ CREATE TABLE public.supplement (
 );
 
 
-SupplimentLog
-	SupplimentLogID integer
-	SupplimentID
+supplementLog
+	supplementLogID integer
+	supplementID
 	UserID
 	Servings
 	Date

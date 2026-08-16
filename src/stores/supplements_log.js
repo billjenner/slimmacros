@@ -1,7 +1,7 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
 
-export const useSupplimentsLogStore = defineStore('SupplimentsLog', {
+export const usesupplementsLogStore = defineStore('supplementsLog', {
   state: () => ({
     logs: [],
     currentLog: null,
@@ -60,7 +60,7 @@ export const useSupplimentsLogStore = defineStore('SupplimentsLog', {
         }
 
         if (!supplementLog.supplement_id) {
-          this.error = 'Please select a suppliment.'
+          this.error = 'Please select a supplement.'
           return null
         }
 
@@ -100,7 +100,7 @@ export const useSupplimentsLogStore = defineStore('SupplimentsLog', {
         }
 
         if (!supplementLog.supplement_id) {
-          this.error = 'Please select a suppliment.'
+          this.error = 'Please select a supplement.'
           return null
         }
 
@@ -211,5 +211,5 @@ export const useSupplimentsLogStore = defineStore('SupplimentsLog', {
 })
 
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useSupplimentsLogStore, import.meta.hot))
+  import.meta.hot.accept(acceptHMRUpdate(usesupplementsLogStore, import.meta.hot))
 }
