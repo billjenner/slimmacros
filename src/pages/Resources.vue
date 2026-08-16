@@ -657,27 +657,9 @@ const weightChartLogs = computed(() => {
     .sort((leftLog, rightLog) => String(leftLog.date).localeCompare(String(rightLog.date)))
 })
 
-const workoutCaloriesByDay = computed(() => {
-  const caloriesByDay = (workoutLogsStore.logs || []).reduce((totals, log) => {
-    const date = String(log?.date || '').slice(0, 10)
-    const caloriesBurned = Number(log?.calories_burned)
-
-    if (!date || !Number.isFinite(caloriesBurned)) {
-      return totals
-    }
-
-    totals[date] = (totals[date] || 0) + caloriesBurned
-    return totals
-  }, {})
-
-  return Object.entries(caloriesByDay)
-    .map(([date, caloriesBurned]) => ({ date, caloriesBurned }))
-    .sort((leftDay, rightDay) => leftDay.date.localeCompare(rightDay.date))
-})
-
 const foodCaloriesByDay = computed(() => {
   const caloriesByDay = (foodLogsStore.logs || []).reduce((totals, log) => {
-    const date = String(log?.datetime || '').slice(0, 10)
+    const date = getLocalDateKey(log?.datetime)
     const servings = Number(log?.servings)
     const food = log?.food || {}
 
@@ -697,6 +679,24 @@ const foodCaloriesByDay = computed(() => {
 
   return Object.entries(caloriesByDay)
     .map(([date, calories]) => ({ date, ...calories }))
+    .sort((leftDay, rightDay) => leftDay.date.localeCompare(rightDay.date))
+})
+
+const workoutCaloriesByDay = computed(() => {
+  const caloriesByDay = (workoutLogsStore.logs || []).reduce((totals, log) => {
+    const date = String(log?.date || '').slice(0, 10)
+    const caloriesBurned = Number(log?.calories_burned)
+
+    if (!date || !Number.isFinite(caloriesBurned)) {
+      return totals
+    }
+
+    totals[date] = (totals[date] || 0) + caloriesBurned
+    return totals
+  }, {})
+
+  return Object.entries(caloriesByDay)
+    .map(([date, caloriesBurned]) => ({ date, caloriesBurned }))
     .sort((leftDay, rightDay) => leftDay.date.localeCompare(rightDay.date))
 })
 
@@ -947,6 +947,20 @@ async function renderSupplementChart() {
       },
     },
   })
+}
+
+const getLocalDateKey = (datetime) => {
+  if (!datetime) return ''
+
+  const date = new Date(datetime)
+
+  if (Number.isNaN(date.getTime())) return ''
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
 }
 
 watch(
