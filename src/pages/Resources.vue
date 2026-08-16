@@ -63,6 +63,29 @@
       </q-card-section>
     </q-card>
 
+    <q-card flat bordered class="q-ma-md">
+      <q-card-section>
+        <div class="text-h6">Daily Supplements</div>
+      </q-card-section>
+      <q-card-section>
+        <q-banner v-if="supplementLogsStore.error" class="bg-negative text-white" rounded>
+          {{ supplementLogsStore.error }}
+        </q-banner>
+        <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
+          Sign in to view your daily supplements.
+        </q-banner>
+        <q-banner
+          v-else-if="!supplementLogsStore.loading && !supplementCountsByDay.length"
+          class="bg-grey-2"
+        >
+          Add supplement entries to see your daily supplement count.
+        </q-banner>
+        <div v-else class="supplement-count-chart">
+          <canvas ref="supplementCountChart"></canvas>
+        </div>
+      </q-card-section>
+    </q-card>
+
     <div class="text-h4 q-mb-lg text-center">Resources</div>
 
     <div
@@ -549,20 +572,24 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
 import { useFoodLogsStore } from 'stores/food-logs'
 import { useProfilesStore } from 'stores/profiles'
+import { useSupplimentsLogStore } from 'stores/suppliments_log'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { useWeightLogsStore } from 'stores/weight-logs'
 
 const usersStore = useUsersStore()
 const foodLogsStore = useFoodLogsStore()
 const profilesStore = useProfilesStore()
+const supplementLogsStore = useSupplimentsLogStore()
 const workoutLogsStore = useWorkoutLogsStore()
 const weightLogsStore = useWeightLogsStore()
 const weightLogChart = ref(null)
 const workoutCaloriesChart = ref(null)
 const foodCaloriesChart = ref(null)
+const supplementCountChart = ref(null)
 let chart = null
 let workoutChart = null
 let foodChart = null
+let supplementChart = null
 
 const chartLogs = computed(() => {
   return [...(weightLogsStore.logs || [])]
@@ -613,6 +640,23 @@ const foodCaloriesByDay = computed(() => {
     .sort((leftDay, rightDay) => leftDay.date.localeCompare(rightDay.date))
 })
 
+const supplementCountsByDay = computed(() => {
+  const countsByDay = (supplementLogsStore.logs || []).reduce((counts, log) => {
+    const date = String(log?.date || '').slice(0, 10)
+
+    if (!date || !log?.supplement_log_id) {
+      return counts
+    }
+
+    counts[date] = (counts[date] || 0) + 1
+    return counts
+  }, {})
+
+  return Object.entries(countsByDay)
+    .map(([date, supplementCount]) => ({ date, supplementCount }))
+    .sort((leftDay, rightDay) => leftDay.date.localeCompare(rightDay.date))
+})
+
 const weightAxisBounds = computed(() => {
   const min = Number(profilesStore.currentProfile?.goal_weight)
   const startWeight = Number(profilesStore.currentProfile?.start_weight)
@@ -638,6 +682,11 @@ function destroyWorkoutChart() {
 function destroyFoodChart() {
   foodChart?.destroy()
   foodChart = null
+}
+
+function destroySupplementChart() {
+  supplementChart?.destroy()
+  supplementChart = null
 }
 
 async function renderChart() {
@@ -799,17 +848,60 @@ async function renderFoodChart() {
   })
 }
 
+async function renderSupplementChart() {
+  await nextTick()
+  destroySupplementChart()
+
+  if (!supplementCountChart.value || !supplementCountsByDay.value.length) {
+    return
+  }
+
+  supplementChart = new Chart(supplementCountChart.value, {
+    type: 'bar',
+    data: {
+      labels: supplementCountsByDay.value.map((day) => day.date),
+      datasets: [
+        {
+          label: 'Supplement Count',
+          data: supplementCountsByDay.value.map((day) => day.supplementCount),
+          backgroundColor: 'rgba(153, 102, 255, 0.7)',
+          borderColor: 'rgba(153, 102, 255, 1)',
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0,
+          },
+          title: {
+            display: true,
+            text: 'Supplement Count',
+          },
+        },
+      },
+    },
+  })
+}
+
 watch(
   () => usersStore.currentUser?.user_id,
   async (userId) => {
     destroyChart()
     destroyWorkoutChart()
     destroyFoodChart()
+    destroySupplementChart()
 
     if (!userId) {
       weightLogsStore.logs = []
       workoutLogsStore.logs = []
       foodLogsStore.logs = []
+      supplementLogsStore.logs = []
       profilesStore.currentProfile = null
       return
     }
@@ -818,11 +910,13 @@ watch(
       weightLogsStore.loadWeightLogs(userId),
       workoutLogsStore.loadWorkoutLogs(userId),
       foodLogsStore.loadFoodLogs(userId),
+      supplementLogsStore.loadSupplementLogs(userId),
       profilesStore.loadCurrentProfile(userId),
     ])
     await renderChart()
     await renderWorkoutChart()
     await renderFoodChart()
+    await renderSupplementChart()
   },
   { immediate: true },
 )
@@ -831,18 +925,21 @@ watch(chartLogs, renderChart)
 watch(weightAxisBounds, renderChart)
 watch(workoutCaloriesByDay, renderWorkoutChart)
 watch(foodCaloriesByDay, renderFoodChart)
+watch(supplementCountsByDay, renderSupplementChart)
 
 onBeforeUnmount(() => {
   destroyChart()
   destroyWorkoutChart()
   destroyFoodChart()
+  destroySupplementChart()
 })
 </script>
 
 <style scoped>
 .weight-log-chart,
 .workout-calories-chart,
-.food-calories-chart {
+.food-calories-chart,
+.supplement-count-chart {
   height: 320px;
 }
 </style>
