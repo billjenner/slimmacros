@@ -238,8 +238,8 @@
               <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
                 <div class="row items-center justify-between q-px-md q-py-sm">
                   <div class="text-subtitle1">Logged foods</div>
-                  <q-chip color="secondary" text-color="white" square>
-                    Today's logged calories: {{ Math.round(totalLoggedCalories) }}
+                  <q-chip :color="weightChangeChip.color" text-color="white" square>
+                    {{ weightChangeChip.label }}
                   </q-chip>
                 </div>
 
@@ -917,6 +917,81 @@ const selectedFoodLogDayOfWeek = computed(() => {
   }
 
   return selectedDate.toLocaleDateString(undefined, { weekday: 'long' })
+})
+
+const weightLogsSortedByDate = computed(() => {
+  return [...(weightLogsStore.logs || [])]
+    .filter((log) => Number.isFinite(Number(log?.weight)) && Number(log?.weight) > 0)
+    .sort((leftLog, rightLog) => {
+      const leftKey = String(leftLog?.date || '').slice(0, 10)
+      const rightKey = String(rightLog?.date || '').slice(0, 10)
+
+      return leftKey.localeCompare(rightKey)
+    })
+})
+
+const previousWeightForSelectedFoodDate = computed(() => {
+  const selectedDateKey = String(selectedFoodLogDate.value || '').slice(0, 10)
+
+  const priorWeight = [...weightLogsSortedByDate.value].reverse().find((log) => {
+    const dateKey = String(log?.date || '').slice(0, 10)
+    return dateKey <= selectedDateKey
+  })
+
+  if (priorWeight) {
+    return Number(priorWeight.weight)
+  }
+
+  const profileStartWeight = Number(currentProfile.value?.start_weight)
+  return Number.isFinite(profileStartWeight) && profileStartWeight > 0 ? profileStartWeight : null
+})
+
+const nextWeightForSelectedFoodDate = computed(() => {
+  const selectedDateKey = String(selectedFoodLogDate.value || '').slice(0, 10)
+
+  return weightLogsSortedByDate.value.find((log) => {
+    const dateKey = String(log?.date || '').slice(0, 10)
+    return dateKey > selectedDateKey
+  })
+    ? Number(
+        weightLogsSortedByDate.value.find((log) => {
+          const dateKey = String(log?.date || '').slice(0, 10)
+          return dateKey > selectedDateKey
+        }).weight,
+      )
+    : null
+})
+
+const daysWeightLoss = computed(() => {
+  const previousWeight = previousWeightForSelectedFoodDate.value
+  const nextWeight = nextWeightForSelectedFoodDate.value
+
+  if (previousWeight === null || nextWeight === null) {
+    return null
+  }
+
+  return Number((nextWeight - previousWeight).toFixed(2))
+})
+
+const weightChangeChip = computed(() => {
+  const change = daysWeightLoss.value
+
+  if (change === null || Number.isNaN(change)) {
+    return { label: '----', color: 'grey' }
+  }
+
+  if (change === 0) {
+    return { label: '----', color: 'grey' }
+  }
+
+  const absoluteChange = Math.abs(change)
+  const roundedChange = Number(absoluteChange.toFixed(2))
+
+  if (change < 0) {
+    return { label: `lost ${roundedChange}`, color: 'green' }
+  }
+
+  return { label: `gain ${roundedChange}`, color: 'red' }
 })
 
 function getCurrentDayOfWeekKey() {
