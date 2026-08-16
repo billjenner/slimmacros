@@ -113,12 +113,9 @@
       </q-expansion-item>
     </q-card>
 
-    <div class="text-h4 q-mb-lg text-center">Resources</div>
+    <q-card flat bordered class="q-ma-md">
+      <div class="text-h4 q-mb-lg text-center">Food & Fitness Guide</div>
 
-    <div
-      class="row q-col-gutter-md"
-      style="background-color: #fdecec; padding-bottom: 16px; padding-right: 16px"
-    >
       <div class="col-12 col-sm-6 col-md-6 col-lg-6 flex justify-center">
         <q-card style="width: 95%">
           <q-card-section class="bg-accent text-center">
@@ -589,7 +586,7 @@
           </q-expansion-item>
         </q-card>
       </div>
-    </div>
+    </q-card>
   </q-page>
 </template>
 
