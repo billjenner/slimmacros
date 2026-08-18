@@ -107,7 +107,7 @@ const routes = [
       },
       {
         path: 'supplements',
-        component: () => import('pages/supplements.vue'),
+        component: () => import('pages/Supplements.vue'),
         meta: {
           requiresAuth: true,
           seo: {
