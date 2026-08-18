@@ -926,7 +926,7 @@ async function renderWorkoutChart() {
           label: 'Calories burned',
           data,
           backgroundColor: 'rgba(255, 112, 67, 0.65)',
-          borderColor: 'rgba(255, 159, 64, 1)',
+          borderColor: 'rgba(255, 081, 0, 1)',
           borderWidth: 1,
         },
       ],
