@@ -882,29 +882,36 @@ async function renderWorkoutChart() {
     workoutCaloriesByDay.value.map((day) => [day.date, day.caloriesBurned]),
   )
 
-  const firstDate = new Date(
-    profilesStore.currentProfile?.created_at ?? `${workoutCaloriesByDay.value[0].date}T00:00:00`,
-  )
+  // Use the calendar date only.
+  // Avoid converting created_at to a Date because it may be UTC
+  // and therefore shift the date when converted to local time.
+  const startDateString =
+    profilesStore.currentProfile?.created_at?.substring(0, 10) ?? workoutCaloriesByDay.value[0].date
 
-  // Today's date
+  const [startYear, startMonth, startDay] = startDateString.split('-').map(Number)
+
+  // Create the starting date using local calendar components.
+  const currentDate = new Date(startYear, startMonth - 1, startDay)
+
+  // Today's local calendar date
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
   const labels = []
   const data = []
 
-  const currentDate = new Date(firstDate)
-
-  // Generate dates from first workout date through today
+  // Generate dates from the start date through TODAY, inclusive
   while (currentDate <= today) {
     const year = currentDate.getFullYear()
     const month = String(currentDate.getMonth() + 1).padStart(2, '0')
     const day = String(currentDate.getDate()).padStart(2, '0')
+
     const dateKey = `${year}-${month}-${day}`
 
     labels.push(dateKey)
     data.push(workoutByDate[dateKey] || 0)
 
+    // Move to the next calendar day
     currentDate.setDate(currentDate.getDate() + 1)
   }
 
