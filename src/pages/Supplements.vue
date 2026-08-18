@@ -13,7 +13,7 @@
               @click="showsupplementForm = !showsupplementForm"
             />
           </div>
-
+          // TODO - remove
           <q-banner v-if="store.error" class="bg-negative text-white q-mb-md" rounded>
             {{ store.error }}
           </q-banner>
