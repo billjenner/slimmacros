@@ -84,26 +84,14 @@
         <q-item clickable v-ripple @click="navigateAndClose('/')">
           <q-item-section>Intro</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/resources')">
-          <q-item-section>Resources</q-item-section>
-        </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/goods')">
           <q-item-section>Goods</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/profiles')">
-          <q-item-section>Profiles</q-item-section>
-        </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/food')">
-          <q-item-section>Food</q-item-section>
-        </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/workouts')">
-          <q-item-section>Workouts</q-item-section>
-        </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/supplements')">
-          <q-item-section>supplements</q-item-section>
-        </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/food-log')">
           <q-item-section>Log</q-item-section>
+        </q-item>
+        <q-item clickable v-ripple @click="navigateAndClose('/hub')">
+          <q-item-section>Hub</q-item-section>
         </q-item>
         <q-item
           v-if="!(usersStore.currentUser && usersStore.currentUser.email)"

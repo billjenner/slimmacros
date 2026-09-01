@@ -27,13 +27,13 @@
           </div>
           <div class="row justify-between items-center q-mt-md">
             <q-chip color="secondary" text-color="white" square>
-              Daily Ave - 1 year: {{ aveWorkoutCalories1Year }}
+              1 year ave: {{ aveWorkoutCalories1Year }}
             </q-chip>
             <q-chip color="secondary" text-color="white" square>
-              Daily Ave - 30 days: {{ aveWorkoutCalories30Days }}
+              30 days ave: {{ aveWorkoutCalories30Days }}
             </q-chip>
             <q-chip color="secondary" text-color="white" square>
-              Daily Ave - 7 days: {{ aveWorkoutCalories7Days }}
+              7 days ave: {{ aveWorkoutCalories7Days }}
             </q-chip>
           </div>
         </div>
