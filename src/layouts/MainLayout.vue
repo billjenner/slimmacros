@@ -43,48 +43,6 @@
             @mouseover="hoveredPath = '/goods'"
             @mouseleave="hoveredPath = null"
           />
-
-          <q-btn
-            flat
-            label="Foods"
-            to="/foods"
-            class="q-mx-sm"
-            style="min-width: 126px"
-            :style="buttonStyle('/foods')"
-            @mouseover="hoveredPath = '/foods'"
-            @mouseleave="hoveredPath = null"
-          />
-          <q-btn
-            flat
-            label="Workouts"
-            to="/workouts"
-            class="q-mx-sm"
-            style="min-width: 126px"
-            :style="buttonStyle('/workouts')"
-            @mouseover="hoveredPath = '/workouts'"
-            @mouseleave="hoveredPath = null"
-          />
-          <q-btn
-            flat
-            label="supplements"
-            to="/supplements"
-            class="q-mx-sm"
-            style="min-width: 126px"
-            :style="buttonStyle('/supplements')"
-            @mouseover="hoveredPath = '/supplements'"
-            @mouseleave="hoveredPath = null"
-          />
-          <q-btn
-            flat
-            label="Profiles"
-            to="/profiles"
-            class="q-mx-sm"
-            style="min-width: 126px"
-            :style="buttonStyle('/profiles')"
-            @mouseover="hoveredPath = '/profiles'"
-            @mouseleave="hoveredPath = null"
-          />
-
           <q-btn
             flat
             label="Hub"
@@ -135,8 +93,8 @@
         <q-item clickable v-ripple @click="navigateAndClose('/profiles')">
           <q-item-section>Profiles</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/foods')">
-          <q-item-section>Foods</q-item-section>
+        <q-item clickable v-ripple @click="navigateAndClose('/food')">
+          <q-item-section>Food</q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/workouts')">
           <q-item-section>Workouts</q-item-section>

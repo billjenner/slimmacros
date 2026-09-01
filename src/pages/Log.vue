@@ -134,8 +134,8 @@
 
                     <div class="row items-center justify-between q-mt-md">
                       <q-toggle
-                        v-model="includeSharedFoods"
-                        label="Include shared foods"
+                        v-model="includeSharedFood"
+                        label="Include shared food"
                         :disable="!usersStore.currentUser"
                       />
                       <q-btn
@@ -237,7 +237,7 @@
 
               <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
                 <div class="row items-center justify-between q-px-md q-py-sm">
-                  <div class="text-subtitle1">Logged foods</div>
+                  <div class="text-subtitle1">Logged food</div>
                   <q-chip :color="weightChangeChip.color" text-color="white" square>
                     {{ weightChangeChip.label }}
                   </q-chip>
@@ -818,7 +818,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
-import { useFoodsStore } from 'stores/foods'
+import { useFoodStore } from 'stores/food'
 import { useFoodLogsStore } from 'stores/food-logs'
 import { useProfilesStore } from 'stores/profiles'
 import { useWorkoutsStore } from 'stores/workouts'
@@ -836,7 +836,7 @@ import {
 } from '../utils/rules'
 
 const usersStore = useUsersStore()
-const foodsStore = useFoodsStore()
+const foodStore = useFoodStore()
 const foodLogsStore = useFoodLogsStore()
 const profilesStore = useProfilesStore()
 const workoutsStore = useWorkoutsStore()
@@ -846,7 +846,7 @@ const supplementLogsStore = usesupplementsLogStore()
 const weightLogsStore = useWeightLogsStore()
 const activeTab = ref('food')
 const isFoodLogExpanded = ref(false)
-const includeSharedFoods = ref(false)
+const includeSharedFood = ref(false)
 const selectedFoodLogDate = ref(getCurrentLocalDate())
 
 function getCurrentLocalDateTime() {
@@ -1073,8 +1073,8 @@ const columns = [
   },
 ]
 
-function sortFoodsForOptionList(foods = []) {
-  return [...foods].sort((leftFood, rightFood) => {
+function sortFoodForOptionList(food = []) {
+  return [...food].sort((leftFood, rightFood) => {
     const leftIsFavorite = Boolean(leftFood?.favorite_food)
     const rightIsFavorite = Boolean(rightFood?.favorite_food)
 
@@ -1087,24 +1087,24 @@ function sortFoodsForOptionList(foods = []) {
 }
 
 const foodOptions = computed(() => {
-  const allFoods = foodsStore.foods || []
+  const allFood = foodStore.food || []
   const currentUserId = usersStore.currentUser?.user_id
-  const ownFoods = sortFoodsForOptionList(
-    allFoods.filter((food) => String(food?.user_id || '') === String(currentUserId || '')),
+  const ownFood = sortFoodForOptionList(
+    allFood.filter((food) => String(food?.user_id || '') === String(currentUserId || '')),
   )
 
-  if (!includeSharedFoods.value) {
-    return ownFoods.map((food) => ({
+  if (!includeSharedFood.value) {
+    return ownFood.map((food) => ({
       label: `${food.description}${food.favorite_food ? ' | *' : ''}`,
       value: food.food_id,
     }))
   }
 
-  const sharedFoods = sortFoodsForOptionList(
-    allFoods.filter((food) => String(food?.user_id || '') !== String(currentUserId || '')),
+  const sharedFood = sortFoodForOptionList(
+    allFood.filter((food) => String(food?.user_id || '') !== String(currentUserId || '')),
   )
 
-  return [...ownFoods, ...sharedFoods].map((food) => ({
+  return [...ownFood, ...sharedFood].map((food) => ({
     label: `${food.description}${food.favorite_food ? ' | *' : ''}`,
     value: food.food_id,
   }))
@@ -1125,7 +1125,7 @@ const selectedWorkout = computed(() => {
 })
 
 const selectedFood = computed(() => {
-  return (foodsStore.foods || []).find((food) => food.food_id === foodLog.food_id) || null
+  return (foodStore.food || []).find((food) => food.food_id === foodLog.food_id) || null
 })
 
 const selectedSupplement = computed(() => {
@@ -1369,7 +1369,7 @@ watch(
       return
     }
 
-    foodsStore.foods = []
+    foodStore.food = []
     foodLogsStore.logs = []
     profilesStore.currentProfile = null
     workoutsStore.workouts = []
@@ -1423,7 +1423,7 @@ async function loadDataForUser(userId) {
   }
 
   await Promise.all([
-    foodsStore.loadFoods(userId),
+    foodStore.loadFood(userId),
     foodLogsStore.loadFoodLogs(userId),
     profilesStore.loadCurrentProfile(userId),
     workoutsStore.loadWorkouts(userId),

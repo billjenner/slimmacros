@@ -12,7 +12,7 @@
             class="text-primary"
             indicator-color="accent"
           >
-            <q-tab name="foods" label="Food" />
+            <q-tab name="food" label="Food" />
             <q-tab name="workouts" label="Workouts" />
             <q-tab name="supplements" label="Supplements" />
             <q-tab name="profiles" label="Profiles" />
@@ -21,17 +21,17 @@
           <q-separator class="q-my-md" />
 
           <q-tab-panels v-model="activeTab" animated>
-            <q-tab-panel name="foods" class="q-pa-none">
-              <foods-page />
+            <q-tab-panel name="food" class="q-pa-none">
+              <food-page embedded />
             </q-tab-panel>
             <q-tab-panel name="workouts" class="q-pa-none">
-              <workouts-page />
+              <workouts-page embedded />
             </q-tab-panel>
             <q-tab-panel name="supplements" class="q-pa-none">
-              <supplements-page />
+              <supplements-page embedded />
             </q-tab-panel>
             <q-tab-panel name="profiles" class="q-pa-none">
-              <profiles-page />
+              <profiles-page embedded />
             </q-tab-panel>
           </q-tab-panels>
         </q-card>
@@ -42,10 +42,10 @@
 
 <script setup>
 import { ref } from 'vue'
-import FoodsPage from 'pages/Foods.vue'
+import FoodPage from 'pages/Food.vue'
 import ProfilesPage from 'pages/Profiles.vue'
 import SupplementsPage from 'pages/Supplements.vue'
 import WorkoutsPage from 'pages/Workouts.vue'
 
-const activeTab = ref('foods')
+const activeTab = ref('food')
 </script>

@@ -77,7 +77,7 @@ const routes = [
           requiresAuth: true,
           seo: {
             title: 'Goods',
-            description: 'Manage foods, workouts, supplements, and your profile.',
+            description: 'Manage food, workouts, supplements, and your profile.',
             canonicalPath: '/goods',
           },
         },
@@ -94,14 +94,14 @@ const routes = [
         },
       },
       {
-        path: 'foods',
-        component: () => import('pages/Foods.vue'),
+        path: 'food',
+        component: () => import('pages/Food.vue'),
         meta: {
           requiresAuth: true,
           seo: {
-            title: 'Foods',
+            title: 'Food',
             description: 'Create and manage your Slim Belly food entries.',
-            canonicalPath: '/foods',
+            canonicalPath: '/food',
           },
         },
       },

@@ -1,10 +1,15 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="row justify-center">
-      <div class="col-12 col-md-10 col-lg-8">
-        <q-card flat bordered class="q-pa-md">
+  <component :is="embedded ? 'div' : 'q-page'" :class="!embedded ? 'q-pa-md' : ''">
+    <div :class="!embedded ? 'row justify-center' : ''">
+      <div :class="!embedded ? 'col-12 col-md-10 col-lg-8' : ''">
+        <component
+          :is="embedded ? 'div' : 'q-card'"
+          :flat="!embedded"
+          :bordered="!embedded"
+          :class="!embedded ? 'q-pa-md' : ''"
+        >
           <div class="row items-center justify-between q-mb-md">
-            <div class="text-h5">Foods</div>
+            <div class="text-h5">Food</div>
             <q-btn
               color="primary"
               class="q-mb-sm"
@@ -39,7 +44,7 @@
                   <div class="col-12">
                     <q-select
                       v-model="food.description"
-                      :options="filteredFoods"
+                      :options="filteredFood"
                       label="Description"
                       filled
                       dense
@@ -47,7 +52,7 @@
                       fill-input
                       hide-selected
                       input-debounce="0"
-                      @filter="filterFoods"
+                      @filter="filterFood"
                       :rules="[(value) => !!value?.trim() || 'Description is required']"
                     />
                   </div>
@@ -189,8 +194,8 @@
 
           <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
             <div class="row items-center justify-between q-px-md q-py-sm">
-              <div class="text-subtitle1">Saved foods</div>
-              <q-toggle v-model="showSharedFoods" label="Show shared foods" />
+              <div class="text-subtitle1">Saved food</div>
+              <q-toggle v-model="showSharedFood" label="Show shared food" />
             </div>
 
             <q-table
@@ -371,24 +376,31 @@
               </template>
             </q-table>
           </q-card>
-        </q-card>
+        </component>
       </div>
     </div>
-  </q-page>
+  </component>
 </template>
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
-import { useFoodsStore } from 'stores/foods'
+import { useFoodStore } from 'stores/food'
 import { calculateFoodCalories, calculateTotalCaloriesForPerson } from '../utils/rules'
-import foods from 'src/data/foods.json'
+import foodMacros from 'src/data/foods.json'
+
+defineProps({
+  embedded: {
+    type: Boolean,
+    default: false,
+  },
+})
 
 const usersStore = useUsersStore()
-const store = useFoodsStore()
+const store = useFoodStore()
 
-const foodOptions = foods.map((item) => item.description)
-const filteredFoods = ref([...foodOptions])
+const foodOptions = foodMacros.map((item) => item.description)
+const filteredFood = ref([...foodOptions])
 
 const servingUnitOptions = [
   { label: 'Ounce', value: 'oz' },
@@ -422,18 +434,18 @@ const food = reactive({
   is_active: true,
 })
 
-function filterFoods(val, update) {
+function filterFood(val, update) {
   update(() => {
     const needle = String(val || '')
       .trim()
       .toLowerCase()
 
     if (!needle) {
-      filteredFoods.value = [...foodOptions]
+      filteredFood.value = [...foodOptions]
       return
     }
 
-    filteredFoods.value = foodOptions.filter((description) =>
+    filteredFood.value = foodOptions.filter((description) =>
       description.toLowerCase().includes(needle),
     )
   })
@@ -450,9 +462,9 @@ const foodColumns = [
 ]
 
 const foodRows = computed(() => {
-  const allRows = store.foods || []
+  const allRows = store.food || []
   const currentUserId = usersStore.currentUser?.user_id
-  const rowsWithoutShared = showSharedFoods.value
+  const rowsWithoutShared = showSharedFood.value
     ? allRows
     : allRows.filter((row) => row?.user_id === currentUserId)
   const searchText = String(food.description || '')
@@ -473,7 +485,7 @@ const foodRows = computed(() => {
 })
 
 const showFoodForm = ref(false)
-const showSharedFoods = ref(false)
+const showSharedFood = ref(false)
 const confirmDeleteOpen = ref(false)
 const pendingDeleteFood = ref(null)
 const expandedFoodIds = ref([])
@@ -490,7 +502,7 @@ const canGetMacros = computed(() => {
 
 onMounted(() => {
   if (usersStore.currentUser?.user_id) {
-    loadFoodsForCurrentUser(usersStore.currentUser.user_id)
+    loadFoodForCurrentUser(usersStore.currentUser.user_id)
   }
 })
 
@@ -498,19 +510,19 @@ watch(
   () => usersStore.currentUser?.user_id,
   (userId) => {
     if (userId) {
-      loadFoodsForCurrentUser(userId)
+      loadFoodForCurrentUser(userId)
     } else {
-      store.foods = []
+      store.food = []
     }
   },
 )
 
-async function loadFoodsForCurrentUser(userId) {
+async function loadFoodForCurrentUser(userId) {
   if (!userId) {
     return
   }
 
-  await store.loadFoods(userId)
+  await store.loadFood(userId)
 }
 
 function isOwnedByCurrentUser(row) {
@@ -683,7 +695,7 @@ async function getMacrosFromAi() {
           {
             role: 'system',
             content:
-              'You estimate nutrition macros for foods. Return only JSON with numeric keys: protein, carb, fat, calories_extra. Protein/carb/fat are grams for the provided serving. calories_extra is non-macro calories for that serving.',
+              'You estimate nutrition macros for food. Return only JSON with numeric keys: protein, carb, fat, calories_extra. Protein/carb/fat are grams for the provided serving. calories_extra is non-macro calories for that serving.',
           },
           {
             role: 'user',
@@ -739,7 +751,7 @@ async function confirmDeleteFood() {
 
   const { error } = await store.deactivateFood(usersStore.currentUser.user_id, row.food_id)
   if (!error) {
-    await loadFoodsForCurrentUser(usersStore.currentUser.user_id)
+    await loadFoodForCurrentUser(usersStore.currentUser.user_id)
   }
 }
 
@@ -757,7 +769,7 @@ async function submitFood() {
     resetFoodForm()
 
     showFoodForm.value = false
-    await loadFoodsForCurrentUser(usersStore.currentUser.user_id)
+    await loadFoodForCurrentUser(usersStore.currentUser.user_id)
   }
 }
 </script>

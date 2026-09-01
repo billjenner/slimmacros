@@ -1,8 +1,13 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="row justify-center">
-      <div class="col-12 col-md-10 col-lg-8">
-        <q-card flat bordered class="q-pa-md">
+  <component :is="embedded ? 'div' : 'q-page'" :class="!embedded ? 'q-pa-md' : ''">
+    <div :class="!embedded ? 'row justify-center' : ''">
+      <div :class="!embedded ? 'col-12 col-md-10 col-lg-8' : ''">
+        <component
+          :is="embedded ? 'div' : 'q-card'"
+          :flat="!embedded"
+          :bordered="!embedded"
+          :class="!embedded ? 'q-pa-md' : ''"
+        >
           <div class="text-h5 q-mb-md">Profiles</div>
 
           <q-banner v-if="store.error" class="bg-negative text-white q-mb-md" rounded>
@@ -183,10 +188,10 @@
               />
             </div>
           </q-form>
-        </q-card>
+        </component>
       </div>
     </div>
-  </q-page>
+  </component>
 </template>
 
 <script setup>
@@ -195,6 +200,13 @@ import { useUsersStore } from 'stores/users'
 import { useProfilesStore } from 'stores/profiles'
 import { calculateBodyMassIndex, calculateTotalDailyCalories } from '../utils/rules'
 import macroTemplates from '../components/macros.json'
+
+defineProps({
+  embedded: {
+    type: Boolean,
+    default: false,
+  },
+})
 
 const usersStore = useUsersStore()
 const store = useProfilesStore()

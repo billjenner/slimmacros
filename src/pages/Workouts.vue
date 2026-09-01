@@ -1,8 +1,13 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="row justify-center">
-      <div class="col-12 col-md-10 col-lg-8">
-        <q-card flat bordered class="q-pa-md">
+  <component :is="embedded ? 'div' : 'q-page'" :class="!embedded ? 'q-pa-md' : ''">
+    <div :class="!embedded ? 'row justify-center' : ''">
+      <div :class="!embedded ? 'col-12 col-md-10 col-lg-8' : ''">
+        <component
+          :is="embedded ? 'div' : 'q-card'"
+          :flat="!embedded"
+          :bordered="!embedded"
+          :class="!embedded ? 'q-pa-md' : ''"
+        >
           <div class="row items-center justify-between q-mb-md">
             <div class="text-h5">Workouts</div>
             <q-btn
@@ -209,16 +214,23 @@
               </template>
             </q-table>
           </q-card>
-        </q-card>
+        </component>
       </div>
     </div>
-  </q-page>
+  </component>
 </template>
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
 import { useWorkoutsStore } from 'stores/workouts'
+
+defineProps({
+  embedded: {
+    type: Boolean,
+    default: false,
+  },
+})
 
 const usersStore = useUsersStore()
 const store = useWorkoutsStore()

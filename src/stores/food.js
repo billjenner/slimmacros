@@ -1,9 +1,9 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
 
-export const useFoodsStore = defineStore('Foods', {
+export const useFoodStore = defineStore('Food', {
   state: () => ({
-    foods: [],
+    food: [],
     currentFood: null,
     error: null,
     loading: false,
@@ -68,7 +68,7 @@ export const useFoodsStore = defineStore('Foods', {
         }
 
         this.currentFood = data
-        this.foods = [data, ...this.foods]
+        this.food = [data, ...this.food]
         return data
       } finally {
         this.loading = false
@@ -107,14 +107,14 @@ export const useFoodsStore = defineStore('Foods', {
         }
 
         this.currentFood = data
-        this.foods = this.foods.map((item) => (item.food_id === foodId ? data : item))
+        this.food = this.food.map((item) => (item.food_id === foodId ? data : item))
         return data
       } finally {
         this.loading = false
       }
     },
 
-    async loadFoods(userId) {
+    async loadFood(userId) {
       this.error = null
       this.loading = true
 
@@ -129,7 +129,7 @@ export const useFoodsStore = defineStore('Foods', {
           return []
         }
 
-        const { data: ownFoods, error: ownError } = await supabase
+        const { data: ownFood, error: ownError } = await supabase
           .from('food')
           .select('*')
           .eq('user_id', userId)
@@ -141,7 +141,7 @@ export const useFoodsStore = defineStore('Foods', {
           return []
         }
 
-        const { data: sharedFoods, error: sharedError } = await supabase
+        const { data: sharedFood, error: sharedError } = await supabase
           .from('food')
           .select('*')
           .neq('user_id', userId)
@@ -154,11 +154,11 @@ export const useFoodsStore = defineStore('Foods', {
           return []
         }
 
-        const sortedOwnFoods = this.sortByDescription(ownFoods || [])
-        const sortedSharedFoods = this.sortByDescription(sharedFoods || [])
+        const sortedOwnFood = this.sortByDescription(ownFood || [])
+        const sortedSharedFood = this.sortByDescription(sharedFood || [])
 
-        this.foods = [...sortedOwnFoods, ...sortedSharedFoods]
-        return this.foods
+        this.food = [...sortedOwnFood, ...sortedSharedFood]
+        return this.food
       } finally {
         this.loading = false
       }
@@ -190,7 +190,7 @@ export const useFoodsStore = defineStore('Foods', {
           return { error: this.error }
         }
 
-        this.foods = this.foods.filter((food) => food.food_id !== foodId)
+        this.food = this.food.filter((food) => food.food_id !== foodId)
         return { error: null }
       } finally {
         this.loading = false
@@ -200,5 +200,5 @@ export const useFoodsStore = defineStore('Foods', {
 })
 
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useFoodsStore, import.meta.hot))
+  import.meta.hot.accept(acceptHMRUpdate(useFoodStore, import.meta.hot))
 }

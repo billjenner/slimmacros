@@ -62,7 +62,7 @@
                       <tr>
                         <td style="padding: 10px; border-bottom: 1px solid #eee">2</td>
                         <td style="padding: 10px; border-bottom: 1px solid #eee">
-                          Add Foods you like
+                          Add Food you like
                         </td>
                       </tr>
 
@@ -179,7 +179,7 @@
 
                       <tr>
                         <td style="padding: 10px; border-bottom: 1px solid #eee">
-                          <strong>Fiber-rich foods</strong>
+                          <strong>Fiber-rich food</strong>
                         </td>
                         <td style="padding: 10px; border-bottom: 1px solid #eee; color: #666">
                           Improves fullness
