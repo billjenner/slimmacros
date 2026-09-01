@@ -23,13 +23,13 @@
             <canvas ref="foodCaloriesChart"></canvas>
           </div>
           <div class="row justify-between items-center q-mt-md">
-            <q-chip color="secondary" text-color="white" square>
+            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
               1 year ave: {{ aveCalories1Year }}
             </q-chip>
-            <q-chip color="secondary" text-color="white" square>
+            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
               30 days ave: {{ aveCalories30Days }}
             </q-chip>
-            <q-chip color="secondary" text-color="white" square>
+            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
               7 days ave: {{ aveCalories7Days }}
             </q-chip>
           </div>
@@ -204,5 +204,12 @@ onBeforeUnmount(destroyFoodChart)
 <style scoped>
 .food-calories-chart {
   height: 320px;
+}
+
+.tiny-chip {
+  font-size: 8px;
+  line-height: 1.2;
+  padding: 0 8px;
+  min-height: 20px;
 }
 </style>

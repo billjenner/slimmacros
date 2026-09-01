@@ -26,13 +26,13 @@
             <canvas ref="workoutCaloriesChart"></canvas>
           </div>
           <div class="row justify-between items-center q-mt-md">
-            <q-chip color="secondary" text-color="white" square>
+            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
               1 year ave: {{ aveWorkoutCalories1Year }}
             </q-chip>
-            <q-chip color="secondary" text-color="white" square>
+            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
               30 days ave: {{ aveWorkoutCalories30Days }}
             </q-chip>
-            <q-chip color="secondary" text-color="white" square>
+            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
               7 days ave: {{ aveWorkoutCalories7Days }}
             </q-chip>
           </div>
@@ -196,5 +196,12 @@ onBeforeUnmount(destroyWorkoutChart)
 <style scoped>
 .workout-calories-chart {
   height: 320px;
+}
+
+.tiny-chip {
+  font-size: 8px;
+  line-height: 1.2;
+  padding: 0 8px;
+  min-height: 20px;
 }
 </style>
