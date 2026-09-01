@@ -914,6 +914,16 @@ const selectedFoodLogDayOfWeek = computed(() => {
   return selectedDate.toLocaleDateString(undefined, { weekday: 'long' })
 })
 
+function getDaysBetween(dateString1, dateString2) {
+  if (!dateString1 || !dateString2) return 0
+  const [y1, m1, d1] = String(dateString1).slice(0, 10).split('-').map(Number)
+  const [y2, m2, d2] = String(dateString2).slice(0, 10).split('-').map(Number)
+  if (!y1 || !m1 || !d1 || !y2 || !m2 || !d2) return 0
+  const date1 = Date.UTC(y1, m1 - 1, d1)
+  const date2 = Date.UTC(y2, m2 - 1, d2)
+  return Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24))
+}
+
 const weightLogsSortedByDate = computed(() => {
   return [...(weightLogsStore.logs || [])]
     .filter((log) => Number.isFinite(Number(log?.weight)) && Number(log?.weight) > 0)
@@ -925,36 +935,42 @@ const weightLogsSortedByDate = computed(() => {
     })
 })
 
-const previousWeightForSelectedFoodDate = computed(() => {
+const previousWeightLogForSelectedFoodDate = computed(() => {
   const selectedDateKey = String(selectedFoodLogDate.value || '').slice(0, 10)
 
-  const priorWeight = [...weightLogsSortedByDate.value].reverse().find((log) => {
-    const dateKey = String(log?.date || '').slice(0, 10)
-    return dateKey <= selectedDateKey
-  })
+  return (
+    [...weightLogsSortedByDate.value].reverse().find((log) => {
+      const dateKey = String(log?.date || '').slice(0, 10)
+      return dateKey <= selectedDateKey
+    }) || null
+  )
+})
 
-  if (priorWeight) {
-    return Number(priorWeight.weight)
+const previousWeightForSelectedFoodDate = computed(() => {
+  const priorWeightLog = previousWeightLogForSelectedFoodDate.value
+
+  if (priorWeightLog) {
+    return Number(priorWeightLog.weight)
   }
 
   const profileStartWeight = Number(currentProfile.value?.start_weight)
   return Number.isFinite(profileStartWeight) && profileStartWeight > 0 ? profileStartWeight : null
 })
 
-const nextWeightForSelectedFoodDate = computed(() => {
+const nextWeightLogForSelectedFoodDate = computed(() => {
   const selectedDateKey = String(selectedFoodLogDate.value || '').slice(0, 10)
 
-  return weightLogsSortedByDate.value.find((log) => {
-    const dateKey = String(log?.date || '').slice(0, 10)
-    return dateKey > selectedDateKey
-  })
-    ? Number(
-        weightLogsSortedByDate.value.find((log) => {
-          const dateKey = String(log?.date || '').slice(0, 10)
-          return dateKey > selectedDateKey
-        }).weight,
-      )
-    : null
+  return (
+    weightLogsSortedByDate.value.find((log) => {
+      const dateKey = String(log?.date || '').slice(0, 10)
+      return dateKey > selectedDateKey
+    }) || null
+  )
+})
+
+const nextWeightForSelectedFoodDate = computed(() => {
+  const nextWeightLog = nextWeightLogForSelectedFoodDate.value
+  return nextWeightLog ? Number(nextWeightLog.weight) : null
 })
 
 const daysWeightLoss = computed(() => {
@@ -963,6 +979,26 @@ const daysWeightLoss = computed(() => {
 
   if (previousWeight === null || nextWeight === null) {
     return null
+  }
+
+  const prevLog = previousWeightLogForSelectedFoodDate.value
+  const nextLog = nextWeightLogForSelectedFoodDate.value
+
+  if (prevLog?.date && nextLog?.date) {
+    const selectedDateKey = String(selectedFoodLogDate.value || '').slice(0, 10)
+    const prevDateKey = String(prevLog.date || '').slice(0, 10)
+    const nextDateKey = String(nextLog.date || '').slice(0, 10)
+
+    const daysFromSelectedToNext = getDaysBetween(selectedDateKey, nextDateKey)
+    const daysFromPrevToSelected = getDaysBetween(prevDateKey, selectedDateKey)
+    const daysBetweenPrevAndNext = getDaysBetween(prevDateKey, nextDateKey)
+
+    if (
+      Math.abs(daysFromSelectedToNext - daysFromPrevToSelected) > 1 &&
+      daysBetweenPrevAndNext > 0
+    ) {
+      return Number(((nextWeight - previousWeight) / daysBetweenPrevAndNext).toFixed(2))
+    }
   }
 
   return Number((nextWeight - previousWeight).toFixed(2))
