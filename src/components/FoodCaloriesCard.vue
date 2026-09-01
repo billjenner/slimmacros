@@ -18,8 +18,21 @@
         <q-banner v-else-if="!foodLogsStore.loading && !foodCaloriesByDay.length" class="bg-grey-2">
           Add food entries to see your daily macro calories.
         </q-banner>
-        <div v-else class="food-calories-chart">
-          <canvas ref="foodCaloriesChart"></canvas>
+        <div v-else>
+          <div class="food-calories-chart q-mb-md">
+            <canvas ref="foodCaloriesChart"></canvas>
+          </div>
+          <div class="row justify-between items-center q-mt-md">
+            <q-chip color="secondary" text-color="white" square>
+              Daily Ave - 1 year: {{ aveCalories1Year }}
+            </q-chip>
+            <q-chip color="secondary" text-color="white" square>
+              Daily Ave - 30 days: {{ aveCalories30Days }}
+            </q-chip>
+            <q-chip color="secondary" text-color="white" square>
+              Daily Ave - 7 days: {{ aveCalories7Days }}
+            </q-chip>
+          </div>
         </div>
       </q-card-section>
     </q-expansion-item>
@@ -61,6 +74,58 @@ const foodCaloriesByDay = computed(() => {
     .map(([date, calories]) => ({ date, ...calories }))
     .sort((leftDay, rightDay) => leftDay.date.localeCompare(rightDay.date))
 })
+
+function getDaysBetween(dateString1, dateString2) {
+  if (!dateString1 || !dateString2) return 0
+  const [y1, m1, d1] = String(dateString1).slice(0, 10).split('-').map(Number)
+  const [y2, m2, d2] = String(dateString2).slice(0, 10).split('-').map(Number)
+  if (!y1 || !m1 || !d1 || !y2 || !m2 || !d2) return 0
+  const date1 = Date.UTC(y1, m1 - 1, d1)
+  const date2 = Date.UTC(y2, m2 - 1, d2)
+  return Math.round((date2 - date1) / (1000 * 60 * 60 * 24))
+}
+
+function getCurrentLocalDateString() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function calculateAveCalories(daysBack) {
+  const days = foodCaloriesByDay.value
+  if (!days || !days.length) {
+    return '----'
+  }
+
+  const todayStr = getCurrentLocalDateString()
+
+  const periodDays = days.filter((day) => {
+    const dayDateStr = String(day.date).slice(0, 10)
+    const daysFromToday = getDaysBetween(dayDateStr, todayStr)
+    return daysFromToday >= 0 && daysFromToday <= daysBack
+  })
+
+  if (!periodDays.length) {
+    return '----'
+  }
+
+  const totalCaloriesSum = periodDays.reduce((sum, day) => {
+    const dailyTotal =
+      (Number(day.proteinCalories) || 0) +
+      (Number(day.carbCalories) || 0) +
+      (Number(day.fatCalories) || 0)
+    return sum + dailyTotal
+  }, 0)
+
+  const avg = totalCaloriesSum / periodDays.length
+  return Math.round(avg)
+}
+
+const aveCalories1Year = computed(() => calculateAveCalories(365))
+const aveCalories30Days = computed(() => calculateAveCalories(30))
+const aveCalories7Days = computed(() => calculateAveCalories(7))
 
 function destroyFoodChart() {
   foodChart?.destroy()

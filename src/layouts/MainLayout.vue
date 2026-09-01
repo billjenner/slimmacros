@@ -14,11 +14,11 @@
           <router-link to="/" class="brand-link row items-center no-wrap">
             <q-img
               src="/icons/icon-192x192.png"
-              alt="Slim Belly"
+              alt="Slim Macros"
               class="q-mr-sm"
               style="width: 32px; height: 32px; border-radius: 4px"
             />
-            <span>Slim Belly</span>
+            <span>Slim Macros</span>
           </router-link>
         </q-toolbar-title>
 
@@ -139,7 +139,7 @@
     <q-dialog v-model="showInstallDialog" persistent>
       <q-card style="min-width: 320px; max-width: 420px">
         <q-card-section>
-          <div class="text-h6">Install Slim Belly App?</div>
+          <div class="text-h6">Install Slim Macros App?</div>
         </q-card-section>
 
         <q-card-section>

@@ -9,7 +9,7 @@ const routes = [
         meta: {
           seo: {
             title: 'Home',
-            description: 'Learn about Slim Belly and begin your personality journey.',
+            description: 'Learn about Slim Macros and begin your personality journey.',
             canonicalPath: '/',
           },
         },
@@ -20,7 +20,7 @@ const routes = [
         meta: {
           seo: {
             title: 'Hub',
-            description: 'Discover the story and idea behind Slim Belly.',
+            description: 'Discover the story and idea behind Slim Macros.',
             canonicalPath: '/hub',
           },
         },
@@ -31,7 +31,7 @@ const routes = [
         meta: {
           seo: {
             title: 'Login',
-            description: 'Sign in to continue your Slim Belly experience.',
+            description: 'Sign in to continue your Slim Macros experience.',
             canonicalPath: '/login',
           },
         },
@@ -53,7 +53,7 @@ const routes = [
         meta: {
           seo: {
             title: 'Forgot password',
-            description: 'Reset your password to access your Slim Belly account.',
+            description: 'Reset your password to access your Slim Macros account.',
             canonicalPath: '/forgot-password',
           },
         },
@@ -65,7 +65,7 @@ const routes = [
           requiresAuth: true,
           seo: {
             title: 'Profiles',
-            description: 'Create and manage your Slim Belly profile.',
+            description: 'Create and manage your Slim Macros profile.',
             canonicalPath: '/profiles',
           },
         },
@@ -88,7 +88,7 @@ const routes = [
         meta: {
           seo: {
             title: 'Users',
-            description: 'View the users and community members in Slim Belly.',
+            description: 'View the users and community members in Slim Macros.',
             canonicalPath: '/users',
           },
         },
@@ -100,7 +100,7 @@ const routes = [
           requiresAuth: true,
           seo: {
             title: 'Food',
-            description: 'Create and manage your Slim Belly food entries.',
+            description: 'Create and manage your Slim Macros food entries.',
             canonicalPath: '/food',
           },
         },
@@ -112,7 +112,7 @@ const routes = [
           requiresAuth: true,
           seo: {
             title: 'Workouts',
-            description: 'Create and manage your Slim Belly workout entries.',
+            description: 'Create and manage your Slim Macros workout entries.',
             canonicalPath: '/workouts',
           },
         },
@@ -124,7 +124,7 @@ const routes = [
           requiresAuth: true,
           seo: {
             title: 'supplements',
-            description: 'Create and manage your Slim Belly supplement log entries.',
+            description: 'Create and manage your Slim Macros supplement log entries.',
             canonicalPath: '/supplements',
           },
         },

@@ -31,7 +31,7 @@
                 transition-hide="jump-up"
               >
                 <template v-slot:header>
-                  <q-chip>Slim-Belly Quick Start</q-chip>
+                  <q-chip>Slim-Macro Quick Start</q-chip>
                 </template>
 
                 <q-card-section>

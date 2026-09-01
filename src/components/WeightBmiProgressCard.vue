@@ -18,8 +18,21 @@
         <q-banner v-else-if="!weightLogsStore.loading && !weightChartLogs.length" class="bg-grey-2">
           Add weight entries to see your progress chart.
         </q-banner>
-        <div v-else class="weight-log-chart">
-          <canvas ref="weightLogChart"></canvas>
+        <div v-else>
+          <div class="weight-log-chart q-mb-md">
+            <canvas ref="weightLogChart"></canvas>
+          </div>
+          <div class="row justify-between items-center q-mt-md">
+            <q-chip color="secondary" text-color="white" square>
+              Daily Ave - 1 year: {{ aveWeightLoss1Year }}
+            </q-chip>
+            <q-chip color="secondary" text-color="white" square>
+              Daily Ave - 30 days: {{ aveWeightLoss30Days }}
+            </q-chip>
+            <q-chip color="secondary" text-color="white" square>
+              Daily Ave - 7 days: {{ aveWeightLoss7Days }}
+            </q-chip>
+          </div>
         </div>
       </q-card-section>
     </q-expansion-item>
@@ -44,6 +57,65 @@ const weightChartLogs = computed(() => {
     .filter((log) => log?.date && Number.isFinite(Number(log?.weight)))
     .sort((leftLog, rightLog) => String(leftLog.date).localeCompare(String(rightLog.date)))
 })
+
+function getDaysBetween(dateString1, dateString2) {
+  if (!dateString1 || !dateString2) return 0
+  const [y1, m1, d1] = String(dateString1).slice(0, 10).split('-').map(Number)
+  const [y2, m2, d2] = String(dateString2).slice(0, 10).split('-').map(Number)
+  if (!y1 || !m1 || !d1 || !y2 || !m2 || !d2) return 0
+  const date1 = Date.UTC(y1, m1 - 1, d1)
+  const date2 = Date.UTC(y2, m2 - 1, d2)
+  return Math.round((date2 - date1) / (1000 * 60 * 60 * 24))
+}
+
+function getCurrentLocalDateString() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function calculateAveWeightLoss(daysBack) {
+  const logs = weightChartLogs.value
+  if (!logs || !logs.length) {
+    return '----'
+  }
+
+  const todayStr = getCurrentLocalDateString()
+  const latestLog = logs[logs.length - 1]
+  const latestWeight = Number(latestLog.weight)
+  const latestDateStr = String(latestLog.date).slice(0, 10)
+
+  const periodLogs = logs.filter((log) => {
+    const logDateStr = String(log.date).slice(0, 10)
+    const daysFromToday = getDaysBetween(logDateStr, todayStr)
+    return daysFromToday >= 0 && daysFromToday <= daysBack
+  })
+
+  if (!periodLogs.length) {
+    return '----'
+  }
+
+  const oldestLog = periodLogs[0]
+  const oldestWeight = Number(oldestLog.weight)
+  const oldestDateStr = String(oldestLog.date).slice(0, 10)
+
+  const endDateStr = latestDateStr === todayStr ? latestDateStr : todayStr
+  const daysInBetween = getDaysBetween(oldestDateStr, endDateStr)
+
+  if (daysInBetween <= 0) {
+    return '----'
+  }
+
+  const diff = latestWeight - oldestWeight
+  const avg = diff / daysInBetween
+  return avg.toFixed(2)
+}
+
+const aveWeightLoss1Year = computed(() => calculateAveWeightLoss(365))
+const aveWeightLoss30Days = computed(() => calculateAveWeightLoss(30))
+const aveWeightLoss7Days = computed(() => calculateAveWeightLoss(7))
 
 const weightAxisBounds = computed(() => {
   const min = Number(profilesStore.currentProfile?.goal_weight)

@@ -21,8 +21,21 @@
         >
           Add workout entries to see your daily calories burned.
         </q-banner>
-        <div v-else class="workout-calories-chart">
-          <canvas ref="workoutCaloriesChart"></canvas>
+        <div v-else>
+          <div class="workout-calories-chart q-mb-md">
+            <canvas ref="workoutCaloriesChart"></canvas>
+          </div>
+          <div class="row justify-between items-center q-mt-md">
+            <q-chip color="secondary" text-color="white" square>
+              Daily Ave - 1 year: {{ aveWorkoutCalories1Year }}
+            </q-chip>
+            <q-chip color="secondary" text-color="white" square>
+              Daily Ave - 30 days: {{ aveWorkoutCalories30Days }}
+            </q-chip>
+            <q-chip color="secondary" text-color="white" square>
+              Daily Ave - 7 days: {{ aveWorkoutCalories7Days }}
+            </q-chip>
+          </div>
         </div>
       </q-card-section>
     </q-expansion-item>
@@ -59,6 +72,54 @@ const workoutCaloriesByDay = computed(() => {
     .map(([date, caloriesBurned]) => ({ date, caloriesBurned }))
     .sort((leftDay, rightDay) => leftDay.date.localeCompare(rightDay.date))
 })
+
+function getDaysBetween(dateString1, dateString2) {
+  if (!dateString1 || !dateString2) return 0
+  const [y1, m1, d1] = String(dateString1).slice(0, 10).split('-').map(Number)
+  const [y2, m2, d2] = String(dateString2).slice(0, 10).split('-').map(Number)
+  if (!y1 || !m1 || !d1 || !y2 || !m2 || !d2) return 0
+  const date1 = Date.UTC(y1, m1 - 1, d1)
+  const date2 = Date.UTC(y2, m2 - 1, d2)
+  return Math.round((date2 - date1) / (1000 * 60 * 60 * 24))
+}
+
+function getCurrentLocalDateString() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function calculateAveWorkoutCalories(daysBack) {
+  const days = workoutCaloriesByDay.value
+  if (!days || !days.length) {
+    return '----'
+  }
+
+  const todayStr = getCurrentLocalDateString()
+
+  const periodDays = days.filter((day) => {
+    const dayDateStr = String(day.date).slice(0, 10)
+    const daysFromToday = getDaysBetween(dayDateStr, todayStr)
+    return daysFromToday >= 0 && daysFromToday <= daysBack
+  })
+
+  if (!periodDays.length) {
+    return '----'
+  }
+
+  const totalCaloriesSum = periodDays.reduce((sum, day) => {
+    return sum + (Number(day.caloriesBurned) || 0)
+  }, 0)
+
+  const avg = totalCaloriesSum / periodDays.length
+  return Math.round(avg)
+}
+
+const aveWorkoutCalories1Year = computed(() => calculateAveWorkoutCalories(365))
+const aveWorkoutCalories30Days = computed(() => calculateAveWorkoutCalories(30))
+const aveWorkoutCalories7Days = computed(() => calculateAveWorkoutCalories(7))
 
 function destroyWorkoutChart() {
   workoutChart?.destroy()

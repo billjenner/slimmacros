@@ -8,9 +8,9 @@ import {
 import routes from './routes'
 
 const defaultSeo = {
-  title: 'Slim Belly',
+  title: 'Slim Macros',
   description:
-    'Explore Slim Belly, an diary for tracking your health and wellness. Log your meals, monitor your progress. Track Macros, Workouts, supplements, and Weight.',
+    'Explore Slim Macros, an diary for tracking your health and wellness. Log your meals, monitor your progress. Track Macros, Workouts, supplements, and Weight.',
   image: '/icons/icon-512x512.png',
   type: 'website',
   robots: 'index,follow',
@@ -19,13 +19,13 @@ const defaultSeo = {
 
 function applySeoMeta(route) {
   const seo = { ...defaultSeo, ...(route.meta?.seo || {}) }
-  const title = seo.title ? `${seo.title} | Slim Belly` : defaultSeo.title
+  const title = seo.title ? `${seo.title} | Slim Macros` : defaultSeo.title
   const description = seo.description || defaultSeo.description
   const canonicalPath = seo.canonicalPath || route.path || '/'
   const origin =
     typeof window !== 'undefined' && window.location?.origin
       ? window.location.origin
-      : 'https://slimbelly.com'
+      : 'https://slimMacros.com'
   const canonicalUrl = `${origin}${canonicalPath === '/' ? '/' : `/${canonicalPath.replace(/^\/+/, '').replace(/\/+$/, '')}`}`
 
   document.title = title

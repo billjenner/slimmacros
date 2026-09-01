@@ -1,8 +1,8 @@
 <template>
   <q-page class="column items-center q-px-md q-py-lg" style="min-height: 100vh">
     <img
-      src="/SlimBelly.jpg"
-      alt="Slim Belly"
+      src="/SlimMacros.jpg"
+      alt="Slim Macros"
       style="
         border-radius: 12px;
         max-width: 100%;
