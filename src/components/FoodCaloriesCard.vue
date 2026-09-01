@@ -207,7 +207,7 @@ onBeforeUnmount(destroyFoodChart)
 }
 
 .tiny-chip {
-  font-size: 8px;
+  font-size: 9px;
   line-height: 1.2;
   padding: 0 8px;
   min-height: 20px;
