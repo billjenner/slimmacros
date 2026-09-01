@@ -126,7 +126,7 @@ async function handleSubmit() {
   if (result) {
     message.value = `User created for ${store.currentUser?.email}`
     messageClass.value = 'text-positive'
-    router.push('/resources')
+    router.push('/hub')
   } else {
     message.value = store.error || 'Unable to save user.'
     messageClass.value = 'text-negative'

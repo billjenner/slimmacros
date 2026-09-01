@@ -37,11 +37,17 @@
                 <div class="text-subtitle1 q-mb-sm">Food details</div>
                 <div class="row q-col-gutter-md">
                   <div class="col-12">
-                    <q-input
+                    <q-select
                       v-model="food.description"
+                      :options="filteredFoods"
                       label="Description"
                       filled
                       dense
+                      use-input
+                      fill-input
+                      hide-selected
+                      input-debounce="0"
+                      @filter="filterFoods"
                       :rules="[(value) => !!value?.trim() || 'Description is required']"
                     />
                   </div>
@@ -376,9 +382,13 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
 import { useFoodsStore } from 'stores/foods'
 import { calculateFoodCalories, calculateTotalCaloriesForPerson } from '../utils/rules'
+import foods from 'src/data/foods.json'
 
 const usersStore = useUsersStore()
 const store = useFoodsStore()
+
+const foodOptions = foods.map((item) => item.description)
+const filteredFoods = ref([...foodOptions])
 
 const servingUnitOptions = [
   { label: 'Ounce', value: 'oz' },
@@ -412,6 +422,23 @@ const food = reactive({
   is_active: true,
 })
 
+function filterFoods(val, update) {
+  update(() => {
+    const needle = String(val || '')
+      .trim()
+      .toLowerCase()
+
+    if (!needle) {
+      filteredFoods.value = [...foodOptions]
+      return
+    }
+
+    filteredFoods.value = foodOptions.filter((description) =>
+      description.toLowerCase().includes(needle),
+    )
+  })
+}
+
 const foodColumns = [
   {
     name: 'description',
@@ -444,6 +471,7 @@ const foodRows = computed(() => {
     return String(leftRow?.description || '').localeCompare(String(rightRow?.description || ''))
   })
 })
+
 const showFoodForm = ref(false)
 const showSharedFoods = ref(false)
 const confirmDeleteOpen = ref(false)

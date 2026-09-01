@@ -1,5 +1,6 @@
 <template>
   <q-page>
+    <div class="text-h4 text-center">Food & Fitness Guide</div>
     <q-card flat bordered class="q-ma-md">
       <q-expansion-item
         label="Weight and BMI progress"

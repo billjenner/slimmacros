@@ -15,13 +15,13 @@ const routes = [
         },
       },
       {
-        path: 'resources',
-        component: () => import('pages/Resources.vue'),
+        path: 'hub',
+        component: () => import('pages/Hub.vue'),
         meta: {
           seo: {
-            title: 'Resources',
+            title: 'Hub',
             description: 'Discover the story and idea behind Slim Belly.',
-            canonicalPath: '/resources',
+            canonicalPath: '/hub',
           },
         },
       },
