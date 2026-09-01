@@ -71,6 +71,18 @@ const routes = [
         },
       },
       {
+        path: 'goods',
+        component: () => import('pages/Goods.vue'),
+        meta: {
+          requiresAuth: true,
+          seo: {
+            title: 'Goods',
+            description: 'Manage foods, workouts, supplements, and your profile.',
+            canonicalPath: '/goods',
+          },
+        },
+      },
+      {
         path: 'users',
         component: () => import('pages/Users.vue'),
         meta: {

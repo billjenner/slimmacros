@@ -14,7 +14,7 @@
           >
             <q-tab name="food" label="Food" />
             <q-tab name="workouts" label="Workouts" />
-            <q-tab name="supplements" label="supplements" />
+            <q-tab name="supplements" label="Supplements" />
             <q-tab name="weight" label="Weight" />
           </q-tabs>
 
@@ -298,6 +298,10 @@
             </q-tab-panel>
 
             <q-tab-panel name="workouts" class="q-pa-none">
+              <workout-log-panel />
+            </q-tab-panel>
+            <!--
+            <q-tab-panel name="workouts" class="q-pa-none">
               <q-banner
                 v-if="workoutLogsStore.error"
                 class="bg-negative text-white q-mb-md"
@@ -469,8 +473,13 @@
                 </q-card>
               </q-dialog>
             </q-tab-panel>
+            -->
 
             <q-tab-panel name="supplements" class="q-pa-none">
+              <supplement-log-panel />
+            </q-tab-panel>
+
+            <!-- <q-tab-panel name="supplements" class="q-pa-none">
               <q-banner
                 v-if="supplementLogsStore.error"
                 class="bg-negative text-white q-mb-md"
@@ -646,9 +655,13 @@
                   </q-card-actions>
                 </q-card>
               </q-dialog>
-            </q-tab-panel>
+            </q-tab-panel> -->
 
             <q-tab-panel name="weight" class="q-pa-none">
+              <weight-log-panel />
+            </q-tab-panel>
+
+            <!-- <q-tab-panel name="weight" class="q-pa-none">
               <q-banner v-if="weightLogsStore.error" class="bg-negative text-white q-mb-md" rounded>
                 {{ weightLogsStore.error }}
               </q-banner>
@@ -794,7 +807,7 @@
                   </q-card-actions>
                 </q-card>
               </q-dialog>
-            </q-tab-panel>
+            </q-tab-panel> -->
           </q-tab-panels>
         </q-card>
       </div>
@@ -813,8 +826,10 @@ import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { usesupplementsStore } from 'stores/supplements'
 import { usesupplementsLogStore } from 'stores/supplements_log'
 import { useWeightLogsStore } from 'stores/weight-logs'
+import SupplementLogPanel from 'components/SupplementLogPanel.vue'
+import WorkoutLogPanel from 'components/WorkoutLogPanel.vue'
+import WeightLogPanel from 'components/WeightLogPanel.vue'
 import {
-  calculateBodyMassIndex,
   calculateFoodCalories,
   calculateTotalCaloriesForPerson,
   calculateTotalDailyCalories,
@@ -832,11 +847,7 @@ const weightLogsStore = useWeightLogsStore()
 const activeTab = ref('food')
 const isFoodLogExpanded = ref(false)
 const includeSharedFoods = ref(false)
-const includeSharedWorkouts = ref(false)
-const includeSharedsupplements = ref(false)
 const selectedFoodLogDate = ref(getCurrentLocalDate())
-const selectedWorkoutLogDate = ref(getCurrentLocalDate())
-const selectedsupplementLogDate = ref(getCurrentLocalDate())
 
 function getCurrentLocalDateTime() {
   const now = new Date()
@@ -882,22 +893,6 @@ function goToPreviousFoodLogDate() {
 
 function goToNextFoodLogDate() {
   selectedFoodLogDate.value = shiftLocalDate(selectedFoodLogDate.value, 1)
-}
-
-function goToPreviousWorkoutLogDate() {
-  selectedWorkoutLogDate.value = shiftLocalDate(selectedWorkoutLogDate.value, -1)
-}
-
-function goToNextWorkoutLogDate() {
-  selectedWorkoutLogDate.value = shiftLocalDate(selectedWorkoutLogDate.value, 1)
-}
-
-function goToPreviousSupplementLogDate() {
-  selectedsupplementLogDate.value = shiftLocalDate(selectedsupplementLogDate.value, -1)
-}
-
-function goToNextSupplementLogDate() {
-  selectedsupplementLogDate.value = shiftLocalDate(selectedsupplementLogDate.value, 1)
 }
 
 const selectedFoodLogDayOfWeek = computed(() => {
@@ -1066,48 +1061,10 @@ const supplementLog = reactive({
   date: getCurrentLocalDate(),
 })
 
-const weightLog = reactive({
-  weight: '',
-  date: getCurrentLocalDate(),
-})
-
 const confirmDeleteOpen = ref(false)
 const pendingDeleteRow = ref(null)
-const confirmDeleteWorkoutLogOpen = ref(false)
-const pendingDeleteWorkoutRow = ref(null)
-const confirmDeleteSupplementLogOpen = ref(false)
-const pendingDeleteSupplementRow = ref(null)
-const confirmDeleteWeightLogOpen = ref(false)
-const pendingDeleteWeightRow = ref(null)
 
 const columns = [
-  {
-    name: 'summary',
-    label: 'Summary',
-    field: 'summary',
-    align: 'right',
-  },
-]
-
-const workoutColumns = [
-  {
-    name: 'summary',
-    label: 'Summary',
-    field: 'summary',
-    align: 'right',
-  },
-]
-
-const supplementColumns = [
-  {
-    name: 'summary',
-    label: 'Summary',
-    field: 'summary',
-    align: 'right',
-  },
-]
-
-const weightColumns = [
   {
     name: 'summary',
     label: 'Summary',
@@ -1153,62 +1110,6 @@ const foodOptions = computed(() => {
   }))
 })
 
-const workoutOptions = computed(() => {
-  const allWorkouts = workoutsStore.workouts || []
-  const currentUserId = usersStore.currentUser?.user_id
-  const ownWorkouts = allWorkouts.filter(
-    (workout) => String(workout?.user_id || '') === String(currentUserId || ''),
-  )
-
-  if (!includeSharedWorkouts.value) {
-    return ownWorkouts.map((workout) => ({
-      label: workout.type,
-      value: workout.workout_id,
-    }))
-  }
-
-  const sharedWorkouts = allWorkouts.filter(
-    (workout) => String(workout?.user_id || '') !== String(currentUserId || ''),
-  )
-
-  return [...ownWorkouts, ...sharedWorkouts].map((workout) => ({
-    label: workout.type,
-    value: workout.workout_id,
-  }))
-})
-
-const supplementOptions = computed(() => {
-  const allsupplements = supplementsStore.supplements || []
-  const currentUserId = usersStore.currentUser?.user_id
-  const ownsupplements = allsupplements.filter(
-    (supplement) => String(supplement?.user_id || '') === String(currentUserId || ''),
-  )
-
-  if (!includeSharedsupplements.value) {
-    return ownsupplements.map((supplement) => ({
-      label: `${supplement.description} (${supplement.serving_size ?? 1} ${supplement.serving_unit || 'other'})`,
-      value: supplement.supplement_id,
-    }))
-  }
-
-  const sharedsupplements = allsupplements.filter(
-    (supplement) => String(supplement?.user_id || '') !== String(currentUserId || ''),
-  )
-
-  return [...ownsupplements, ...sharedsupplements].map((supplement) => ({
-    label: `${supplement.description} (${supplement.serving_size ?? 1} ${supplement.serving_unit || 'other'})`,
-    value: supplement.supplement_id,
-  }))
-})
-
-const servingUnitOptions = [
-  { label: 'Pills', value: 'pills' },
-  { label: 'Oz', value: 'oz' },
-  { label: 'Scoop', value: 'scoop' },
-  { label: 'Glasses', value: 'glasses' },
-  { label: 'Other', value: 'other' },
-]
-
 function areSameId(leftId, rightId) {
   if (leftId === null || leftId === undefined || rightId === null || rightId === undefined) {
     return false
@@ -1236,175 +1137,6 @@ const selectedSupplement = computed(() => {
 })
 
 const currentProfile = computed(() => profilesStore.currentProfile || null)
-
-const latestWeightLogForToday = computed(() => {
-  const today = getCurrentLocalDate()
-
-  return (weightLogsStore.logs || []).reduce((latestLog, log) => {
-    const dateKey = String(log?.date || '').slice(0, 10)
-    if (!dateKey || dateKey > today) {
-      return latestLog
-    }
-
-    const weight = Number(log?.weight)
-    if (!Number.isFinite(weight) || weight <= 0) {
-      return latestLog
-    }
-
-    if (!latestLog) {
-      return log
-    }
-
-    const latestDateKey = String(latestLog?.date || '').slice(0, 10)
-    if (dateKey > latestDateKey) {
-      return log
-    }
-
-    return latestLog
-  }, null)
-})
-
-const oldestWeightLogForToday = computed(() => {
-  const today = getCurrentLocalDate()
-
-  return (weightLogsStore.logs || []).reduce((oldestLog, log) => {
-    const dateKey = String(log?.date || '').slice(0, 10)
-    if (!dateKey || dateKey > today) {
-      return oldestLog
-    }
-
-    const weight = Number(log?.weight)
-    if (!Number.isFinite(weight) || weight <= 0) {
-      return oldestLog
-    }
-
-    if (!oldestLog) {
-      return log
-    }
-
-    const oldestDateKey = String(oldestLog?.date || '').slice(0, 10)
-    if (dateKey < oldestDateKey) {
-      return log
-    }
-
-    return oldestLog
-  }, null)
-})
-
-const weightProgressCurrentValue = computed(() => {
-  const loggedWeight = Number(latestWeightLogForToday.value?.weight)
-  if (Number.isFinite(loggedWeight) && loggedWeight > 0) {
-    return loggedWeight
-  }
-
-  const startWeight = Number(currentProfile.value?.start_weight)
-  if (Number.isFinite(startWeight) && startWeight > 0) {
-    return startWeight
-  }
-
-  return null
-})
-
-const weightLogBodyMassIndex = computed(() => {
-  const enteredWeight = Number(weightLog.weight)
-  const latestLoggedWeight = Number(latestWeightLogForToday.value?.weight)
-  const startWeight = Number(currentProfile.value?.start_weight)
-
-  let effectiveWeight = null
-  if (Number.isFinite(enteredWeight) && enteredWeight > 0) {
-    effectiveWeight = enteredWeight
-  } else if (Number.isFinite(latestLoggedWeight) && latestLoggedWeight > 0) {
-    effectiveWeight = latestLoggedWeight
-  } else if (Number.isFinite(startWeight) && startWeight > 0) {
-    effectiveWeight = startWeight
-  }
-
-  const bmi = calculateBodyMassIndex({
-    weight: effectiveWeight,
-    height: currentProfile.value?.height,
-  })
-
-  return bmi ?? ''
-})
-
-const weightProgressGoalValue = computed(() => {
-  const goalWeight = Number(currentProfile.value?.goal_weight)
-  if (Number.isFinite(goalWeight) && goalWeight > 0) {
-    return goalWeight
-  }
-
-  return null
-})
-
-const weightProgressValue = computed(() => {
-  const startWeight = Number(currentProfile.value?.start_weight)
-  const goalWeight = weightProgressGoalValue.value
-  const currentWeight = weightProgressCurrentValue.value
-
-  if (
-    !Number.isFinite(startWeight) ||
-    !Number.isFinite(goalWeight) ||
-    !Number.isFinite(currentWeight) ||
-    startWeight <= 0 ||
-    goalWeight <= 0 ||
-    startWeight === goalWeight
-  ) {
-    return 0
-  }
-
-  const rawProgress = (currentWeight - startWeight) / (goalWeight - startWeight)
-  return Math.min(1, Math.max(0, rawProgress))
-})
-
-const projectedGoalDateLabel = computed(() => {
-  const profileWeight = Number(currentProfile.value?.start_weight)
-  const goalWeight = Number(weightProgressGoalValue.value)
-  const currentWeight = Number(weightProgressCurrentValue.value)
-
-  const latestDateText = String(latestWeightLogForToday.value?.date || '').slice(0, 10)
-  const oldestDateText = String(oldestWeightLogForToday.value?.date || '').slice(0, 10)
-
-  if (!latestDateText || !oldestDateText) {
-    return 'N/A'
-  }
-
-  const latestDate = new Date(`${latestDateText}T00:00:00`)
-  const oldestDate = new Date(`${oldestDateText}T00:00:00`)
-
-  if (Number.isNaN(latestDate.getTime()) || Number.isNaN(oldestDate.getTime())) {
-    return 'N/A'
-  }
-
-  if (
-    !Number.isFinite(profileWeight) ||
-    !Number.isFinite(goalWeight) ||
-    !Number.isFinite(currentWeight) ||
-    profileWeight === currentWeight
-  ) {
-    return 'N/A'
-  }
-
-  const elapsedDays = (latestDate.getTime() - oldestDate.getTime()) / (1000 * 60 * 60 * 24)
-  if (!Number.isFinite(elapsedDays) || elapsedDays < 0) {
-    return 'N/A'
-  }
-
-  const projectedDays =
-    elapsedDays * ((profileWeight - goalWeight) / (profileWeight - currentWeight)) * 1.41
-
-  if (!Number.isFinite(projectedDays)) {
-    return 'N/A'
-  }
-
-  const projectedDate = new Date(oldestDate)
-  projectedDate.setDate(projectedDate.getDate() + Math.round(projectedDays))
-
-  const year = projectedDate.getFullYear()
-  const month = String(projectedDate.getMonth() + 1).padStart(2, '0')
-  const day = String(projectedDate.getDate()).padStart(2, '0')
-
-  return `${year}-${month}-${day}`
-})
 
 const totalDailyCalories = computed(() => {
   const selectedDateKey = selectedFoodLogDate.value || getCurrentLocalDate()
@@ -1610,38 +1342,6 @@ const foodFatProgress = computed(() => {
   return Math.min(1, totalFatLoggedToday.value / totalFatBudgetForToday.value)
 })
 
-const workoutTableRows = computed(() => {
-  const selectedDateKey = selectedWorkoutLogDate.value || getCurrentLocalDate()
-
-  return (workoutLogsStore.logs || []).map((log) => {
-    const workout = log.workout || {}
-    const workoutLabel = workout.type || `Workout #${log.workout_id}`
-    const workoutTime = log.workout_time ?? workout.average_workout_time ?? 'N/A'
-    const workoutCaloriesBurned = Number(log.calories_burned) || 0
-    const logDate = String(log?.date || '').slice(0, 10)
-
-    return {
-      ...log,
-      description: workoutLabel,
-      isSelectedWorkoutLogDate: logDate === selectedDateKey,
-      summary: `${workoutLabel.trim()} | ${String(workoutTime).trim()} (minutes)\n${String(workoutCaloriesBurned).trim()} (calories burned) | ${log.date || ''}`,
-    }
-  })
-})
-
-const totalWorkoutCaloriesBurnedbyDay = computed(() => {
-  const selectedDateKey = selectedWorkoutLogDate.value || getCurrentLocalDate()
-
-  return (workoutLogsStore.logs || []).reduce((sum, log) => {
-    const logDate = String(log?.date || '').slice(0, 10)
-    if (logDate !== selectedDateKey) {
-      return sum
-    }
-
-    return sum + (Number(log?.calories_burned) || 0)
-  }, 0)
-})
-
 const totalWorkoutCaloriesBurnedbyFoodDay = computed(() => {
   const selectedDateKey = selectedFoodLogDate.value || getCurrentLocalDate()
 
@@ -1653,104 +1353,6 @@ const totalWorkoutCaloriesBurnedbyFoodDay = computed(() => {
 
     return sum + (Number(log?.calories_burned) || 0)
   }, 0)
-})
-
-const workoutTotalCaloriesBurned = computed(() => {
-  const selected = selectedWorkout.value
-  if (!selected) {
-    return 0
-  }
-
-  const workoutTime = Number(workoutLog.workout_time)
-  const averageWorkoutTime = Number(selected.average_workout_time)
-  const caloriesBurned = Number(selected.calories_burned)
-
-  if (
-    !Number.isFinite(workoutTime) ||
-    workoutTime < 0 ||
-    !Number.isFinite(averageWorkoutTime) ||
-    averageWorkoutTime <= 0 ||
-    !Number.isFinite(caloriesBurned) ||
-    caloriesBurned < 0
-  ) {
-    return 0
-  }
-
-  return Math.round((workoutTime / averageWorkoutTime) * caloriesBurned)
-})
-
-const supplementCountForSelectedDate = computed(() => {
-  const selectedDateKey = selectedsupplementLogDate.value || getCurrentLocalDate()
-
-  return (supplementLogsStore.logs || []).reduce((sum, log) => {
-    const logDate = String(log?.date || '').slice(0, 10)
-    if (logDate !== selectedDateKey) {
-      return sum
-    }
-
-    return sum + 1
-  }, 0)
-})
-
-const supplementTableRows = computed(() => {
-  const selectedDateKey = selectedsupplementLogDate.value || getCurrentLocalDate()
-
-  return [...(supplementLogsStore.logs || [])]
-    .sort((leftLog, rightLog) => {
-      const leftDate = String(leftLog?.date || '')
-      const rightDate = String(rightLog?.date || '')
-
-      if (leftDate !== rightDate) {
-        return rightDate.localeCompare(leftDate)
-      }
-
-      const leftDescription = String(leftLog?.supplement?.description || '').toLowerCase()
-      const rightDescription = String(rightLog?.supplement?.description || '').toLowerCase()
-
-      return leftDescription.localeCompare(rightDescription)
-    })
-    .map((log) => {
-      const supplement = log.supplement || {}
-      const label = supplement.description || `supplement #${log.supplement_id}`
-      const servings = Number(log.servings) || 0
-      const servingType = supplement.serving_unit || 'other'
-      const logDate = String(log?.date || '').slice(0, 10)
-
-      return {
-        ...log,
-        description: label,
-        isSelectedSupplementLogDate: logDate === selectedDateKey,
-        summary: `${label} | ${servings.toFixed(2)} | ${servingType} | ${log.date || ''}`,
-      }
-    })
-})
-
-const weightTableRows = computed(() => {
-  return [...(weightLogsStore.logs || [])]
-    .sort((leftLog, rightLog) => {
-      const leftDate = String(leftLog?.date || '')
-      const rightDate = String(rightLog?.date || '')
-
-      if (leftDate !== rightDate) {
-        return rightDate.localeCompare(leftDate)
-      }
-
-      const leftWeight = Number(leftLog?.weight) || 0
-      const rightWeight = Number(rightLog?.weight) || 0
-
-      return rightWeight - leftWeight
-    })
-    .map((log) => {
-      const weightValue = Number(log.weight) || 0
-      const bmiValue = Number(log.bmi)
-      const bmiLabel = Number.isFinite(bmiValue) && bmiValue > 0 ? bmiValue.toFixed(2) : 'N/A'
-
-      return {
-        ...log,
-        description: weightValue.toFixed(2),
-        summary: `${weightValue.toFixed(2)} | ${bmiLabel} | ${log.date || ''}`,
-      }
-    })
 })
 
 onMounted(() => {
@@ -1874,72 +1476,6 @@ async function submitFoodLog() {
   }
 }
 
-async function submitWorkoutLog() {
-  if (!usersStore.currentUser?.user_id) {
-    workoutLogsStore.error = 'No current user is available.'
-    return
-  }
-
-  const payload = {
-    workout_id: workoutLog.workout_id,
-    workout_time: workoutLog.workout_time,
-    calories_burned: workoutTotalCaloriesBurned.value,
-    date: workoutLog.date,
-  }
-
-  const saved = await workoutLogsStore.createWorkoutLog(usersStore.currentUser.user_id, payload)
-  if (saved) {
-    workoutLog.workout_time = selectedWorkout.value?.average_workout_time ?? null
-    workoutLog.date = getCurrentLocalDate()
-    await workoutLogsStore.loadWorkoutLogs(usersStore.currentUser.user_id)
-  }
-}
-
-async function submitSupplementLog() {
-  if (!usersStore.currentUser?.user_id) {
-    supplementLogsStore.error = 'No current user is available.'
-    return
-  }
-
-  const payload = {
-    supplement_id: supplementLog.supplement_id,
-    servings: supplementLog.servings,
-    serving_unit: supplementLog.serving_unit,
-    date: supplementLog.date,
-  }
-
-  const saved = await supplementLogsStore.createSupplementLog(
-    usersStore.currentUser.user_id,
-    payload,
-  )
-  if (saved) {
-    supplementLog.servings = 1
-    supplementLog.serving_unit = selectedSupplement.value?.serving_unit || 'other'
-    supplementLog.date = getCurrentLocalDate()
-    await supplementLogsStore.loadSupplementLogs(usersStore.currentUser.user_id)
-  }
-}
-
-async function submitWeightLog() {
-  if (!usersStore.currentUser?.user_id) {
-    weightLogsStore.error = 'No current user is available.'
-    return
-  }
-
-  const payload = {
-    weight: weightLog.weight,
-    bmi: weightLogBodyMassIndex.value,
-    date: weightLog.date,
-  }
-
-  const saved = await weightLogsStore.createWeightLog(usersStore.currentUser.user_id, payload)
-  if (saved) {
-    weightLog.weight = ''
-    weightLog.date = getCurrentLocalDate()
-    await weightLogsStore.loadWeightLogs(usersStore.currentUser.user_id)
-  }
-}
-
 function requestDelete(row) {
   pendingDeleteRow.value = row
   confirmDeleteOpen.value = true
@@ -1966,98 +1502,6 @@ async function confirmDelete() {
   )
   if (!error) {
     await foodLogsStore.loadFoodLogs(usersStore.currentUser.user_id)
-  }
-}
-
-function requestDeleteWorkoutLog(row) {
-  pendingDeleteWorkoutRow.value = row
-  confirmDeleteWorkoutLogOpen.value = true
-}
-
-function cancelDeleteWorkoutLog() {
-  pendingDeleteWorkoutRow.value = null
-  confirmDeleteWorkoutLogOpen.value = false
-}
-
-async function confirmDeleteWorkoutLog() {
-  const row = pendingDeleteWorkoutRow.value
-  pendingDeleteWorkoutRow.value = null
-  confirmDeleteWorkoutLogOpen.value = false
-
-  if (!usersStore.currentUser?.user_id || !row?.workout_log_id) {
-    workoutLogsStore.error = 'No current user is available.'
-    return
-  }
-
-  const { error } = await workoutLogsStore.deleteWorkoutLog(
-    usersStore.currentUser.user_id,
-    row.workout_log_id,
-  )
-  if (!error) {
-    await workoutLogsStore.loadWorkoutLogs(usersStore.currentUser.user_id)
-  }
-}
-
-function requestDeleteSupplementLog(row) {
-  pendingDeleteSupplementRow.value = row
-  confirmDeleteSupplementLogOpen.value = true
-}
-
-function cancelDeleteSupplementLog() {
-  pendingDeleteSupplementRow.value = null
-  confirmDeleteSupplementLogOpen.value = false
-}
-
-async function confirmDeleteSupplementLog() {
-  const row = pendingDeleteSupplementRow.value
-  pendingDeleteSupplementRow.value = null
-  confirmDeleteSupplementLogOpen.value = false
-
-  if (!usersStore.currentUser?.user_id || !row?.supplement_log_id) {
-    supplementLogsStore.error = 'No current user is available.'
-    return
-  }
-
-  const { error } = await supplementLogsStore.deleteSupplementLog(
-    usersStore.currentUser.user_id,
-    row.supplement_log_id,
-  )
-
-  if (!error) {
-    await supplementLogsStore.loadSupplementLogs(usersStore.currentUser.user_id)
-  }
-}
-
-function requestDeleteWeightLog(row) {
-  pendingDeleteWorkoutRow.value = null
-  pendingDeleteSupplementRow.value = null
-  pendingDeleteRow.value = null
-  pendingDeleteWeightRow.value = row
-  confirmDeleteWeightLogOpen.value = true
-}
-
-function cancelDeleteWeightLog() {
-  pendingDeleteWeightRow.value = null
-  confirmDeleteWeightLogOpen.value = false
-}
-
-async function confirmDeleteWeightLog() {
-  const row = pendingDeleteWeightRow.value
-  pendingDeleteWeightRow.value = null
-  confirmDeleteWeightLogOpen.value = false
-
-  if (!usersStore.currentUser?.user_id || !row?.weight_log_id) {
-    weightLogsStore.error = 'No current user is available.'
-    return
-  }
-
-  const { error } = await weightLogsStore.deleteWeightLog(
-    usersStore.currentUser.user_id,
-    row.weight_log_id,
-  )
-
-  if (!error) {
-    await weightLogsStore.loadWeightLogs(usersStore.currentUser.user_id)
   }
 }
 </script>

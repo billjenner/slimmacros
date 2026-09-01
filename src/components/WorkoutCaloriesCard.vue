@@ -1,0 +1,139 @@
+<template>
+  <q-card flat bordered class="q-ma-md">
+    <q-expansion-item
+      label="Workout calories burned"
+      expand-icon="keyboard_arrow_down"
+      expanded-icon="keyboard_arrow_up"
+      transition-show="jump-down"
+      transition-hide="jump-up"
+      @after-show="renderWorkoutChart"
+    >
+      <q-card-section>
+        <q-banner v-if="workoutLogsStore.error" class="bg-negative text-white" rounded>
+          {{ workoutLogsStore.error }}
+        </q-banner>
+        <q-banner v-else-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
+          Sign in to view your workout calories.
+        </q-banner>
+        <q-banner
+          v-else-if="!workoutLogsStore.loading && !workoutCaloriesByDay.length"
+          class="bg-grey-2"
+        >
+          Add workout entries to see your daily calories burned.
+        </q-banner>
+        <div v-else class="workout-calories-chart">
+          <canvas ref="workoutCaloriesChart"></canvas>
+        </div>
+      </q-card-section>
+    </q-expansion-item>
+  </q-card>
+</template>
+
+<script setup>
+import { Chart } from 'chart.js/auto'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { useProfilesStore } from 'stores/profiles'
+import { useUsersStore } from 'stores/users'
+import { useWorkoutLogsStore } from 'stores/workout-logs'
+
+const profilesStore = useProfilesStore()
+const usersStore = useUsersStore()
+const workoutLogsStore = useWorkoutLogsStore()
+const workoutCaloriesChart = ref(null)
+let workoutChart = null
+
+const workoutCaloriesByDay = computed(() => {
+  const caloriesByDay = (workoutLogsStore.logs || []).reduce((totals, log) => {
+    const date = String(log?.date || '').slice(0, 10)
+    const caloriesBurned = Number(log?.calories_burned)
+
+    if (!date || !Number.isFinite(caloriesBurned)) {
+      return totals
+    }
+
+    totals[date] = (totals[date] || 0) + caloriesBurned
+    return totals
+  }, {})
+
+  return Object.entries(caloriesByDay)
+    .map(([date, caloriesBurned]) => ({ date, caloriesBurned }))
+    .sort((leftDay, rightDay) => leftDay.date.localeCompare(rightDay.date))
+})
+
+function destroyWorkoutChart() {
+  workoutChart?.destroy()
+  workoutChart = null
+}
+
+async function renderWorkoutChart() {
+  await nextTick()
+  destroyWorkoutChart()
+
+  if (!workoutCaloriesChart.value || !workoutCaloriesByDay.value.length) {
+    return
+  }
+
+  const workoutByDate = Object.fromEntries(
+    workoutCaloriesByDay.value.map((day) => [day.date, day.caloriesBurned]),
+  )
+  const startDateString =
+    profilesStore.currentProfile?.created_at?.substring(0, 10) ?? workoutCaloriesByDay.value[0].date
+  const [startYear, startMonth, startDay] = startDateString.split('-').map(Number)
+  const currentDate = new Date(startYear, startMonth - 1, startDay)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const labels = []
+  const data = []
+
+  while (currentDate <= today) {
+    const year = currentDate.getFullYear()
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0')
+    const day = String(currentDate.getDate()).padStart(2, '0')
+    const dateKey = `${year}-${month}-${day}`
+
+    labels.push(dateKey)
+    data.push(workoutByDate[dateKey] || 0)
+    currentDate.setDate(currentDate.getDate() + 1)
+  }
+
+  workoutChart = new Chart(workoutCaloriesChart.value, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Calories burned',
+          data,
+          backgroundColor: 'rgba(255, 112, 67, 0.65)',
+          borderColor: 'rgba(255, 081, 0, 1)',
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Calories burned',
+          },
+        },
+      },
+    },
+  })
+}
+
+watch(workoutCaloriesByDay, renderWorkoutChart)
+
+onBeforeUnmount(destroyWorkoutChart)
+</script>
+
+<style scoped>
+.workout-calories-chart {
+  height: 320px;
+}
+</style>

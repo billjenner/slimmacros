@@ -11,7 +11,7 @@
           @click="leftDrawerOpen = !leftDrawerOpen"
         />
         <q-toolbar-title>
-          <div class="row items-center no-wrap">
+          <router-link to="/" class="brand-link row items-center no-wrap">
             <q-img
               src="/icons/icon-192x192.png"
               alt="Slim Belly"
@@ -19,20 +19,10 @@
               style="width: 32px; height: 32px; border-radius: 4px"
             />
             <span>Slim Belly</span>
-          </div>
+          </router-link>
         </q-toolbar-title>
 
         <template v-if="!$q.screen.lt.md">
-          <q-btn
-            flat
-            label="Intro"
-            to="/"
-            class="q-mx-sm"
-            style="min-width: 126px"
-            :style="buttonStyle('/')"
-            @mouseover="hoveredPath = '/'"
-            @mouseleave="hoveredPath = null"
-          />
           <q-btn
             flat
             label="Log"
@@ -41,6 +31,16 @@
             style="min-width: 126px"
             :style="buttonStyle('/food-log')"
             @mouseover="hoveredPath = '/food-log'"
+            @mouseleave="hoveredPath = null"
+          />
+          <q-btn
+            flat
+            label="Goods"
+            to="/goods"
+            class="q-mx-sm"
+            style="min-width: 126px"
+            :style="buttonStyle('/goods')"
+            @mouseover="hoveredPath = '/goods'"
             @mouseleave="hoveredPath = null"
           />
 
@@ -87,12 +87,12 @@
 
           <q-btn
             flat
-            label="Resources"
-            to="/resources"
+            label="Hub"
+            to="/hub"
             class="q-mx-sm"
             style="min-width: 126px"
-            :style="buttonStyle('/resources')"
-            @mouseover="hoveredPath = '/resourcesresources'"
+            :style="buttonStyle('/hub')"
+            @mouseover="hoveredPath = '/hub'"
             @mouseleave="hoveredPath = null"
           />
           <q-btn
@@ -109,14 +109,14 @@
           <q-btn
             v-else
             flat
-            label="LOG OFF"
-            class="q-mx-sm"
-            style="min-width: 126px"
-            :style="buttonStyle('/login')"
+            round
+            :label="userInitials"
+            aria-label="Log off"
+            class="q-mx-sm user-initials-button"
             @click="logOff"
-            @mouseover="hoveredPath = '/login'"
-            @mouseleave="hoveredPath = null"
-          />
+          >
+            <q-tooltip>Log off</q-tooltip>
+          </q-btn>
         </template>
       </q-toolbar>
     </q-header>
@@ -128,6 +128,9 @@
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/resources')">
           <q-item-section>Resources</q-item-section>
+        </q-item>
+        <q-item clickable v-ripple @click="navigateAndClose('/goods')">
+          <q-item-section>Goods</q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/profiles')">
           <q-item-section>Profiles</q-item-section>
@@ -195,7 +198,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useQuasar } from 'quasar'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsersStore } from 'stores/users'
@@ -208,6 +211,17 @@ const router = useRouter()
 const leftDrawerOpen = ref(false)
 const deferredInstallPrompt = ref(null)
 const showInstallDialog = ref(false)
+
+const userInitials = computed(() => {
+  const firstInitial = String(usersStore.currentUser?.fname || '')
+    .trim()
+    .charAt(0)
+  const lastInitial = String(usersStore.currentUser?.lname || '')
+    .trim()
+    .charAt(0)
+
+  return `${firstInitial}${lastInitial}`.toUpperCase() || 'U'
+})
 
 async function navigate(path) {
   router.push(path)
@@ -304,5 +318,16 @@ onBeforeUnmount(() => {
   opacity: 1;
   transform: translateY(0);
   filter: blur(0);
+}
+
+.brand-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.user-initials-button {
+  background-color: var(--q-secondary);
+  min-width: 40px;
+  min-height: 40px;
 }
 </style>
