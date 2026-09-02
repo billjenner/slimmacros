@@ -172,7 +172,7 @@
                         <q-linear-progress
                           :value="foodLogProgress"
                           color="accent"
-                          size="16px"
+                          size="12px"
                           rounded
                         />
                       </td>
@@ -188,7 +188,7 @@
                         <q-linear-progress
                           :value="foodProteinProgress"
                           color="green"
-                          size="16px"
+                          size="12px"
                           rounded
                         />
                       </td>

@@ -67,7 +67,7 @@
           class="col"
           :value="weightProgressValue"
           color="accent"
-          size="16px"
+          size="12px"
           rounded
         />
         <q-chip dense color="accent" text-color="white" square>{{ projectedGoalDateLabel }}</q-chip>
