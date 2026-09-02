@@ -25,6 +25,7 @@
           <div class="workout-calories-chart q-mb-md">
             <canvas ref="workoutCaloriesChart"></canvas>
           </div>
+          <hr />
           <div class="row justify-between items-center q-mt-md">
             <q-chip class="tiny-chip" color="secondary" text-color="white" square>
               1 year ave: {{ aveWorkoutCalories1Year }}

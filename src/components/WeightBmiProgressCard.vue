@@ -22,14 +22,15 @@
           <div class="weight-log-chart q-mb-md">
             <canvas ref="weightLogChart"></canvas>
           </div>
+          <hr />
           <div class="row justify-between items-center q-mt-md">
-            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
+            <q-chip dense color="secondary" text-color="white" square>
               1 year ave: {{ aveWeightLoss1Year }}
             </q-chip>
-            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
+            <q-chip dense color="secondary" text-color="white" square>
               30 days ave: {{ aveWeightLoss30Days }}
             </q-chip>
-            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
+            <q-chip dense color="secondary" text-color="white" square>
               7 days ave: {{ aveWeightLoss7Days }}
             </q-chip>
           </div>

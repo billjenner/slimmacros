@@ -22,10 +22,11 @@
         line-height: 1.6;
       "
     >
-      Your daily diary for health and wellness. This app is designed to help you track your daily
-      habits, monitor your progress, and gain a better understanding of your lifestyle. By keeping
-      consistent logs, you can identify patterns, make informed decisions, and take meaningful steps
-      toward improving your overall health and well-being.
+      Track your food, macros, workouts, supplements, weight, and BMI—all in one place.
+      Automatically calculate your daily calorie and macro budgets, monitor what you consume against
+      your goals, and get meaningful feedback along the way. Discover patterns, gain insights into
+      your habits, make informed decisions, track your progress, and take meaningful steps toward a
+      healthier, more balanced you.
     </h5>
 
     <div class="q-pa-md text-center" style="max-width: 720px; width: 100%">

@@ -189,9 +189,15 @@ async function navigateAndClose(path) {
 }
 
 async function logOffAndClose() {
-  leftDrawerOpen.value = false
-  await logOff()
+  window.close()
+  //  leftDrawerOpen.value = false
+  //  await logOff()
 }
+
+// TODO: Use with capacitor
+// async function exitApp() {
+//   await App.exitApp()
+// }
 
 function buttonStyle(path) {
   if (route.path === path) {

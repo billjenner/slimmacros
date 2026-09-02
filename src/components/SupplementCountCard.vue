@@ -25,6 +25,7 @@
           <div class="supplement-count-chart q-mb-md">
             <canvas ref="supplementCountChart"></canvas>
           </div>
+          <hr />
           <div class="row justify-between items-center q-mt-md">
             <q-chip class="tiny-chip" color="secondary" text-color="white" square>
               1 year ave: {{ aveSupplementCount1Year }}

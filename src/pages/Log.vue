@@ -172,12 +172,12 @@
                         <q-linear-progress
                           :value="foodLogProgress"
                           color="accent"
-                          size="10px"
+                          size="16px"
                           rounded
                         />
                       </td>
                       <td style="width: 16%">
-                        <q-chip color="secondary" text-color="white" square>
+                        <q-chip dense color="secondary" text-color="white" square>
                           Calories: {{ Math.round(totalLoggedCalories) }} /
                           {{ Math.round(totalCaloriesForPerson || 2000) }}
                         </q-chip>
@@ -188,12 +188,12 @@
                         <q-linear-progress
                           :value="foodProteinProgress"
                           color="green"
-                          size="10px"
+                          size="16px"
                           rounded
                         />
                       </td>
                       <td>
-                        <q-chip color="secondary" text-color="white" square>
+                        <q-chip dense color="secondary" text-color="white" square>
                           Protein: {{ Math.round(totalProteinLoggedToday) }} /
                           {{ Math.round(totalProteinBudgetForToday) }}
                         </q-chip>
@@ -204,12 +204,12 @@
                         <q-linear-progress
                           :value="foodCarbProgress"
                           color="yellow"
-                          size="10px"
+                          size="12px"
                           rounded
                         />
                       </td>
                       <td>
-                        <q-chip color="secondary" text-color="white" square>
+                        <q-chip dense color="secondary" text-color="white" square>
                           Carbs: {{ Math.round(totalCarbsLoggedToday) }} /
                           {{ Math.round(totalCarbBudgetForToday) }}
                         </q-chip>
@@ -220,12 +220,12 @@
                         <q-linear-progress
                           :value="foodFatProgress"
                           color="blue"
-                          size="10px"
+                          size="12px"
                           rounded
                         />
                       </td>
                       <td>
-                        <q-chip color="secondary" text-color="white" square>
+                        <q-chip dense color="secondary" text-color="white" square>
                           Fat: {{ Math.round(totalFatLoggedToday) }} /
                           {{ Math.round(totalFatBudgetForToday) }}
                         </q-chip>

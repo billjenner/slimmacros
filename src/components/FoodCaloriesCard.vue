@@ -22,14 +22,15 @@
           <div class="food-calories-chart q-mb-md">
             <canvas ref="foodCaloriesChart"></canvas>
           </div>
+          <hr />
           <div class="row justify-between items-center q-mt-md">
-            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
+            <q-chip dense color="secondary" text-color="white" square>
               1 year ave: {{ aveCalories1Year }}
             </q-chip>
-            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
+            <q-chip dense color="secondary" text-color="white" square>
               30 days ave: {{ aveCalories30Days }}
             </q-chip>
-            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
+            <q-chip dense color="secondary" text-color="white" square>
               7 days ave: {{ aveCalories7Days }}
             </q-chip>
           </div>
