@@ -7,7 +7,29 @@
       Sign in to record weight.
     </q-banner>
 
-    <q-form @submit.prevent="submitWeightLog" class="q-gutter-md">
+    <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
+      <div class="row items-center q-px-md q-py-sm no-wrap q-gutter-sm">
+        <q-chip color="secondary" text-color="white" square>
+          {{ Math.round(currentProfile?.start_weight ?? 0) }}
+        </q-chip>
+        <div class="col text-subtitle1 text-center">Weight progress</div>
+        <q-chip color="secondary" text-color="white" square>
+          {{ Math.round(weightProgressGoalValue ?? 0) }}
+        </q-chip>
+      </div>
+      <div class="row items-center no-wrap q-gutter-sm q-px-md q-pb-md">
+        <q-linear-progress
+          class="col"
+          :value="weightProgressValue"
+          color="accent"
+          size="12px"
+          rounded
+        />
+        <q-chip dense color="accent" text-color="white" square>{{ projectedGoalDateLabel }}</q-chip>
+      </div>
+    </q-card>
+
+    <q-form @submit.prevent="submitWeightLog" class="q-mt-md">
       <q-card flat bordered class="q-pa-md bg-grey-1">
         <div class="text-subtitle1 q-mb-sm">Log Weight</div>
         <div class="row q-col-gutter-md">
@@ -51,28 +73,6 @@
         </div>
       </q-card>
     </q-form>
-
-    <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
-      <div class="row items-center q-px-md q-py-sm no-wrap q-gutter-sm">
-        <q-chip color="secondary" text-color="white" square>
-          {{ Math.round(currentProfile?.start_weight ?? 0) }}
-        </q-chip>
-        <div class="col text-subtitle1 text-center">Weight progress</div>
-        <q-chip color="secondary" text-color="white" square>
-          {{ Math.round(weightProgressGoalValue ?? 0) }}
-        </q-chip>
-      </div>
-      <div class="row items-center no-wrap q-gutter-sm q-px-md q-pb-md">
-        <q-linear-progress
-          class="col"
-          :value="weightProgressValue"
-          color="accent"
-          size="12px"
-          rounded
-        />
-        <q-chip dense color="accent" text-color="white" square>{{ projectedGoalDateLabel }}</q-chip>
-      </div>
-    </q-card>
 
     <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
       <div class="text-subtitle1 q-px-md q-pt-md q-pb-sm">Logged weight</div>

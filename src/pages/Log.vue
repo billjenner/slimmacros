@@ -34,6 +34,91 @@
                 Sign in to record food consumption.
               </q-banner>
 
+              <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
+                <div class="row items-center q-px-md q-py-sm">
+                  <div class="col text-subtitle2 text-center">{{ selectedFoodLogDayOfWeek }}</div>
+                  <div class="row items-center no-wrap q-gutter-xs">
+                    <q-btn flat dense type="button" label="<" @click="goToPreviousFoodLogDate" />
+                    <q-input
+                      v-model="selectedFoodLogDate"
+                      type="date"
+                      filled
+                      dense
+                      style="max-width: 220px"
+                    />
+                    <q-btn flat dense type="button" label=">" @click="goToNextFoodLogDate" />
+                  </div>
+                </div>
+                <q-markup-table flat bordered dense separator="horizontal">
+                  <tbody>
+                    <tr>
+                      <td style="width: 84%">
+                        <q-linear-progress
+                          :value="foodLogProgress"
+                          color="accent"
+                          size="10px"
+                          rounded
+                        />
+                      </td>
+                      <td style="width: 16%">
+                        <q-chip dense color="secondary" text-color="white" square>
+                          Calories: {{ Math.round(totalLoggedCalories) }} /
+                          {{ Math.round(totalCaloriesForPerson || 2000) }}
+                        </q-chip>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <q-linear-progress
+                          :value="foodProteinProgress"
+                          color="green"
+                          size="10px"
+                          rounded
+                        />
+                      </td>
+                      <td>
+                        <q-chip dense color="secondary" text-color="white" square>
+                          Protein: {{ Math.round(totalProteinLoggedToday) }} /
+                          {{ Math.round(totalProteinBudgetForToday) }}
+                        </q-chip>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <q-linear-progress
+                          :value="foodCarbProgress"
+                          color="yellow"
+                          size="10px"
+                          rounded
+                        />
+                      </td>
+                      <td>
+                        <q-chip dense color="secondary" text-color="white" square>
+                          Carbs: {{ Math.round(totalCarbsLoggedToday) }} /
+                          {{ Math.round(totalCarbBudgetForToday) }}
+                        </q-chip>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <q-linear-progress
+                          :value="foodFatProgress"
+                          color="blue"
+                          size="10px"
+                          rounded
+                        />
+                      </td>
+                      <td>
+                        <q-chip dense color="secondary" text-color="white" square>
+                          Fat: {{ Math.round(totalFatLoggedToday) }} /
+                          {{ Math.round(totalFatBudgetForToday) }}
+                        </q-chip>
+                      </td>
+                    </tr>
+                  </tbody>
+                </q-markup-table>
+              </q-card>
+
               <q-form @submit.prevent="submitFoodLog" class="q-gutter-md">
                 <q-card flat bordered class="q-pa-md bg-grey-1">
                   <div class="row items-center q-mb-sm">
@@ -151,91 +236,6 @@
               </q-form>
 
               <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
-                <div class="row items-center q-px-md q-py-sm">
-                  <div class="col text-subtitle2 text-center">{{ selectedFoodLogDayOfWeek }}</div>
-                  <div class="row items-center no-wrap q-gutter-xs">
-                    <q-btn flat dense type="button" label="<" @click="goToPreviousFoodLogDate" />
-                    <q-input
-                      v-model="selectedFoodLogDate"
-                      type="date"
-                      filled
-                      dense
-                      style="max-width: 220px"
-                    />
-                    <q-btn flat dense type="button" label=">" @click="goToNextFoodLogDate" />
-                  </div>
-                </div>
-                <q-markup-table flat bordered dense separator="horizontal">
-                  <tbody>
-                    <tr>
-                      <td style="width: 84%">
-                        <q-linear-progress
-                          :value="foodLogProgress"
-                          color="accent"
-                          size="12px"
-                          rounded
-                        />
-                      </td>
-                      <td style="width: 16%">
-                        <q-chip dense color="secondary" text-color="white" square>
-                          Calories: {{ Math.round(totalLoggedCalories) }} /
-                          {{ Math.round(totalCaloriesForPerson || 2000) }}
-                        </q-chip>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <q-linear-progress
-                          :value="foodProteinProgress"
-                          color="green"
-                          size="12px"
-                          rounded
-                        />
-                      </td>
-                      <td>
-                        <q-chip dense color="secondary" text-color="white" square>
-                          Protein: {{ Math.round(totalProteinLoggedToday) }} /
-                          {{ Math.round(totalProteinBudgetForToday) }}
-                        </q-chip>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <q-linear-progress
-                          :value="foodCarbProgress"
-                          color="yellow"
-                          size="12px"
-                          rounded
-                        />
-                      </td>
-                      <td>
-                        <q-chip dense color="secondary" text-color="white" square>
-                          Carbs: {{ Math.round(totalCarbsLoggedToday) }} /
-                          {{ Math.round(totalCarbBudgetForToday) }}
-                        </q-chip>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <q-linear-progress
-                          :value="foodFatProgress"
-                          color="blue"
-                          size="12px"
-                          rounded
-                        />
-                      </td>
-                      <td>
-                        <q-chip dense color="secondary" text-color="white" square>
-                          Fat: {{ Math.round(totalFatLoggedToday) }} /
-                          {{ Math.round(totalFatBudgetForToday) }}
-                        </q-chip>
-                      </td>
-                    </tr>
-                  </tbody>
-                </q-markup-table>
-              </q-card>
-
-              <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
                 <div class="row items-center justify-between q-px-md q-py-sm">
                   <div class="text-subtitle1">Logged food</div>
                   <q-chip :color="weightChangeChip.color" text-color="white" square>
@@ -344,7 +344,7 @@ const supplementsStore = usesupplementsStore()
 const supplementLogsStore = usesupplementsLogStore()
 const weightLogsStore = useWeightLogsStore()
 const activeTab = ref('food')
-const isFoodLogExpanded = ref(false)
+const isFoodLogExpanded = ref(true)
 const includeSharedFood = ref(false)
 const selectedFoodLogDate = ref(getCurrentLocalDate())
 

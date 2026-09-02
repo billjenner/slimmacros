@@ -1,11 +1,5 @@
 <template>
   <q-page>
-    <div class="text-h4 text-center">Food & Fitness Guide</div>
-    <weight-bmi-progress-card />
-    <food-calories-card />
-    <workout-calories-card />
-    <supplement-count-card />
-
     <q-card flat bordered class="q-ma-md">
       <q-expansion-item
         expand-icon="keyboard_arrow_down"
@@ -15,7 +9,7 @@
       >
         <template v-slot:header>
           <q-item-section class="text-center">
-            <div class="text-h4">Food & Fitness Guide</div>
+            <div class="text-h4">Nutrition</div>
           </q-item-section>
         </template>
         <div class="row q-col-gutter-md q-pa-md">
@@ -444,6 +438,43 @@
             </q-card>
           </div>
 
+          <div class="col-12 col-md-4">
+            <q-card flat bordered style="width: 90%; max-width: 90%; margin: 0 auto">
+              <q-expansion-item
+                expand-icon="keyboard_arrow_down"
+                expanded-icon="keyboard_arrow_up"
+                transition-show="jump-down"
+                transition-hide="jump-up"
+              >
+                <template v-slot:header>
+                  <q-chip>Related Resources</q-chip>
+                </template>
+                <q-card-section>
+                  <div class="text-weight-bold">More to come here</div>
+                  <a href="https://google.com" target="_blank" rel="noopener noreferrer">
+                    Google
+                  </a>
+                </q-card-section>
+              </q-expansion-item>
+            </q-card>
+          </div>
+        </div>
+      </q-expansion-item>
+    </q-card>
+
+    <q-card flat bordered class="q-ma-md">
+      <q-expansion-item
+        expand-icon="keyboard_arrow_down"
+        expanded-icon="keyboard_arrow_up"
+        transition-show="jump-down"
+        transition-hide="jump-up"
+      >
+        <template v-slot:header>
+          <q-item-section class="text-center">
+            <div class="text-h4">Fitness</div>
+          </q-item-section>
+        </template>
+        <div class="row q-col-gutter-md q-pa-md">
           <div class="col-12 col-sm-6 col-md-6 col-lg-6 flex justify-center">
             <q-card style="width: 95%">
               <q-card-section class="bg-secondary text-white text-center">
@@ -489,73 +520,8 @@
               </q-expansion-item>
             </q-card>
           </div>
-
-          <div class="col-12 col-md-4">
-            <q-card flat bordered style="width: 90%; max-width: 90%; margin: 0 auto">
-              <q-expansion-item
-                expand-icon="keyboard_arrow_down"
-                expanded-icon="keyboard_arrow_up"
-                transition-show="jump-down"
-                transition-hide="jump-up"
-              >
-                <template v-slot:header>
-                  <q-chip>Related Resources</q-chip>
-                </template>
-                <q-card-section>
-                  <div class="text-weight-bold">More to come here</div>
-                  <a href="https://google.com" target="_blank" rel="noopener noreferrer">
-                    Google
-                  </a>
-                </q-card-section>
-              </q-expansion-item>
-            </q-card>
-          </div>
         </div>
       </q-expansion-item>
     </q-card>
   </q-page>
 </template>
-
-<script setup>
-import { watch } from 'vue'
-import { useUsersStore } from 'stores/users'
-import { useFoodLogsStore } from 'stores/food-logs'
-import { useProfilesStore } from 'stores/profiles'
-import { usesupplementsLogStore } from 'stores/supplements_log'
-import { useWorkoutLogsStore } from 'stores/workout-logs'
-import { useWeightLogsStore } from 'stores/weight-logs'
-import FoodCaloriesCard from 'components/FoodCaloriesCard.vue'
-import SupplementCountCard from 'components/SupplementCountCard.vue'
-import WeightBmiProgressCard from 'components/WeightBmiProgressCard.vue'
-import WorkoutCaloriesCard from 'components/WorkoutCaloriesCard.vue'
-
-const usersStore = useUsersStore()
-const foodLogsStore = useFoodLogsStore()
-const profilesStore = useProfilesStore()
-const supplementLogsStore = usesupplementsLogStore()
-const workoutLogsStore = useWorkoutLogsStore()
-const weightLogsStore = useWeightLogsStore()
-
-watch(
-  () => usersStore.currentUser?.user_id,
-  async (userId) => {
-    if (!userId) {
-      weightLogsStore.logs = []
-      foodLogsStore.logs = []
-      workoutLogsStore.logs = []
-      supplementLogsStore.logs = []
-      profilesStore.currentProfile = null
-      return
-    }
-
-    await Promise.all([
-      weightLogsStore.loadWeightLogs(userId),
-      foodLogsStore.loadFoodLogs(userId),
-      workoutLogsStore.loadWorkoutLogs(userId),
-      supplementLogsStore.loadSupplementLogs(userId),
-      profilesStore.loadCurrentProfile(userId),
-    ])
-  },
-  { immediate: true },
-)
-</script>

@@ -23,6 +23,18 @@
       "
     >
       Track your food, macros, workouts, supplements, weight, and BMI—all in one place.
+    </h5>
+
+    <h5
+      style="
+        max-width: 720px;
+        width: 75%;
+        margin: 16px auto 24px;
+        text-align: justify;
+        font-size: 1.05rem;
+        line-height: 1.6;
+      "
+    >
       Automatically calculate your daily calorie and macro budgets, monitor what you consume against
       your goals, and get meaningful feedback along the way. Discover patterns, gain insights into
       your habits, make informed decisions, track your progress, and take meaningful steps toward a

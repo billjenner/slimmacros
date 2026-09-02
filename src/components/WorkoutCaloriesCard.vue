@@ -27,13 +27,13 @@
           </div>
           <hr />
           <div class="row justify-between items-center q-mt-md">
-            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
+            <q-chip class="resize-chip" color="secondary" text-color="white" square>
               1 year ave: {{ aveWorkoutCalories1Year }}
             </q-chip>
-            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
+            <q-chip class="resize-chip" color="secondary" text-color="white" square>
               30 days ave: {{ aveWorkoutCalories30Days }}
             </q-chip>
-            <q-chip class="tiny-chip" color="secondary" text-color="white" square>
+            <q-chip class="resize-chip" color="secondary" text-color="white" square>
               7 days ave: {{ aveWorkoutCalories7Days }}
             </q-chip>
           </div>
@@ -199,10 +199,17 @@ onBeforeUnmount(destroyWorkoutChart)
   height: 320px;
 }
 
-.tiny-chip {
-  font-size: 9px;
-  line-height: 1.2;
-  padding: 0 8px;
-  min-height: 20px;
+.resize-chip {
+  /* normal size */
+}
+
+@media (max-width: 780px) {
+  .resize-chip {
+    /* styles for small screens */
+    font-size: 10px;
+    line-height: 1.2;
+    padding: 0 8px;
+    min-height: 22px;
+  }
 }
 </style>

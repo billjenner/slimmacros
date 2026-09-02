@@ -45,12 +45,22 @@
           />
           <q-btn
             flat
-            label="Hub"
-            to="/hub"
+            label="Dashboard"
+            to="/dashboard"
             class="q-mx-sm"
             style="min-width: 126px"
-            :style="buttonStyle('/hub')"
-            @mouseover="hoveredPath = '/hub'"
+            :style="buttonStyle('/dashboard')"
+            @mouseover="hoveredPath = '/dashboard'"
+            @mouseleave="hoveredPath = null"
+          />
+          <q-btn
+            flat
+            label="Docs"
+            to="/docs"
+            class="q-mx-sm"
+            style="min-width: 126px"
+            :style="buttonStyle('/docs')"
+            @mouseover="hoveredPath = '/docs'"
             @mouseleave="hoveredPath = null"
           />
           <q-btn
@@ -69,11 +79,11 @@
             flat
             round
             :label="userInitials"
-            aria-label="Log off"
+            aria-label="Sign out"
             class="q-mx-sm user-initials-button"
-            @click="logOff"
+            @click="signOut()"
           >
-            <q-tooltip>Log off</q-tooltip>
+            <q-tooltip>Sign out</q-tooltip>
           </q-btn>
         </template>
       </q-toolbar>
@@ -84,14 +94,17 @@
         <q-item clickable v-ripple @click="navigateAndClose('/')">
           <q-item-section>Intro</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/goods')">
-          <q-item-section>Goods</q-item-section>
-        </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/food-log')">
           <q-item-section>Log</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/hub')">
-          <q-item-section>Hub</q-item-section>
+        <q-item clickable v-ripple @click="navigateAndClose('/goods')">
+          <q-item-section>Goods</q-item-section>
+        </q-item>
+        <q-item clickable v-ripple @click="navigateAndClose('/dashboard')">
+          <q-item-section>Dashboard</q-item-section>
+        </q-item>
+        <q-item clickable v-ripple @click="navigateAndClose('/docs')">
+          <q-item-section>Docs</q-item-section>
         </q-item>
         <q-item
           v-if="!(usersStore.currentUser && usersStore.currentUser.email)"
@@ -101,8 +114,8 @@
         >
           <q-item-section>Login</q-item-section>
         </q-item>
-        <q-item v-else clickable v-ripple @click="logOffAndClose()">
-          <q-item-section>Log Off</q-item-section>
+        <q-item v-else clickable v-ripple @click="signOut()">
+          <q-item-section>Sign out</q-item-section>
         </q-item>
       </q-list>
     </q-drawer>
@@ -173,7 +186,7 @@ async function navigate(path) {
   router.push(path)
 }
 
-async function logOff() {
+async function signOut() {
   await usersStore.clearCurrentUser()
   router.push('/login')
 }
@@ -186,12 +199,6 @@ async function navigateAndClose(path) {
   }
 
   await navigate(path)
-}
-
-async function logOffAndClose() {
-  window.close()
-  //  leftDrawerOpen.value = false
-  //  await logOff()
 }
 
 // TODO: Use with capacitor

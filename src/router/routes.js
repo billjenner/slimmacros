@@ -15,13 +15,24 @@ const routes = [
         },
       },
       {
-        path: 'hub',
-        component: () => import('pages/Hub.vue'),
+        path: 'dashboard',
+        component: () => import('pages/Dashboard.vue'),
         meta: {
           seo: {
-            title: 'Hub',
+            title: 'Dashboard',
+            description: 'Overview of your Slim Macros activities.',
+            canonicalPath: '/dashboard',
+          },
+        },
+      },
+      {
+        path: 'docs',
+        component: () => import('pages/docs.vue'),
+        meta: {
+          seo: {
+            title: 'Docs',
             description: 'Discover the story and idea behind Slim Macros.',
-            canonicalPath: '/hub',
+            canonicalPath: '/docs',
           },
         },
       },
