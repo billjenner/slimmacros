@@ -27,7 +27,7 @@ const routes = [
       },
       {
         path: 'docs',
-        component: () => import('pages/docs.vue'),
+        component: () => import('pages/Docs.vue'),
         meta: {
           seo: {
             title: 'Docs',
