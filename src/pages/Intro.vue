@@ -42,7 +42,7 @@
     </h5>
 
     <div class="q-pa-md text-center" style="max-width: 720px; width: 100%">
-      <q-btn color="secondary" label="Let's Go!" to="/resources" style="margin-top: 8px" />
+      <q-btn color="secondary" label="Let's Go!" to="/food-log" style="margin-top: 8px" />
     </div>
   </q-page>
 </template>
