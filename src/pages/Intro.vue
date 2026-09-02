@@ -31,7 +31,7 @@
         width: 75%;
         margin: 12px auto 16px;
         text-align: justify;
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         line-height: 1.6;
       "
     >
@@ -42,7 +42,7 @@
     </h5>
 
     <div class="q-pa-md text-center" style="max-width: 720px; width: 100%">
-      <q-btn color="secondary" label="Let's Go!" to="/resources" style="margin-top: 12px" />
+      <q-btn color="secondary" label="Let's Go!" to="/resources" style="margin-top: 8px" />
     </div>
   </q-page>
 </template>
