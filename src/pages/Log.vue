@@ -34,7 +34,7 @@
                 Sign in to record food consumption.
               </q-banner>
 
-              <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
+              <q-card flat bordered class="q-pa-none bg-grey-1">
                 <div class="row items-center q-px-md q-py-sm">
                   <div class="col text-subtitle2 text-center">{{ selectedFoodLogDayOfWeek }}</div>
                   <div class="row items-center no-wrap q-gutter-xs">
@@ -119,7 +119,7 @@
                 </q-markup-table>
               </q-card>
 
-              <q-form @submit.prevent="submitFoodLog" class="q-gutter-md">
+              <q-form @submit.prevent="submitFoodLog" class="q-gutter-md q-mt-md">
                 <q-card flat bordered class="q-pa-md bg-grey-1">
                   <div class="row items-center q-mb-sm">
                     <q-btn
