@@ -7,8 +7,8 @@
         border-radius: 12px;
         max-width: 100%;
         width: 25%;
-        margin-top: 20px;
-        margin-bottom: 20px;
+        margin-top: 16px;
+        margin-bottom: 16px;
       "
     />
 
@@ -16,7 +16,7 @@
       style="
         max-width: 720px;
         width: 75%;
-        margin: 16px auto 24px;
+        margin: 12px auto 16px;
         text-align: justify;
         font-size: 1.05rem;
         line-height: 1.6;
@@ -29,20 +29,20 @@
       style="
         max-width: 720px;
         width: 75%;
-        margin: 16px auto 24px;
+        margin: 12px auto 16px;
         text-align: justify;
-        font-size: 1.05rem;
+        font-size: 0.9rem;
         line-height: 1.6;
       "
     >
-      Automatically calculate your daily calorie and macro budgets, monitor what you consume against
-      your goals, and get meaningful feedback along the way. Discover patterns, gain insights into
-      your habits, make informed decisions, track your progress, and take meaningful steps toward a
-      healthier, more balanced you.
+      Automatically calculate your daily calorie and macro budgets, monitor your consumption against
+      your goals, and see how you’re tracking throughout the day. Discover patterns, gain insights
+      into your habits, make informed decisions, and take meaningful steps toward a healthier, more
+      balanced you.
     </h5>
 
     <div class="q-pa-md text-center" style="max-width: 720px; width: 100%">
-      <q-btn color="secondary" label="Let's Go!" to="/resources" style="margin-top: 16px" />
+      <q-btn color="secondary" label="Let's Go!" to="/resources" style="margin-top: 12px" />
     </div>
   </q-page>
 </template>
