@@ -39,7 +39,7 @@ export const useFoodStore = defineStore('Food', {
         favorite_food: Boolean(food.favorite_food),
         share_with_others: Boolean(food.share_with_others),
         serving_size: this.toNumber(food.serving_size) || 1,
-        serving_unit: food.serving_unit || 'unit',
+        serving_unit: food.serving_unit || 'serving',
         is_active: food.is_active !== false,
       }
     },

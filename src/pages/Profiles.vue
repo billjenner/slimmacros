@@ -457,7 +457,7 @@ async function saveProfile() {
   loading.value = false
 
   if (savedProfile) {
-    notifySuccess($q, 'Profile saved successfully.')
+    notifySuccess($q, 'Profile saved successfully.', { color: 'positive' })
   }
 }
 

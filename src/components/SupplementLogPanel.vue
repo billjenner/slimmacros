@@ -292,7 +292,7 @@ async function submitSupplementLog() {
   })
 
   if (saved) {
-    notifySuccess($q, 'Supplement added to log successfully.')
+    notifySuccess($q, 'Supplement added to log successfully.', { color: 'positive' })
     supplementLog.servings = 1
     supplementLog.serving_unit = selectedSupplement.value?.serving_unit || 'other'
     supplementLog.date = currentDate()

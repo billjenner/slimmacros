@@ -1008,7 +1008,7 @@ async function submitFoodLog() {
 
   const saved = await foodLogsStore.createFoodLog(usersStore.currentUser.user_id, payload)
   if (saved) {
-    notifySuccess($q, 'Food added to log successfully.')
+    notifySuccess($q, 'Food added to log successfully.', { color: 'positive' })
     foodLog.servings = 1
     foodLog.datetime = getCurrentLocalDateTime()
     await foodLogsStore.loadFoodLogs(usersStore.currentUser.user_id)

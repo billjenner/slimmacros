@@ -42,19 +42,11 @@
                 <div class="text-subtitle1 q-mb-sm">Food details</div>
                 <div class="row q-col-gutter-md">
                   <div class="col-12">
-                    <q-select
+                    <q-input
                       v-model="food.description"
-                      :options="filteredFood"
                       label="Description"
                       filled
                       dense
-                      use-input
-                      fill-input
-                      hide-selected
-                      new-value-mode="add-unique"
-                      input-debounce="0"
-                      @filter="filterFood"
-                      @new-value="setFoodDescription"
                       :rules="[(value) => !!value?.trim() || 'Description is required']"
                     />
                   </div>
@@ -391,7 +383,6 @@ import { useUsersStore } from 'stores/users'
 import { useFoodStore } from 'stores/food'
 import { calculateFoodCalories, calculateTotalCaloriesForPerson } from '../utils/rules'
 import { notifySuccess } from '../utils/notify'
-import foodMacros from 'src/data/foods.json'
 
 defineProps({
   embedded: {
@@ -403,9 +394,6 @@ defineProps({
 const usersStore = useUsersStore()
 const store = useFoodStore()
 const $q = useQuasar()
-
-const foodOptions = foodMacros.map((item) => item.description)
-const filteredFood = ref([...foodOptions])
 
 const servingUnitOptions = [
   { label: 'Ounce', value: 'oz' },
@@ -423,6 +411,7 @@ const servingUnitOptions = [
   { label: 'Tab', value: 'tab' },
   { label: 'Tablespoon', value: 'tbsp' },
   { label: 'Teaspoon', value: 'tsp' },
+  { label: 'Teaspoon', value: 'tsp' },
 ]
 
 const food = reactive({
@@ -435,36 +424,9 @@ const food = reactive({
   favorite_food: false,
   share_with_others: false,
   serving_size: 1,
-  serving_unit: 'unit',
+  serving_unit: 'serving',
   is_active: true,
 })
-
-function filterFood(val, update) {
-  update(() => {
-    const needle = String(val || '')
-      .trim()
-      .toLowerCase()
-
-    if (!needle) {
-      filteredFood.value = [...foodOptions]
-      return
-    }
-
-    filteredFood.value = foodOptions.filter((description) =>
-      description.toLowerCase().includes(needle),
-    )
-  })
-}
-
-function setFoodDescription(value, done) {
-  const description = String(value || '').trim()
-
-  if (description) {
-    done(description, 'add-unique')
-  } else {
-    done()
-  }
-}
 
 const foodColumns = [
   {
@@ -621,7 +583,7 @@ function editFood(row) {
     favorite_food: Boolean(row.favorite_food),
     share_with_others: Boolean(row.share_with_others),
     serving_size: row.serving_size ?? 1,
-    serving_unit: row.serving_unit || 'unit',
+    serving_unit: row.serving_unit || 'serving',
     is_active: row.is_active !== false,
   })
 
@@ -639,7 +601,7 @@ function resetFoodForm() {
     favorite_food: false,
     share_with_others: false,
     serving_size: 1,
-    serving_unit: 'unit',
+    serving_unit: 'serving',
     is_active: true,
   })
 
@@ -785,6 +747,7 @@ async function submitFood() {
     notifySuccess(
       $q,
       editingFoodId.value ? 'Food updated successfully.' : 'Food added successfully.',
+      { color: 'positive' },
     )
     resetFoodForm()
 

@@ -432,6 +432,7 @@ async function submitsupplement() {
       editingsupplementId.value
         ? 'Supplement updated successfully.'
         : 'Supplement added successfully.',
+      { color: 'positive' },
     )
     resetsupplementForm()
     showsupplementForm.value = false

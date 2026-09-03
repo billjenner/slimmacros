@@ -391,6 +391,7 @@ async function submitWorkout() {
     notifySuccess(
       $q,
       editingWorkoutId.value ? 'Workout updated successfully.' : 'Workout added successfully.',
+      { color: 'positive' },
     )
     resetWorkoutForm()
 

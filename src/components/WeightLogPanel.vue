@@ -288,7 +288,7 @@ async function submitWeightLog() {
   })
 
   if (saved) {
-    notifySuccess($q, 'Weight added to log successfully.')
+    notifySuccess($q, 'Weight added to log successfully.', { color: 'positive' })
     weightLog.weight = ''
     weightLog.date = currentDate()
     await weightLogsStore.loadWeightLogs(usersStore.currentUser.user_id)
