@@ -316,6 +316,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
 import { useFoodStore } from 'stores/food'
 import { useFoodLogsStore } from 'stores/food-logs'
@@ -333,6 +334,7 @@ import {
   calculateTotalCaloriesForPerson,
   calculateTotalDailyCalories,
 } from '../utils/rules'
+import { notifySuccess } from '../utils/notify'
 
 const usersStore = useUsersStore()
 const foodStore = useFoodStore()
@@ -343,6 +345,7 @@ const workoutLogsStore = useWorkoutLogsStore()
 const supplementsStore = usesupplementsStore()
 const supplementLogsStore = usesupplementsLogStore()
 const weightLogsStore = useWeightLogsStore()
+const $q = useQuasar()
 const activeTab = ref('food')
 const isFoodLogExpanded = ref(true)
 const includeSharedFood = ref(false)
@@ -1005,6 +1008,7 @@ async function submitFoodLog() {
 
   const saved = await foodLogsStore.createFoodLog(usersStore.currentUser.user_id, payload)
   if (saved) {
+    notifySuccess($q, 'Food added to log successfully.')
     foodLog.servings = 1
     foodLog.datetime = getCurrentLocalDateTime()
     await foodLogsStore.loadFoodLogs(usersStore.currentUser.user_id)
@@ -1036,6 +1040,7 @@ async function confirmDelete() {
     row.food_log_id,
   )
   if (!error) {
+    notifySuccess($q, 'Food log entry deleted successfully.', { color: 'negative' })
     await foodLogsStore.loadFoodLogs(usersStore.currentUser.user_id)
   }
 }

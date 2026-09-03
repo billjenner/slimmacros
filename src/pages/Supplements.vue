@@ -224,8 +224,10 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
 import { usesupplementsStore } from 'stores/supplements'
+import { notifySuccess } from '../utils/notify'
 
 defineProps({
   embedded: {
@@ -236,6 +238,7 @@ defineProps({
 
 const usersStore = useUsersStore()
 const store = usesupplementsStore()
+const $q = useQuasar()
 
 const supplement = reactive({
   description: '',
@@ -391,6 +394,7 @@ async function confirmDeletesupplement() {
     row.supplement_id,
   )
   if (!error) {
+    notifySuccess($q, 'Supplement deleted successfully.', { color: 'negative' })
     await store.loadSupplements(usersStore.currentUser.user_id)
   }
 }
@@ -423,6 +427,12 @@ async function submitsupplement() {
     : await store.createSupplement(usersStore.currentUser.user_id, payload)
 
   if (savedsupplement) {
+    notifySuccess(
+      $q,
+      editingsupplementId.value
+        ? 'Supplement updated successfully.'
+        : 'Supplement added successfully.',
+    )
     resetsupplementForm()
     showsupplementForm.value = false
     await store.loadSupplements(usersStore.currentUser.user_id)

@@ -51,8 +51,10 @@
                       use-input
                       fill-input
                       hide-selected
+                      new-value-mode="add-unique"
                       input-debounce="0"
                       @filter="filterFood"
+                      @new-value="setFoodDescription"
                       :rules="[(value) => !!value?.trim() || 'Description is required']"
                     />
                   </div>
@@ -384,9 +386,11 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
 import { useFoodStore } from 'stores/food'
 import { calculateFoodCalories, calculateTotalCaloriesForPerson } from '../utils/rules'
+import { notifySuccess } from '../utils/notify'
 import foodMacros from 'src/data/foods.json'
 
 defineProps({
@@ -398,6 +402,7 @@ defineProps({
 
 const usersStore = useUsersStore()
 const store = useFoodStore()
+const $q = useQuasar()
 
 const foodOptions = foodMacros.map((item) => item.description)
 const filteredFood = ref([...foodOptions])
@@ -449,6 +454,16 @@ function filterFood(val, update) {
       description.toLowerCase().includes(needle),
     )
   })
+}
+
+function setFoodDescription(value, done) {
+  const description = String(value || '').trim()
+
+  if (description) {
+    done(description, 'add-unique')
+  } else {
+    done()
+  }
 }
 
 const foodColumns = [
@@ -751,6 +766,7 @@ async function confirmDeleteFood() {
 
   const { error } = await store.deactivateFood(usersStore.currentUser.user_id, row.food_id)
   if (!error) {
+    notifySuccess($q, 'Food deleted successfully.', { color: 'negative' })
     await loadFoodForCurrentUser(usersStore.currentUser.user_id)
   }
 }
@@ -766,6 +782,10 @@ async function submitFood() {
     : await store.createFood(usersStore.currentUser.user_id, food)
 
   if (savedFood) {
+    notifySuccess(
+      $q,
+      editingFoodId.value ? 'Food updated successfully.' : 'Food added successfully.',
+    )
     resetFoodForm()
 
     showFoodForm.value = false

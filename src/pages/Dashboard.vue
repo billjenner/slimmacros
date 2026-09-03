@@ -1,5 +1,5 @@
 <template>
-  <q-page>
+  <q-page class="q-pt-md">
     <div class="text-h4 text-center">Dashboard</div>
     <weight-bmi-progress-card />
     <food-calories-card />

@@ -145,13 +145,16 @@
 
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
 import { useWorkoutsStore } from 'stores/workouts'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
+import { notifySuccess } from '../utils/notify'
 
 const usersStore = useUsersStore()
 const workoutsStore = useWorkoutsStore()
 const workoutLogsStore = useWorkoutLogsStore()
+const $q = useQuasar()
 const includeSharedWorkouts = ref(false)
 const selectedWorkoutLogDate = ref(currentDate())
 const confirmDeleteOpen = ref(false)
@@ -255,6 +258,7 @@ async function submitWorkoutLog() {
     date: workoutLog.date,
   })
   if (saved) {
+    notifySuccess($q, 'Workout added to log successfully.')
     workoutLog.workout_time = selectedWorkout.value?.average_workout_time ?? null
     workoutLog.date = currentDate()
     await workoutLogsStore.loadWorkoutLogs(usersStore.currentUser.user_id)
@@ -280,6 +284,9 @@ async function confirmDelete() {
     usersStore.currentUser.user_id,
     row.workout_log_id,
   )
-  if (!error) await workoutLogsStore.loadWorkoutLogs(usersStore.currentUser.user_id)
+  if (!error) {
+    notifySuccess($q, 'Workout log entry deleted successfully.', { color: 'negative' })
+    await workoutLogsStore.loadWorkoutLogs(usersStore.currentUser.user_id)
+  }
 }
 </script>

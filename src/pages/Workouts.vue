@@ -222,8 +222,10 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
 import { useWorkoutsStore } from 'stores/workouts'
+import { notifySuccess } from '../utils/notify'
 
 defineProps({
   embedded: {
@@ -234,6 +236,7 @@ defineProps({
 
 const usersStore = useUsersStore()
 const store = useWorkoutsStore()
+const $q = useQuasar()
 
 const workout = reactive({
   type: '',
@@ -369,6 +372,7 @@ async function confirmDeleteWorkout() {
 
   const { error } = await store.deactivateWorkout(usersStore.currentUser.user_id, row.workout_id)
   if (!error) {
+    notifySuccess($q, 'Workout deleted successfully.', { color: 'negative' })
     await loadWorkoutsForCurrentUser(usersStore.currentUser.user_id)
   }
 }
@@ -384,6 +388,10 @@ async function submitWorkout() {
     : await store.createWorkout(usersStore.currentUser.user_id, workout)
 
   if (savedWorkout) {
+    notifySuccess(
+      $q,
+      editingWorkoutId.value ? 'Workout updated successfully.' : 'Workout added successfully.',
+    )
     resetWorkoutForm()
 
     showWorkoutForm.value = false

@@ -196,9 +196,11 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
 import { useProfilesStore } from 'stores/profiles'
 import { calculateBodyMassIndex, calculateTotalDailyCalories } from '../utils/rules'
+import { notifySuccess } from '../utils/notify'
 import macroTemplates from '../components/macros.json'
 
 defineProps({
@@ -210,6 +212,7 @@ defineProps({
 
 const usersStore = useUsersStore()
 const store = useProfilesStore()
+const $q = useQuasar()
 const loading = ref(false)
 
 const dietTypeOptions = [
@@ -421,7 +424,7 @@ async function saveProfile() {
   }
 
   loading.value = true
-  await store.saveProfile(currentUserId.value, {
+  const savedProfile = await store.saveProfile(currentUserId.value, {
     start_weight: profile.start_weight,
     goal_weight: profile.goal_weight,
     height: profile.height,
@@ -452,6 +455,10 @@ async function saveProfile() {
     saturday_fat: profile.saturday_fat,
   })
   loading.value = false
+
+  if (savedProfile) {
+    notifySuccess($q, 'Profile saved successfully.')
+  }
 }
 
 watch(

@@ -29,6 +29,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
+import { notifySuccess } from '../utils/notify'
 
 const router = useRouter()
 const store = useUsersStore()
@@ -73,10 +74,7 @@ async function handleSubmit() {
       throw new Error('Unable to send password email right now.')
     }
 
-    $q.notify({
-      color: 'accent',
-      textColor: 'white',
-      message: `Your password was sent to ${result.email}`,
+    notifySuccess($q, `Your password was sent to ${result.email}`, {
       timeout: 30000,
       actions: [
         {

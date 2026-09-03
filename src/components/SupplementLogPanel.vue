@@ -155,13 +155,16 @@
 
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import { usesupplementsLogStore } from 'stores/supplements_log'
 import { usesupplementsStore } from 'stores/supplements'
 import { useUsersStore } from 'stores/users'
+import { notifySuccess } from '../utils/notify'
 
 const usersStore = useUsersStore()
 const supplementsStore = usesupplementsStore()
 const supplementLogsStore = usesupplementsLogStore()
+const $q = useQuasar()
 const includeSharedSupplements = ref(false)
 const selectedSupplementLogDate = ref(currentDate())
 const confirmDeleteOpen = ref(false)
@@ -289,6 +292,7 @@ async function submitSupplementLog() {
   })
 
   if (saved) {
+    notifySuccess($q, 'Supplement added to log successfully.')
     supplementLog.servings = 1
     supplementLog.serving_unit = selectedSupplement.value?.serving_unit || 'other'
     supplementLog.date = currentDate()
@@ -322,6 +326,7 @@ async function confirmDelete() {
   )
 
   if (!error) {
+    notifySuccess($q, 'Supplement log entry deleted successfully.', { color: 'negative' })
     await supplementLogsStore.loadSupplementLogs(usersStore.currentUser.user_id)
   }
 }

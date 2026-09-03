@@ -130,14 +130,17 @@
 
 <script setup>
 import { computed, reactive, ref } from 'vue'
+import { useQuasar } from 'quasar'
 import { useProfilesStore } from 'stores/profiles'
 import { useUsersStore } from 'stores/users'
 import { useWeightLogsStore } from 'stores/weight-logs'
 import { calculateBodyMassIndex } from '../utils/rules'
+import { notifySuccess } from '../utils/notify'
 
 const usersStore = useUsersStore()
 const profilesStore = useProfilesStore()
 const weightLogsStore = useWeightLogsStore()
+const $q = useQuasar()
 const weightLog = reactive({ weight: '', date: currentDate() })
 const confirmDeleteOpen = ref(false)
 const pendingDeleteRow = ref(null)
@@ -285,6 +288,7 @@ async function submitWeightLog() {
   })
 
   if (saved) {
+    notifySuccess($q, 'Weight added to log successfully.')
     weightLog.weight = ''
     weightLog.date = currentDate()
     await weightLogsStore.loadWeightLogs(usersStore.currentUser.user_id)
@@ -315,6 +319,9 @@ async function confirmDelete() {
     usersStore.currentUser.user_id,
     row.weight_log_id,
   )
-  if (!error) await weightLogsStore.loadWeightLogs(usersStore.currentUser.user_id)
+  if (!error) {
+    notifySuccess($q, 'Weight log entry deleted successfully.', { color: 'negative' })
+    await weightLogsStore.loadWeightLogs(usersStore.currentUser.user_id)
+  }
 }
 </script>
