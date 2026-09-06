@@ -2,7 +2,7 @@
 -- ENUM TYPES 
 -- ============================================================ 
 DROP TYPE IF EXISTS public.diet_type;
-CREATE TYPE public.diet_type AS ENUM ( 'Balanced', 'Low Carb', 'High Protein', 'High Metabolic' ); 
+CREATE TYPE public.diet_type AS ENUM ( 'Balanced', 'Low Carb', 'High Protein', 'High Metabolic', 'Custom'  ); 
 CREATE TYPE public.food_serving_unit AS ENUM ( 'oz', 'gram', 'cup', 'scoop', 'bar', 'can', 'count',
 'item', 'piece', 'pinch', 'serving', 'slice', 'tab', 'tbsp', 'tsp' ); 
 
@@ -261,6 +261,24 @@ CREATE TABLE public.users_logged_in (
   public_ip text NOT NULL UNIQUE,
   is_logged_in boolean NOT NULL DEFAULT true,
   updated_at timestamp with time zone NOT NULL DEFAULT now()
+);
+
+-- ============================================================ 
+-- feedback
+-- ============================================================ 
+CREATE TABLE public.feedback (
+    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+    user_id uuid NOT NULL
+        REFERENCES public.users(user_id)
+        ON DELETE CASCADE,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    feedback_type text NOT NULL,
+    subject text NOT NULL,
+    description text NOT NULL,
+    contact text,
+    email text,
+    allow_contact boolean NOT NULL DEFAULT false
 );
 
 -- ============================================================ 

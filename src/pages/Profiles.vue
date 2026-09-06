@@ -140,7 +140,7 @@
 
             <q-card flat bordered class="q-pa-md bg-grey-1">
               <div class="row items-center justify-between q-mb-sm">
-                <div class="text-subtitle1">Macro split by day</div>
+                <div class="text-subtitle1">Nutrition Budget Plan - Macros split by day</div>
                 <q-btn
                   label="Load template"
                   color="secondary"
@@ -220,6 +220,7 @@ const dietTypeOptions = [
   { label: 'Low Carb', value: 'Low Carb' },
   { label: 'High Protein', value: 'High Protein' },
   { label: 'High Metabolic', value: 'High Metabolic' },
+  { label: 'Custom', value: 'Custom' },
 ]
 
 const activityLevelOptions = [

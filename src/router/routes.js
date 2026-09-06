@@ -105,6 +105,17 @@ const routes = [
         },
       },
       {
+        path: 'feedback',
+        component: () => import('pages/Feedback.vue'),
+        meta: {
+          seo: {
+            title: 'Feedback',
+            description: 'View feedback submitted by Slim Macros users.',
+            canonicalPath: '/feedback',
+          },
+        },
+      },
+      {
         path: 'food',
         component: () => import('pages/Food.vue'),
         meta: {

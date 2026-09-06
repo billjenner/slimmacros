@@ -1,5 +1,5 @@
 <template>
-  <q-page class="column items-center q-px-md q-py-lg" style="min-height: 100vh">
+  <q-page class="column items-center q-px-md q-py-lg">
     <img
       src="/SlimMacros.png"
       alt="Slim Macros"
@@ -48,5 +48,3 @@
     </div>
   </q-page>
 </template>
-
-<script setup></script>

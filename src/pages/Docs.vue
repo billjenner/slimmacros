@@ -208,6 +208,95 @@
                   </table>
                 </q-card-section>
               </q-expansion-item>
+
+              <q-expansion-item
+                expand-icon="keyboard_arrow_down"
+                expanded-icon="keyboard_arrow_up"
+                transition-show="jump-down"
+                transition-hide="jump-up"
+              >
+                <template v-slot:header>
+                  <q-chip>Nutrition Budget Plan</q-chip>
+                </template>
+
+                <q-card-section>
+                  <p>
+                    The Nutrition Budget Plan helps you allocate your daily calories across
+                    different macronutrients to support your fitness goals.
+                  </p>
+                  <p>
+                    Each plan provides allocates a certain percentage of your daily calories to
+                    protein, carbohydrates, and fats. The exact distribution can be adjusted based
+                    on your individual goals and dietary preferences.
+                  </p>
+                  <p>
+                    There are several pre-built templates to choose from. Select one of these or
+                    customize your own.
+                  </p>
+                  <table style="width: 100%; border-collapse: collapse">
+                    <thead>
+                      <tr>
+                        <th style="text-align: left; padding: 10px; border-bottom: 2px solid #ddd">
+                          Plan
+                        </th>
+                        <th style="text-align: left; padding: 10px; border-bottom: 2px solid #ddd">
+                          Purpose
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee">
+                          <strong>Balanced</strong>
+                        </td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; color: #666">
+                          This plan provides a balanced distribution of macronutrients.
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee">
+                          <strong>Low Carb</strong>
+                        </td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; color: #666">
+                          This plan reduces carbohydrate intake and increases fat and protein
+                          consumption.
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee">
+                          <strong>High Protein</strong>
+                        </td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; color: #666">
+                          This plan increases protein intake to support muscle preservation and
+                          growth.
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee">
+                          <strong>High Metabolic</strong>
+                        </td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; color: #666">
+                          This plan includes days with lower calorie intake to help with fat loss,
+                          while other days focus on higher calorie intake to boost metabolism.
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee">
+                          <strong>Custom</strong>
+                        </td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; color: #666">
+                          Your preferences.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </q-card-section>
+              </q-expansion-item>
             </q-card>
           </div>
 
@@ -224,18 +313,22 @@
                 transition-hide="jump-up"
               >
                 <template v-slot:header>
-                  <q-chip>supplement Recomendations</q-chip>
+                  <q-chip>Supplement Suggestions</q-chip>
                 </template>
 
                 <q-card-section>
+                  <td style="padding: 20px">
+                    <p>
+                      <strong>NOTE -</strong> These Supplement Suggestions are not based on medical
+                      advice and should be used at your own discretion. Please consult with a
+                      healthcare professional before starting any new supplement regimen.
+                    </p>
+                  </td>
                   <table style="width: 100%; border-collapse: collapse">
                     <thead>
                       <tr>
                         <th style="text-align: left; padding: 12px; border-bottom: 2px solid #ccc">
                           Supplement
-                        </th>
-                        <th style="text-align: left; padding: 12px; border-bottom: 2px solid #ccc">
-                          Recommendation
                         </th>
                         <th style="text-align: left; padding: 12px; border-bottom: 2px solid #ccc">
                           Purpose / Benefits
@@ -247,9 +340,7 @@
                       <tr>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           <strong>Water</strong>
-                        </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee">
-                          64 oz minimum/day
+                          <p><span style="color: #666">64 oz minimum/day</span></p>
                         </td>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           Breaking down stored fat requires several biochemical reactions that occur
@@ -260,9 +351,7 @@
                       <tr>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           <strong>Protein Powder</strong>
-                        </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee">
-                          20–40 g/serving
+                          <p><span style="color: #666">As needed to keep protein up.</span></p>
                         </td>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           Makes it easier to reach your protein target while dieting.
@@ -272,8 +361,8 @@
                       <tr>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           <strong>Creatine Monohydrate</strong>
+                          <p><span style="color: #666">5 g/day</span></p>
                         </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee">5 g/day</td>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           Helps maintain strength and muscle during a calorie deficit.
                         </td>
@@ -282,9 +371,7 @@
                       <tr>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           <strong>Omega-3 (Fish Oil)</strong>
-                        </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee">
-                          2 g/day EPA + DHA
+                          <p><span style="color: #666">2 g/day EPA + DHA</span></p>
                         </td>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           Provides EPA and DHA; useful when you're not eating fish.
@@ -294,9 +381,9 @@
                       <tr>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           <strong>Krill Oil</strong><br />
+                          <p><span style="color: #666">500 mg/day</span></p>
                           <span style="color: #666">(Ocean crustaceans)</span>
                         </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee">500 mg/day</td>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           EPA + DHA, antioxidant properties, and phospholipids that help form cell
                           membranes and transport fats.
@@ -306,13 +393,19 @@
                       <tr>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           <strong>Multivitamin</strong><br />
-                          <span style="color: #666">(AG1 recommended)</span>
                         </td>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
-                          1 daily serving
-                        </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee">
-                          AG1 combines a large number of ingredients into one daily serving.
+                          Some popular multivitamin options include:
+                          <ul style="margin: 8px 0 0 20px; padding: 0">
+                            <li>AG1</li>
+                            <li>Huel Daily Greens</li>
+                            <li>Live It Up Super Greenst</li>
+                            <li>Thorne Daily Greens Plus</li>
+                            <li>IM8 Daily Essentials</li>
+                            <li>Amazing Grass Greens Blend</li>
+                            <li>Nested Naturals Super Greens</li>
+                          </ul>
+                          <hr />
                           <ul style="margin: 8px 0 0 20px; padding: 0">
                             <li>Vitamins &amp; minerals — nutritional support</li>
                             <li>Prebiotics &amp; probiotics — digestive/gut support</li>
@@ -327,10 +420,8 @@
                       <tr>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           <strong>D3 + K2</strong><br />
-                          <span style="color: #666">D3 (cholecalciferol)</span>
-                        </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee">
-                          500 UI, 100 MCG
+                          <p><span style="color: #666">D3 (cholecalciferol)</span></p>
+                          <p><span style="color: #666">500 UI, 100 MCG</span></p>
                         </td>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           <ul style="margin: 8px 0 0 20px; padding: 0">
@@ -345,7 +436,6 @@
                           <strong>Magnesium</strong><br />
                           <span style="color: #666">(Magnesium glycinate)</span>
                         </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee">200-400 mg/day</td>
                         <td style="padding: 12px; border-bottom: 1px solid #eee">
                           <ul style="margin: 8px 0 0 20px; padding: 0">
                             <li>Supports muscle and nerve function</li>
@@ -360,7 +450,6 @@
                         <td style="padding: 12px">
                           <strong>Electrolytes</strong>
                         </td>
-                        <td style="padding: 12px">As needed</td>
                         <td style="padding: 12px">
                           Maintain fluid balance, nerve function, muscle function, and blood
                           pressure.
@@ -392,8 +481,21 @@
                 </template>
 
                 <q-card-section>
+                  <td style="padding: 20px">
+                    <p>
+                      <strong>NOTE -</strong> These Supplement Suggestions are not based on medical
+                      advice and should be used at your own discretion. Please consult with a
+                      healthcare professional before starting any new supplement regimen.
+                    </p>
+                  </td>
+                  <q-chip color="accent" text-color="white"
+                    >Apple Cider Vinegar Fat-Burning Drink (Spicy).</q-chip
+                  >
                   <ul>
-                    <li>Bragg's Apple Cider Vinegar (ACV) — 2 Tbsp</li>
+                    <li>Best first thing in the morningin the morning.</li>
+                  </ul>
+                  <ul>
+                    <li>Apple Cider Vinegar (ACV) — 2 Tbsp (Bragg's or other unfiltered brands)</li>
                     <li>Cayenne pepper</li>
                     <li>Turmeric — ¼ tsp</li>
                     <li>Lemon juice — ¼ tsp</li>
@@ -416,13 +518,48 @@
                 transition-hide="jump-up"
               >
                 <template v-slot:header>
-                  <q-chip>Coconut Oil</q-chip>
+                  <q-chip>Fasting Supplements</q-chip>
                 </template>
 
                 <q-card-section>
+                  <td style="padding: 20px">
+                    <p>
+                      <strong>NOTE -</strong> These Supplement Suggestions are not based on medical
+                      advice and should be used at your own discretion. Please consult with a
+                      healthcare professional before starting any new supplement regimen.
+                    </p>
+                  </td>
+                  <q-chip color="accent" text-color="white">Bone Broth</q-chip>
+                  <ul>
+                    <li>
+                      Fluid and electrolytes — sodium, potassium, and sometimes magnesium can help
+                      with headaches, weakness, and that “flat” feeling during fasting.
+                    </li>
+                    <li>
+                      Some protein — collagen/gelatin can reduce hunger and may make a longer fast
+                      more comfortable.
+                    </li>
+                    <li>
+                      Warmth and satiety — a cup of broth can psychologically make a fast much
+                      easier to stick with.
+                    </li>
+                    <li>
+                      Very few calories — depending on the broth, often roughly 30–60 calories per
+                      cup.
+                    </li>
+                  </ul>
+                  <hr />
+                  <q-chip color="accent" text-color="white">Coconut Oil</q-chip>
+                  <p style="padding: 20px">
+                    Coconut oil is almost entirely fat, particularly medium-chain triglycerides
+                    (MCTs). MCTs are rapidly absorbed and can increase ketone production, which may:
+                    Reduce hunger for some people, Provide readily available energy, reduce the “low
+                    energy” feeling, and make it easier to fast longer.
+                  </p>
                   <ul>
                     <li>Useful when fasting Useful on a empty stomic.</li>
                     <li>Useful taken in the morning on an empty stomach before coffee or water</li>
+                    <li>May make it easier to sleep if taken before bed while fasting.</li>
                   </ul>
                   <p style="padding-left: 1.5rem">
                     Up to 1 tablespoon coconut oil Why: MCTs are rapidly delivered to and
@@ -523,5 +660,233 @@
         </div>
       </q-expansion-item>
     </q-card>
+
+    <q-card flat bordered class="q-ma-md">
+      <q-expansion-item
+        expand-icon="keyboard_arrow_down"
+        expanded-icon="keyboard_arrow_up"
+        transition-show="jump-down"
+        transition-hide="jump-up"
+      >
+        <template v-slot:header>
+          <q-item-section class="text-center">
+            <div class="text-h4">Contact</div>
+          </q-item-section>
+        </template>
+        <div class="row q-col-gutter-md q-pa-md">
+          <div class="col-12 col-md-8 col-lg-6 flex justify-center">
+            <q-card style="width: 100%">
+              <q-card-section class="bg-secondary text-white text-center">
+                Feedback
+              </q-card-section>
+
+              <q-card-section>
+                <q-banner
+                  v-if="!usersStore.currentUser?.email"
+                  class="bg-warning text-white q-mb-md"
+                >
+                  Please log in to submit feedback.
+                </q-banner>
+
+                <q-banner v-if="submitLimitReached" class="bg-warning text-white q-mb-md">
+                  You've reached the limit of {{ RECENT_SUBMISSION_LIMIT }} feedback submissions in
+                  the last {{ RECENT_SUBMISSION_WINDOW_DAYS }} days. Please try again later.
+                </q-banner>
+
+                <q-form class="q-gutter-md" @submit.prevent="handleFeedbackSubmit">
+                  <q-select
+                    v-model="feedbackForm.feedback_type"
+                    :options="feedbackTypeOptions"
+                    label="Feedback Type"
+                    multiple
+                    outlined
+                    dense
+                    use-chips
+                    :rules="[(val) => (val && val.length > 0) || 'Select at least one type']"
+                  />
+
+                  <q-input
+                    v-model="feedbackForm.subject"
+                    label="Subject"
+                    outlined
+                    dense
+                    :rules="[(val) => !!val?.trim() || 'Subject is required']"
+                  />
+
+                  <q-input
+                    v-model="feedbackForm.description"
+                    label="Description"
+                    type="textarea"
+                    outlined
+                    dense
+                    :rules="[(val) => !!val?.trim() || 'Description is required']"
+                  />
+
+                  <q-input
+                    v-model="feedbackForm.contact"
+                    label="Contact (optional)"
+                    outlined
+                    dense
+                  />
+
+                  <q-input
+                    v-model="feedbackForm.email"
+                    label="Email (optional)"
+                    type="email"
+                    outlined
+                    dense
+                  />
+
+                  <q-checkbox
+                    v-model="feedbackForm.allow_contact"
+                    label="You may contact me about this feedback"
+                  />
+
+                  <q-btn
+                    color="primary"
+                    label="Submit Feedback"
+                    type="submit"
+                    :disable="!usersStore.currentUser?.email || submitLimitReached || submitting"
+                    :loading="submitting"
+                  />
+                </q-form>
+              </q-card-section>
+            </q-card>
+          </div>
+        </div>
+      </q-expansion-item>
+    </q-card>
   </q-page>
 </template>
+
+<script setup>
+import { reactive, ref, watch } from 'vue'
+import { useQuasar } from 'quasar'
+import { useUsersStore } from 'stores/users'
+import { useFeedbackStore } from 'stores/feedback'
+import { sanitizeInput } from '../utils/sanitize'
+import { notifySuccess } from '../utils/notify'
+
+const RECENT_SUBMISSION_LIMIT = 2
+const RECENT_SUBMISSION_WINDOW_DAYS = 7
+
+const feedbackTypeOptions = [
+  'Bug',
+  'Feature Request',
+  'Suggestion',
+  'Question',
+  'Compliment',
+  'Other',
+]
+
+const $q = useQuasar()
+const usersStore = useUsersStore()
+const feedbackStore = useFeedbackStore()
+
+const submitting = ref(false)
+const submitLimitReached = ref(false)
+
+const feedbackForm = reactive({
+  feedback_type: [],
+  subject: '',
+  description: '',
+  contact: '',
+  email: '',
+  allow_contact: false,
+})
+
+function resetFeedbackForm() {
+  feedbackForm.feedback_type = []
+  feedbackForm.subject = ''
+  feedbackForm.description = ''
+  feedbackForm.contact = ''
+  feedbackForm.email = ''
+  feedbackForm.allow_contact = false
+}
+
+watch(
+  () => usersStore.currentUser?.user_id,
+  async (userId) => {
+    submitLimitReached.value = userId
+      ? await feedbackStore.hasReachedRecentSubmissionLimit(userId)
+      : false
+  },
+  { immediate: true },
+)
+
+async function sendFeedbackEmail(feedback) {
+  const formSubmitRecipient = import.meta.env.VITE_FORMSUBMIT_RECIPIENT || 'bill.jenner@gmail.com'
+  const formSubmitUrl =
+    import.meta.env.VITE_FORMSUBMIT_URL || `https://formsubmit.co/ajax/${formSubmitRecipient}`
+
+  await fetch(formSubmitUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      feedback_type: feedback.feedback_type,
+      subject: feedback.subject,
+      description: feedback.description,
+      contact: feedback.contact,
+      email: feedback.email,
+      allow_contact: feedback.allow_contact,
+      _subject: `Slim Macros Feedback: ${feedback.subject}`,
+      _captcha: 'false',
+    }),
+  })
+}
+
+async function handleFeedbackSubmit() {
+  const userId = usersStore.currentUser?.user_id
+
+  if (!userId) {
+    $q.notify({ color: 'negative', message: 'Please log in to submit feedback.' })
+    return
+  }
+
+  submitting.value = true
+
+  try {
+    submitLimitReached.value = await feedbackStore.hasReachedRecentSubmissionLimit(userId)
+    if (submitLimitReached.value) {
+      $q.notify({
+        color: 'negative',
+        message: `You've reached the limit of ${RECENT_SUBMISSION_LIMIT} feedback submissions in the last ${RECENT_SUBMISSION_WINDOW_DAYS} days.`,
+      })
+      return
+    }
+
+    const sanitizedFeedback = {
+      feedback_type: feedbackForm.feedback_type.join(', '),
+      subject: sanitizeInput(feedbackForm.subject),
+      description: sanitizeInput(feedbackForm.description),
+      contact: sanitizeInput(feedbackForm.contact),
+      email: sanitizeInput(feedbackForm.email),
+      allow_contact: feedbackForm.allow_contact,
+    }
+
+    const result = await feedbackStore.createFeedback(userId, sanitizedFeedback)
+
+    if (!result) {
+      throw new Error(feedbackStore.error || 'Unable to submit feedback right now.')
+    }
+
+    try {
+      await sendFeedbackEmail(sanitizedFeedback)
+    } catch (emailError) {
+      console.error('Feedback email notification failed:', emailError)
+    }
+
+    notifySuccess($q, 'Thank you for your feedback!')
+    resetFeedbackForm()
+    submitLimitReached.value = await feedbackStore.hasReachedRecentSubmissionLimit(userId)
+  } catch (error) {
+    console.error('Feedback submission failed:', error)
+    $q.notify({ color: 'negative', message: error?.message || 'Unable to submit feedback.' })
+  } finally {
+    submitting.value = false
+  }
+}
+</script>

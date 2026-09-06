@@ -34,5 +34,14 @@
     "Thursday": { "Protein": 35, "Carbs": 25, "Fat": 40 },
     "Friday": { "Protein": 35, "Carbs": 25, "Fat": 40 },
     "Saturday": { "Protein": 35, "Carbs": 25, "Fat": 40 }
+  },
+  "Custom": {
+    "Sunday": { "Protein": 30, "Carbs": 30, "Fat": 40 },
+    "Monday": { "Protein": 30, "Carbs": 30, "Fat": 40 },
+    "Tuesday": { "Protein": 30, "Carbs": 30, "Fat": 40 },
+    "Wednesday": { "Protein": 30, "Carbs": 30, "Fat": 40 },
+    "Thursday": { "Protein": 30, "Carbs": 30, "Fat": 40 },
+    "Friday": { "Protein": 30, "Carbs": 30, "Fat": 40 },
+    "Saturday": { "Protein": 30, "Carbs": 30, "Fat": 40 }
   }
 }
