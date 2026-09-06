@@ -13,7 +13,7 @@
         <q-toolbar-title>
           <router-link to="/" class="brand-link row items-center no-wrap">
             <q-img
-              src="/icons/favicon-32x32.png"
+              src="/icons/favicon-48x48.png"
               alt="Slim Macros"
               class="q-mr-sm"
               style="width: 21px; height: 32px; border-radius: 4px"

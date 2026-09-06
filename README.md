@@ -1,8 +1,8 @@
-# 🥗 Slim Belly
+# 🥗 Slim Macros
 
 > **Your daily companion for smarter nutrition, healthier habits, and measurable progress.**
 
-**Slim Belly** is a health and wellness diary designed to help you track your daily habits, monitor your progress, and gain meaningful insights into your overall well-being.
+**Slim Macros** is a health and wellness diary designed to help you track your daily habits, monitor your progress, and gain meaningful insights into your overall well-being.
 
 By consistently tracking your nutrition, activity, and wellness habits, you can better understand your health patterns and make informed decisions to support a healthier lifestyle.
 
@@ -67,7 +67,7 @@ Track changes over time and visualize your weight progress to better understand 
 
 ## 📊 Your Daily Wellness Diary
 
-Slim Belly brings the important pieces of your wellness routine together in one place:
+Slim Macros brings the important pieces of your wellness routine together in one place:
 
 | Feature            | Description                                                       |
 | ------------------ | ----------------------------------------------------------------- |
@@ -85,7 +85,7 @@ Slim Belly brings the important pieces of your wellness routine together in one 
 
 Small, consistent actions can make a big difference.
 
-Use **Slim Belly** regularly to:
+Use **Slim Macros** regularly to:
 
 - Understand your eating patterns
 - Stay accountable to your nutrition goals
@@ -113,4 +113,4 @@ Use **Slim Belly** regularly to:
 
 ## 🎯 Your Health. Your Habits. Your Progress.
 
-**Slim Belly** makes everyday wellness tracking simple, visual, and actionable — helping you turn your daily choices into long-term healthy habits.
+**Slim Macros** makes everyday wellness tracking simple, visual, and actionable — helping you turn your daily choices into long-term healthy habits.

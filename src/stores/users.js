@@ -1,7 +1,7 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
 
-const CURRENT_USER_STORAGE_KEY = 'slimbelly.currentUser'
+const CURRENT_USER_STORAGE_KEY = 'slimmacros.currentUser'
 const USERS_LOGGED_IN_FUNCTION = 'users-logged-in'
 
 function normalizeEmail(email) {

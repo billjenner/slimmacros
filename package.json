@@ -1,8 +1,8 @@
 {
   "name": "thecubegame",
   "version": "0.0.1",
-  "description": "Slim Belly",
-  "productName": "Slim Belly",
+  "description": "Slim Macros",
+  "productName": "Slim Macros",
   "author": "Bill Jenner",
   "type": "module",
   "private": true,
