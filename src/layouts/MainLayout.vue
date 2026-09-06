@@ -140,22 +140,13 @@
       </div>
     </q-footer>
 
-    <q-dialog v-model="showInstallDialog" persistent>
-      <q-card style="min-width: 320px; max-width: 420px">
-        <q-card-section>
-          <div class="text-h6">Install Slim Macros App?</div>
-        </q-card-section>
-
-        <q-card-section>
-          Install this app on your device for a faster, full-screen experience.
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat color="negative" label="Not now" @click="dismissInstallDialog" />
-          <q-btn color="secondary" label="Install" @click="promptInstall" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <q-banner v-if="showInstallDialog" class="bg-secondary text-white install-banner" dense>
+      Install Slim Macros for a faster, full-screen experience.
+      <template v-slot:action>
+        <q-btn flat label="Not now" @click="dismissInstallDialog" />
+        <q-btn flat label="Install" @click="promptInstall" />
+      </template>
+    </q-banner>
   </q-layout>
 </template>
 
@@ -173,6 +164,9 @@ const router = useRouter()
 const leftDrawerOpen = ref(false)
 const deferredInstallPrompt = ref(null)
 const showInstallDialog = ref(false)
+const INSTALL_PROMPT_DELAY_MS = 20000
+let installPromptTimer = null
+let installPromptDelayElapsed = false
 
 const userInitials = computed(() => {
   const firstInitial = String(usersStore.currentUser?.fname || '')
@@ -251,7 +245,10 @@ async function promptInstall() {
 function handleBeforeInstallPrompt(event) {
   event.preventDefault()
   deferredInstallPrompt.value = event
-  showInstallDialog.value = true
+
+  if (installPromptDelayElapsed) {
+    showInstallDialog.value = true
+  }
 }
 
 function handleAppInstalled() {
@@ -262,11 +259,20 @@ function handleAppInstalled() {
 onMounted(() => {
   window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
   window.addEventListener('appinstalled', handleAppInstalled)
+
+  installPromptTimer = setTimeout(() => {
+    installPromptDelayElapsed = true
+
+    if (deferredInstallPrompt.value) {
+      showInstallDialog.value = true
+    }
+  }, INSTALL_PROMPT_DELAY_MS)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
   window.removeEventListener('appinstalled', handleAppInstalled)
+  clearTimeout(installPromptTimer)
 })
 </script>
 
@@ -302,5 +308,13 @@ onBeforeUnmount(() => {
   background-color: var(--q-secondary);
   min-width: 40px;
   min-height: 40px;
+}
+
+.install-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6000;
 }
 </style>
