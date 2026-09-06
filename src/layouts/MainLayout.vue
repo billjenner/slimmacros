@@ -215,7 +215,7 @@ function buttonStyle(path) {
     return { backgroundColor: 'var(--q-accent)' }
   }
 
-  return { backgroundColor: '#D9433F' }
+  return { backgroundColor: 'var(--q-negative)' }
 }
 
 function dismissInstallDialog() {

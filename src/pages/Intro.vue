@@ -22,7 +22,7 @@
         line-height: 1.6;
       "
     >
-      Track your food, macros, workouts, supplements, weight, and BMI—all in one place.
+      Your daily companion for smarter nutrition, healthier habits, and measurable progress.
     </h5>
 
     <h5
@@ -35,6 +35,7 @@
         line-height: 1.6;
       "
     >
+      Track your food, macros, workouts, supplements, weight, and BMI—all in one place.
       Automatically calculate your daily calorie and macro budgets, monitor your intake against your
       goals, and track your progress throughout the day. With integrated exercise and
       nutrition‑supplement information, you can uncover patterns, gain insights into your habits,
