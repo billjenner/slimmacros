@@ -106,7 +106,7 @@
         <q-item clickable v-ripple @click="navigateAndClose('/docs')">
           <q-item-section>Docs</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/feedback')">
+        <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/feedback')">
           <q-item-section>Feedback</q-item-section>
         </q-item>
         <q-item
@@ -183,6 +183,17 @@ const userInitials = computed(() => {
     .charAt(0)
 
   return `${firstInitial}${lastInitial}`.toUpperCase() || 'U'
+})
+
+const isAdmin = computed(() => {
+  const adminEmail = String(import.meta.env.VITE_FORMSUBMIT_RECIPIENT || '')
+    .trim()
+    .toLowerCase()
+  const currentEmail = String(usersStore.currentUser?.email || '')
+    .trim()
+    .toLowerCase()
+
+  return Boolean(adminEmail) && currentEmail === adminEmail
 })
 
 async function navigate(path) {

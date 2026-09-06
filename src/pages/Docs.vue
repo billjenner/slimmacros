@@ -674,7 +674,7 @@
           </q-item-section>
         </template>
         <div class="row q-col-gutter-md q-pa-md">
-          <div class="col-12 col-md-8 col-lg-6 flex justify-center">
+          <div class="col-12 flex justify-center">
             <q-card style="width: 100%">
               <q-card-section class="bg-secondary text-white text-center">
                 Feedback

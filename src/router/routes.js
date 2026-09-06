@@ -97,6 +97,8 @@ const routes = [
         path: 'users',
         component: () => import('pages/Users.vue'),
         meta: {
+          requiresAuth: true,
+          requiresAdmin: true,
           seo: {
             title: 'Users',
             description: 'View the users and community members in Slim Macros.',
@@ -108,6 +110,8 @@ const routes = [
         path: 'feedback',
         component: () => import('pages/Feedback.vue'),
         meta: {
+          requiresAuth: true,
+          requiresAdmin: true,
           seo: {
             title: 'Feedback',
             description: 'View feedback submitted by Slim Macros users.',

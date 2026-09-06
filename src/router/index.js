@@ -99,12 +99,26 @@ export default defineRouter(async (/* { store, ssrContext } */) => {
     Router.beforeEach(async (to) => {
       const loggedIn = Boolean(store.currentUser?.user_id || store.currentUser?.email)
       const requiresAuth = to.matched.some((record) => record.meta?.requiresAuth)
+      const requiresAdmin = to.matched.some((record) => record.meta?.requiresAdmin)
 
       if (requiresAuth && !loggedIn) {
         const restoredUser = await store.restoreCurrentUserFromPublicIp()
 
         if (!restoredUser) {
           return { path: '/login', query: { redirect: to.fullPath } }
+        }
+      }
+
+      if (requiresAdmin) {
+        const adminEmail = String(import.meta.env.VITE_FORMSUBMIT_RECIPIENT || '')
+          .trim()
+          .toLowerCase()
+        const currentEmail = String(store.currentUser?.email || '')
+          .trim()
+          .toLowerCase()
+
+        if (!adminEmail || currentEmail !== adminEmail) {
+          return { path: '/' }
         }
       }
 
