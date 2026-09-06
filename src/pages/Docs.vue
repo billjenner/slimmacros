@@ -693,7 +693,12 @@
                   the last {{ RECENT_SUBMISSION_WINDOW_DAYS }} days. Please try again later.
                 </q-banner>
 
-                <q-form class="q-gutter-md" @submit.prevent="handleFeedbackSubmit">
+                <q-form
+                  ref="feedbackFormRef"
+                  greedy
+                  class="q-gutter-md"
+                  @submit.prevent="handleFeedbackSubmit"
+                >
                   <q-select
                     v-model="feedbackForm.feedback_type"
                     :options="feedbackTypeOptions"
@@ -702,6 +707,7 @@
                     outlined
                     dense
                     use-chips
+                    lazy-rules="ondemand"
                     :rules="[(val) => (val && val.length > 0) || 'Select at least one type']"
                   />
 
@@ -710,6 +716,7 @@
                     label="Subject"
                     outlined
                     dense
+                    lazy-rules="ondemand"
                     :rules="[(val) => !!val?.trim() || 'Subject is required']"
                   />
 
@@ -719,6 +726,7 @@
                     type="textarea"
                     outlined
                     dense
+                    lazy-rules="ondemand"
                     :rules="[(val) => !!val?.trim() || 'Description is required']"
                   />
 
@@ -742,13 +750,15 @@
                     label="You may contact me about this feedback"
                   />
 
-                  <q-btn
-                    color="primary"
-                    label="Submit Feedback"
-                    type="submit"
-                    :disable="!usersStore.currentUser?.email || submitLimitReached || submitting"
-                    :loading="submitting"
-                  />
+                  <div class="text-center">
+                    <q-btn
+                      color="primary"
+                      label="Submit Feedback"
+                      type="submit"
+                      :disable="!usersStore.currentUser?.email || submitLimitReached || submitting"
+                      :loading="submitting"
+                    />
+                  </div>
                 </q-form>
               </q-card-section>
             </q-card>
@@ -767,7 +777,7 @@ import { useFeedbackStore } from 'stores/feedback'
 import { sanitizeInput } from '../utils/sanitize'
 import { notifySuccess } from '../utils/notify'
 
-const RECENT_SUBMISSION_LIMIT = 2
+const RECENT_SUBMISSION_LIMIT = 3
 const RECENT_SUBMISSION_WINDOW_DAYS = 7
 
 const feedbackTypeOptions = [
@@ -783,6 +793,7 @@ const $q = useQuasar()
 const usersStore = useUsersStore()
 const feedbackStore = useFeedbackStore()
 
+const feedbackFormRef = ref(null)
 const submitting = ref(false)
 const submitLimitReached = ref(false)
 
@@ -881,6 +892,7 @@ async function handleFeedbackSubmit() {
 
     notifySuccess($q, 'Thank you for your feedback!')
     resetFeedbackForm()
+    feedbackFormRef.value?.resetValidation()
     submitLimitReached.value = await feedbackStore.hasReachedRecentSubmissionLimit(userId)
   } catch (error) {
     console.error('Feedback submission failed:', error)

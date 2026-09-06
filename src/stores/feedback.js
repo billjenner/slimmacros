@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { supabase } from '../lib/supabase'
 
 const RECENT_SUBMISSION_WINDOW_DAYS = 7
-const RECENT_SUBMISSION_LIMIT = 2
+const RECENT_SUBMISSION_LIMIT = 3
 
 export const useFeedbackStore = defineStore('Feedback', {
   state: () => ({
