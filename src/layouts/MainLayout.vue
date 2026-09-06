@@ -140,22 +140,13 @@
       </div>
     </q-footer>
 
-    <q-dialog v-model="showInstallDialog" persistent>
-      <q-card style="min-width: 320px; max-width: 420px">
-        <q-card-section>
-          <div class="text-h6">Install Slim Macros App?</div>
-        </q-card-section>
-
-        <q-card-section>
-          Install this app on your device for a faster, full-screen experience.
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat color="negative" label="Not now" @click="dismissInstallDialog" />
-          <q-btn color="secondary" label="Install" @click="promptInstall" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <q-banner v-if="showInstallDialog" class="bg-secondary text-white install-banner" dense>
+      Install Slim Macros for a faster, full-screen experience.
+      <template v-slot:action>
+        <q-btn flat label="Not now" @click="dismissInstallDialog" />
+        <q-btn flat label="Install" @click="promptInstall" />
+      </template>
+    </q-banner>
   </q-layout>
 </template>
 
