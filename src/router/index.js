@@ -14,7 +14,7 @@ const defaultSeo = {
   image: '/icons/icon-512x512.png',
   type: 'website',
   robots: 'index,follow',
-  themeColor: '#027be3',
+  themeColor: '#690808',
 }
 
 function applySeoMeta(route) {
