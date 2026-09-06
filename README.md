@@ -114,3 +114,8 @@ Use **Slim Macros** regularly to:
 ## 🎯 Your Health. Your Habits. Your Progress.
 
 **Slim Macros** makes everyday wellness tracking simple, visual, and actionable — helping you turn your daily choices into long-term healthy habits.
+
+### PWA commands
+
+npx quasar build -m pwa
+npx http-server dist/pwa
