@@ -102,7 +102,8 @@ export default defineRouter(async (/* { store, ssrContext } */) => {
       const requiresAdmin = to.matched.some((record) => record.meta?.requiresAdmin)
 
       if (requiresAuth && !loggedIn) {
-        const restoredUser = await store.restoreCurrentUserFromPublicIp()
+        const restoredUser =
+          (await store.restoreSessionFromAuth())
 
         if (!restoredUser) {
           return { path: '/login', query: { redirect: to.fullPath } }

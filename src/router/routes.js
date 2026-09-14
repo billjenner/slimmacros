@@ -70,6 +70,29 @@ const routes = [
         },
       },
       {
+        path: 'reset-password',
+        component: () => import('pages/ResetPassword.vue'),
+        meta: {
+          seo: {
+            title: 'Reset password',
+            description: 'Choose a new password for your Slim Macros account.',
+            canonicalPath: '/reset-password',
+          },
+        },
+      },
+      {
+        path: 'change-password',
+        component: () => import('pages/ChangePassword.vue'),
+        meta: {
+          requiresAuth: true,
+          seo: {
+            title: 'Change password',
+            description: 'Change the password for your Slim Macros account.',
+            canonicalPath: '/change-password',
+          },
+        },
+      },
+      {
         path: 'profiles',
         component: () => import('pages/Profiles.vue'),
         meta: {

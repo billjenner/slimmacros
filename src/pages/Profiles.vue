@@ -8,7 +8,10 @@
           :bordered="!embedded"
           :class="!embedded ? 'q-pa-md' : ''"
         >
-          <div class="text-h5 q-mb-md">Profiles</div>
+          <div class="row items-center justify-between q-mb-md">
+            <div class="text-h5">Profiles</div>
+            <q-btn to="/change-password" label="Change Password" color="secondary" flat />
+          </div>
 
           <q-banner v-if="store.error" class="bg-negative text-white q-mb-md" rounded>
             {{ store.error }}
@@ -19,7 +22,6 @@
             class="bg-warning text-dark q-mb-md"
             rounded
           >
-            Sign in to create or edit a profile.
           </q-banner>
 
           <q-form @submit.prevent="saveProfile" class="q-gutter-md">
@@ -35,7 +37,19 @@
                 </div>
 
                 <div class="col-12 col-md-4">
-                  <q-input v-model="profile.sex" label="Sex" readonly filled dense />
+                  <q-select
+                    v-model="profile.sex"
+                    label="Sex"
+                    :options="sexOptions"
+                    emit-value
+                    map-options
+                    filled
+                    dense
+                  />
+                </div>
+
+                <div class="col-12 col-md-4">
+                  <q-input v-model="profile.age" label="Age" readonly filled dense />
                 </div>
               </div>
             </q-card>
@@ -231,6 +245,11 @@ const activityLevelOptions = [
   { label: 'Extremely active', value: 'ExtremelyActive' },
 ]
 
+const sexOptions = [
+  { label: 'Male', value: 'M' },
+  { label: 'Female', value: 'F' },
+]
+
 const dayGroups = [
   {
     key: 'sunday',
@@ -301,6 +320,7 @@ const profile = reactive({
   fname: '',
   lname: '',
   sex: '',
+  age: '0',
   start_weight: null,
   goal_weight: null,
   height: null,
@@ -335,10 +355,10 @@ const currentUserId = computed(() => usersStore.currentUser?.user_id || null)
 
 const totalDailyCalories = computed(() => {
   const calories = calculateTotalDailyCalories({
+    sex: profile.sex,
+    age: profile.age,
     weight: profile.start_weight,
     height: profile.height,
-    age: usersStore.currentUser?.age,
-    sex: usersStore.currentUser?.sex,
     activityLevel: profile.activity_level,
   })
 
@@ -389,6 +409,8 @@ async function loadProfile() {
 
   if (!currentUserId.value) {
     store.currentProfile = null
+    profile.sex = null
+    profile.age = 0
     profile.start_weight = null
     profile.goal_weight = null
     profile.height = null
@@ -405,6 +427,10 @@ async function loadProfile() {
 
   loading.value = true
   const data = await store.loadCurrentProfile(currentUserId.value)
+  profile.fname = data?.fname ?? ''
+  profile.lname = data?.lname ?? ''
+  profile.sex = data?.sex ?? null
+  profile.age = data?.age ?? null
   profile.start_weight = data?.start_weight ?? null
   profile.goal_weight = data?.goal_weight ?? null
   profile.height = data?.height ?? null
@@ -426,6 +452,10 @@ async function saveProfile() {
 
   loading.value = true
   const savedProfile = await store.saveProfile(currentUserId.value, {
+    fname: profile.fname,
+    lname: profile.lname,
+    sex: profile.sex,
+    age: profile.age,
     start_weight: profile.start_weight,
     goal_weight: profile.goal_weight,
     height: profile.height,
@@ -463,11 +493,12 @@ async function saveProfile() {
 }
 
 watch(
-  () => usersStore.currentUser,
-  () => {
-    syncUserDetails()
+  () => usersStore.currentUser?.user_id,
+  (userId, previousUserId) => {
+    if (userId !== previousUserId) {
+      loadProfile()
+    }
   },
-  { deep: true },
 )
 
 onMounted(() => {

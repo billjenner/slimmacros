@@ -18,7 +18,6 @@
       <q-list v-else bordered separator class="rounded-borders">
         <q-item v-for="user in store.users" :key="user.email" clickable>
           <q-item-section>
-            <q-item-label>{{ user.fname }} {{ user.lname }}</q-item-label>
             <q-item-label caption>{{ user.email }}</q-item-label>
           </q-item-section>
         </q-item>

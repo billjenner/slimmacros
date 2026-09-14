@@ -52,7 +52,7 @@ export const useFeedbackStore = defineStore('Feedback', {
 
       const { count, error } = await supabase
         .from('feedback')
-        .select('id', { count: 'exact', head: true })
+        .select('feedback_id', { count: 'exact', head: true })
         .eq('user_id', userId)
         .gte('created_at', windowStart)
 

@@ -133,8 +133,8 @@
     <q-footer class="bg-primary text-white q-pa-sm">
       <div class="row items-center justify-end">
         <div v-if="usersStore.currentUser && usersStore.currentUser.email">
-          Current User: {{ usersStore.currentUser.fname }} {{ usersStore.currentUser.lname }} -
-          {{ usersStore.currentUser.email }}
+          Current User: {{ profilesStore.currentProfile?.fname }}
+          {{ profilesStore.currentProfile?.lname }} - {{ usersStore.currentUser.email }}
         </div>
         <div v-else class="text-caption">Not logged in</div>
       </div>
@@ -160,25 +160,27 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsersStore } from 'stores/users'
+import { useProfilesStore } from 'stores/profiles'
 
 const $q = useQuasar()
 const route = useRoute()
 const hoveredPath = ref(null)
 const usersStore = useUsersStore()
+const profilesStore = useProfilesStore()
 const router = useRouter()
 const leftDrawerOpen = ref(false)
 const deferredInstallPrompt = ref(null)
 const showInstallDialog = ref(false)
 
 const userInitials = computed(() => {
-  const firstInitial = String(usersStore.currentUser?.fname || '')
+  const firstInitial = String(profilesStore.currentProfile?.fname || '')
     .trim()
     .charAt(0)
-  const lastInitial = String(usersStore.currentUser?.lname || '')
+  const lastInitial = String(profilesStore.currentProfile?.lname || '')
     .trim()
     .charAt(0)
 
@@ -201,7 +203,7 @@ async function navigate(path) {
 }
 
 async function signOut() {
-  await usersStore.clearCurrentUser()
+  await usersStore.logoutUser()
   router.push('/login')
 }
 
@@ -262,7 +264,22 @@ function handleAppInstalled() {
 onMounted(() => {
   window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
   window.addEventListener('appinstalled', handleAppInstalled)
+
+  if (usersStore.currentUser?.user_id) {
+    profilesStore.loadCurrentProfile(usersStore.currentUser.user_id)
+  }
 })
+
+watch(
+  () => usersStore.currentUser?.user_id,
+  (userId) => {
+    if (userId) {
+      profilesStore.loadCurrentProfile(userId)
+    } else {
+      profilesStore.currentProfile = null
+    }
+  },
+)
 
 onBeforeUnmount(() => {
   window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)

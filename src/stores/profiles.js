@@ -22,6 +22,10 @@ export const useProfilesStore = defineStore('Profiles', {
     buildProfilePayload(userId, profile = {}) {
       return {
         user_id: userId,
+        fname: profile.fname || '',
+        lname: profile.lname || '',
+        sex: profile.sex || 'M',
+        age: this.toNullableNumber(profile.age),
         start_weight: this.toNullableNumber(profile.start_weight),
         goal_weight: this.toNullableNumber(profile.goal_weight),
         height: this.toNullableNumber(profile.height),

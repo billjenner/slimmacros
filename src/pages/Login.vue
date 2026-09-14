@@ -33,7 +33,14 @@
         </q-input>
 
         <div class="full-width">
-          <q-btn color="primary" label="Log In" type="submit" class="full-width" />
+          <q-btn
+            color="primary"
+            label="Log In"
+            type="submit"
+            class="full-width"
+            :loading="submitting"
+            :disable="submitting"
+          />
         </div>
 
         <div class="row justify-center q-gutter-sm q-mt-sm full-width">
@@ -59,18 +66,24 @@ const password = ref('')
 const showPassword = ref(false)
 const message = ref('')
 const messageClass = ref('text-positive')
+const submitting = ref(false)
 
 const router = useRouter()
 const route = useRoute()
 const store = useUsersStore()
 
 async function handleSubmit() {
+  if (submitting.value) {
+    return
+  }
+
   if (!email.value.trim() || !password.value) {
     message.value = 'Please enter email and password.'
     messageClass.value = 'text-negative'
     return
   }
 
+  submitting.value = true
   const result = await store.loginUser(email.value, password.value)
 
   if (result) {
@@ -82,5 +95,7 @@ async function handleSubmit() {
     message.value = store.error || 'Unable to log in.'
     messageClass.value = 'text-negative'
   }
+
+  submitting.value = false
 }
 </script>

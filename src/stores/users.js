@@ -39,25 +39,19 @@ function persistCurrentUser(user) {
   }
 }
 
-function sanitizeCurrentUser(user) {
-  if (!user) {
+function formatAuthUser(authUser) {
+  if (!authUser) {
     return null
   }
 
-  const safeUser = { ...user }
-  delete safeUser.password
-  return safeUser
-}
-
-function toLoggedInCurrentUser(user) {
-  const safeUser = sanitizeCurrentUser(user)
-  if (!safeUser) {
-    return null
-  }
+  const id = authUser.id
 
   return {
-    ...safeUser,
-    is_logged_in: true,
+    id,
+    user_id: id,
+    email: authUser.email || '',
+    created_at: authUser.created_at,
+    user_metadata: authUser.user_metadata || {},
   }
 }
 
@@ -67,12 +61,10 @@ export const useUsersStore = defineStore('Users', {
     currentUser: getPersistedCurrentUser(),
     answers: [],
     error: null,
-    activeAnswerId: null,
-    activeAnswerDateTime: null,
   }),
 
   actions: {
-    async saveUser(email, password, fname = '', lname = '', sex = '', age = null) {
+    async registerUser(email, password) {
       this.error = null
 
       if (!supabase) {
@@ -81,51 +73,35 @@ export const useUsersStore = defineStore('Users', {
       }
 
       const normalizedEmail = normalizeEmail(email)
-      const user = {
+
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: normalizedEmail,
         password,
-        fname,
-        lname,
-        sex,
-        age: age !== null && age !== '' ? Number(age) : null,
-        is_active: true,
-      }
+      })
 
-      const { data: existingUser, error: lookupError } = await supabase
-        .from('users')
-        .select('email')
-        .eq('email', normalizedEmail)
-        .maybeSingle()
-
-      if (lookupError) {
-        this.error = lookupError.message
+      if (signUpError) {
+        this.error = signUpError.message
         return null
       }
 
-      if (existingUser) {
-        this.error = 'User already exists'
+      if (!signUpData?.session && !signUpData?.user) {
+        this.error = 'Account created, but email confirmation is required before logging in.'
         return null
       }
 
-      const { data, error } = await supabase
-        .from('users')
-        .upsert(user, { onConflict: 'email' })
-        .select()
-        .single()
-
-      if (error) {
-        this.error = error.message
+      const authUser = signUpData.user
+      if (!authUser) {
+        this.error = 'Unable to complete user registration.'
         return null
       }
 
-      const savedUser = sanitizeCurrentUser(data)
-
+      const savedUser = formatAuthUser(authUser)
       this.users = this.users.filter((user) => user.email !== normalizedEmail)
       this.users.push(savedUser)
       this.currentUser = savedUser
       persistCurrentUser(savedUser)
       await this.syncLoggedInSession(normalizedEmail, true)
-      return data
+      return savedUser
     },
 
     async recoverPassword(email) {
@@ -137,23 +113,22 @@ export const useUsersStore = defineStore('Users', {
       }
 
       const normalizedEmail = normalizeEmail(email)
-      const { data, error } = await supabase
-        .from('users')
-        .select('email, password')
-        .eq('email', normalizedEmail)
-        .maybeSingle()
+      // Path doesn't matter here: the app uses hash routing, so Supabase's own
+      // "#access_token=..." fragment would collide with a "/#/reset-password"
+      // route. The auth-redirect boot file routes to /reset-password once the
+      // PASSWORD_RECOVERY event fires.
+      const redirectTo = typeof window !== 'undefined' ? window.location.origin : undefined
+
+      // Supabase Auth hashes passwords, so we can no longer recover/email the
+      // original password. This sends a password-reset link instead.
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, { redirectTo })
 
       if (error) {
         this.error = error.message
         return null
       }
 
-      if (!data) {
-        this.error = 'No account found for that email.'
-        return null
-      }
-
-      return data
+      return { email: normalizedEmail }
     },
 
     async loginUser(email, password) {
@@ -165,35 +140,61 @@ export const useUsersStore = defineStore('Users', {
       }
 
       const normalizedEmail = normalizeEmail(email)
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', normalizedEmail)
-        .maybeSingle()
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      })
 
-      if (error) {
-        this.error = error.message
+      if (signInError) {
+        this.error = signInError.message
         return null
       }
 
-      if (!data) {
+      const authUser = signInData?.user
+      if (!authUser) {
         this.error = 'No account found for that email.'
         return null
       }
 
-      if (data.password !== password) {
-        this.error = 'Invalid password.'
-        return null
-      }
-
-      const savedUser = sanitizeCurrentUser(data)
-
+      const savedUser = formatAuthUser(authUser)
       this.currentUser = savedUser
       this.users = this.users.filter((u) => u.email !== normalizedEmail)
       this.users.push(savedUser)
       persistCurrentUser(savedUser)
       await this.syncLoggedInSession(normalizedEmail, true)
-      return data
+      return savedUser
+    },
+
+    async restoreSessionFromAuth() {
+      if (!supabase) {
+        return null
+      }
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session?.user) {
+        return null
+      }
+
+      const savedUser = formatAuthUser(session.user)
+      this.currentUser = savedUser
+      this.users = this.users.filter((u) => u.email !== savedUser.email)
+      this.users.push(savedUser)
+      persistCurrentUser(savedUser)
+      return savedUser
+    },
+
+    async logoutUser() {
+      if (supabase) {
+        let { error } = await supabase.auth.signOut()
+        if (error) {
+          this.error = error.message
+          return null
+        }
+      }
+      await this.clearCurrentUser()
     },
 
     async getUserByEmail(email) {
@@ -209,18 +210,21 @@ export const useUsersStore = defineStore('Users', {
         return null
       }
 
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', normalizedEmail)
-        .maybeSingle()
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
 
-      if (error) {
-        this.error = error.message
+      if (error || !user) {
+        if (error) this.error = error.message
         return null
       }
 
-      return sanitizeCurrentUser(data)
+      if (user.email && normalizeEmail(user.email) === normalizedEmail) {
+        return formatAuthUser(user)
+      }
+
+      return null
     },
 
     async syncLoggedInSession(email, isLoggedIn) {
@@ -247,42 +251,6 @@ export const useUsersStore = defineStore('Users', {
       return !error
     },
 
-    async restoreCurrentUserFromPublicIp() {
-      this.error = null
-
-      if (!supabase) {
-        this.error = 'Supabase client is not configured.'
-        return null
-      }
-
-      const { data, error } = await supabase.functions.invoke(USERS_LOGGED_IN_FUNCTION, {
-        body: {
-          action: 'restore',
-        },
-      })
-
-      if (error) {
-        this.error = error.message
-        return null
-      }
-
-      if (!data?.users_email || !data.is_logged_in) {
-        return null
-      }
-
-      const restoredUser = await this.getUserByEmail(data.users_email)
-      if (!restoredUser) {
-        return null
-      }
-
-      const currentUser = toLoggedInCurrentUser(restoredUser)
-      this.currentUser = currentUser
-      this.users = this.users.filter((user) => user.email !== currentUser.email)
-      this.users.push(currentUser)
-      persistCurrentUser(currentUser)
-      return currentUser
-    },
-
     async loadUsers() {
       this.error = null
 
@@ -291,148 +259,24 @@ export const useUsersStore = defineStore('Users', {
         return []
       }
 
-      const { data, error } = await supabase.from('users').select('*').order('created_at', {
-        ascending: false,
-      })
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
 
       if (error) {
         this.error = error.message
         return []
       }
 
-      this.users = (data || []).map((user) => ({
-        ...user,
-        name: `${user.fname || ''}   ${user.lname || ''}`.trim(),
-      }))
-      return this.users
-    },
-
-    async saveAnswers(answers) {
-      this.error = null
-
-      if (!supabase) {
-        this.error = 'Supabase client is not configured.'
-        return null
+      if (user) {
+        const formatted = formatAuthUser(user)
+        this.users = [formatted]
+        return this.users
       }
 
-      if (!this.currentUser?.email) {
-        this.error = 'No current user is available.'
-        return null
-      }
-
-      const currentTime = new Date().toISOString()
-      const payload = {
-        email: this.currentUser.email,
-        room: answers?.room || '',
-        cube: answers?.cube || '',
-        ladder: answers?.ladder || '',
-        horse: answers?.horse || '',
-        window: answers?.window || '',
-        storm: answers?.storm || '',
-        flowers: answers?.flowers || '',
-        date_time: currentTime,
-      }
-
-      const { data, error } = await supabase.from('answers').insert(payload).select().single()
-
-      if (error) {
-        this.error = error.message
-        return null
-      }
-
-      this.activeAnswerId = data?.ID || null
-      this.activeAnswerDateTime = data?.date_time || currentTime
-
-      this.answers = this.answers.filter((item) => item.email !== this.currentUser.email)
-      this.answers.push(data)
-      return data
-    },
-
-    async finishAnswers(answers) {
-      this.error = null
-
-      if (!supabase) {
-        this.error = 'Supabase client is not configured.'
-        return null
-      }
-
-      if (!this.currentUser?.email) {
-        this.error = 'No current user is available.'
-        return null
-      }
-
-      const currentTime = new Date().toISOString()
-      const targetDateTime = this.activeAnswerDateTime || currentTime
-      const payload = {
-        email: this.currentUser.email,
-        room: answers?.room || '',
-        cube: answers?.cube || '',
-        ladder: answers?.ladder || '',
-        horse: answers?.horse || '',
-        window: answers?.window || '',
-        storm: answers?.storm || '',
-        flowers: answers?.flowers || '',
-        date_time: targetDateTime,
-      }
-
-      let data = null
-      let error = null
-
-      if (this.activeAnswerId) {
-        const updateResult = await supabase
-          .from('answers')
-          .update(payload)
-          .eq('ID', this.activeAnswerId)
-          .select()
-          .maybeSingle()
-
-        data = updateResult.data
-        error = updateResult.error
-      }
-
-      if (!data && !error && this.activeAnswerDateTime) {
-        const updateResult = await supabase
-          .from('answers')
-          .update(payload)
-          .eq('email', this.currentUser.email)
-          .eq('date_time', this.activeAnswerDateTime)
-          .select()
-          .maybeSingle()
-
-        data = updateResult.data
-        error = updateResult.error
-      }
-
-      if (!data && !error && this.activeAnswerDateTime) {
-        // Fallback update for schemas where date_time comparison may not match exactly.
-        const updateByEmailResult = await supabase
-          .from('answers')
-          .update(payload)
-          .eq('email', this.currentUser.email)
-          .select()
-          .maybeSingle()
-
-        data = updateByEmailResult.data
-        error = updateByEmailResult.error
-      }
-
-      if (!data && !error && !this.activeAnswerDateTime) {
-        const insertResult = await supabase.from('answers').insert(payload).select().single()
-        data = insertResult.data
-        error = insertResult.error
-      }
-
-      if (error) {
-        this.error = error.message
-        return null
-      }
-
-      this.activeAnswerId = data?.ID || this.activeAnswerId
-      this.activeAnswerDateTime = data?.date_time || targetDateTime
-
-      this.answers = this.answers.filter((item) => item.email !== this.currentUser.email)
-      this.answers.push(data)
-      return data
+      this.users = []
+      return []
     },
 
     async clearCurrentUser() {
@@ -442,8 +286,6 @@ export const useUsersStore = defineStore('Users', {
       }
 
       this.currentUser = null
-      this.activeAnswerId = null
-      this.activeAnswerDateTime = null
       persistCurrentUser(null)
     },
   },

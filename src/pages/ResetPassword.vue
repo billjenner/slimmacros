@@ -1,26 +1,16 @@
 <template>
   <q-page class="flex flex-center q-pa-md">
-    <q-card class="q-pa-lg" style="width: min(100%, 460px)">
-      <div class="text-h5 text-center q-mb-md">Create User</div>
+    <q-card class="q-pa-lg" style="width: min(100%, 420px)">
+      <div class="text-h5 text-center q-mb-md">Set a new password</div>
 
       <q-form @submit.prevent="handleSubmit" class="q-gutter-y-md full-width">
         <q-input
-          v-model="email"
-          label="Email"
-          type="email"
-          outlined
-          dense
-          autocomplete="email"
-          :rules="[(val) => !!val || 'Email is required']"
-        />
-
-        <q-input
           v-model="password"
-          label="Password"
+          label="New Password"
           :type="showPassword ? 'text' : 'password'"
           outlined
           dense
-          autocomplete="off"
+          autocomplete="new-password"
           :rules="[(val) => !!val || 'Password is required']"
         >
           <template #append>
@@ -33,14 +23,7 @@
         </q-input>
 
         <div class="full-width">
-          <q-btn
-            color="primary"
-            label="Create User"
-            type="submit"
-            class="full-width"
-            :loading="submitting"
-            :disable="submitting"
-          />
+          <q-btn color="primary" label="Update Password" type="submit" class="full-width" />
         </div>
       </q-form>
 
@@ -54,41 +37,40 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUsersStore } from 'stores/users'
+import { supabase } from '../lib/supabase'
 
 const router = useRouter()
-const store = useUsersStore()
 
-const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const message = ref('')
 const messageClass = ref('text-positive')
-const submitting = ref(false)
 
 async function handleSubmit() {
-  if (submitting.value) {
-    return
-  }
-
-  if (!email.value.trim() || !password.value) {
-    message.value = 'Please fill in all required fields.'
+  if (!password.value) {
+    message.value = 'Please enter a new password.'
     messageClass.value = 'text-negative'
     return
   }
 
-  submitting.value = true
-  const result = await store.registerUser(email.value, password.value)
-
-  if (result) {
-    message.value = `User created for ${store.currentUser?.email}`
-    messageClass.value = 'text-positive'
-    router.push('/log')
-  } else {
-    message.value = store.error || 'Unable to save user.'
+  if (!supabase) {
+    message.value = 'Supabase client is not configured.'
     messageClass.value = 'text-negative'
+    return
   }
 
-  submitting.value = false
+  // The reset-password link from Supabase Auth signs the browser in with a
+  // recovery session before landing here, so updateUser() applies to that user.
+  const { error } = await supabase.auth.updateUser({ password: password.value })
+
+  if (error) {
+    message.value = error.message
+    messageClass.value = 'text-negative'
+    return
+  }
+
+  message.value = 'Password updated. Please log in.'
+  messageClass.value = 'text-positive'
+  setTimeout(() => router.push('/login'), 1500)
 }
 </script>
