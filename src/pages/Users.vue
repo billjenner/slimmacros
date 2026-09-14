@@ -18,7 +18,13 @@
       <q-list v-else bordered separator class="rounded-borders">
         <q-item v-for="user in store.users" :key="user.email" clickable>
           <q-item-section>
-            <q-item-label caption>{{ user.email }}</q-item-label>
+            <q-item-label caption>
+              {{ getProfile(user)?.fname }} {{ getProfile(user)?.lname }} | {{ user.email }} |
+              {{ getProfile(user)?.sex }} | {{ getProfile(user)?.age }} |
+              {{ roundWeight(getProfile(user)?.start_weight) }} |
+              {{ roundWeight(getProfile(user)?.goal_weight) }} |
+              {{ formatDate(getProfile(user)?.created_at) }}
+            </q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -33,11 +39,29 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useUsersStore } from 'stores/users'
+import { useProfilesStore } from 'stores/profiles'
 
 const store = useUsersStore()
+const profilesStore = useProfilesStore()
 
 function loadUsers() {
   store.loadUsers()
+  profilesStore.loadProfiles()
+}
+
+function getProfile(user) {
+  return profilesStore.profiles.find((profile) => profile.user_id === user.id)
+}
+
+function roundWeight(value) {
+  return value === null || value === undefined ? '' : Math.round(value)
+}
+
+function formatDate(value) {
+  if (!value) {
+    return ''
+  }
+  return new Date(value).toISOString().slice(0, 10)
 }
 
 onMounted(() => {
