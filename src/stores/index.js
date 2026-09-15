@@ -9,6 +9,12 @@ import { createPinia } from 'pinia'
  * async/await or return a Promise which resolves
  * with the Store instance.
  */
+console.log({
+  prod: import.meta.env.PROD,
+  dev: import.meta.env.DEV,
+  mode: import.meta.env.MODE,
+  nodeEnv: process.env.NODE_ENV,
+})
 
 export default defineStore((/* { ssrContext } */) => {
   const pinia = createPinia()
