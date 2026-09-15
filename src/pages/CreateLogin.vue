@@ -55,6 +55,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUsersStore } from 'stores/users'
+import { notifySuccess } from '../utils/notify'
 
 const router = useRouter()
 const store = useUsersStore()
@@ -82,8 +83,9 @@ async function handleSubmit() {
 
   if (result) {
     message.value = `User created for ${store.currentUser?.email}`
+    notifySuccess(`User created for ${store.currentUser?.email}`)
     messageClass.value = 'text-positive'
-    router.push('/log')
+    setTimeout(() => router.push('/login'), 2000)
   } else {
     message.value = store.error || 'Unable to save user.'
     messageClass.value = 'text-negative'

@@ -66,9 +66,12 @@
 
 <script setup>
 import { nextTick, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { supabase } from '../lib/supabase'
 import { useUsersStore } from 'stores/users'
+import { notifySuccess } from '../utils/notify'
 
+const router = useRouter()
 const store = useUsersStore()
 
 const formRef = ref(null)
@@ -140,6 +143,8 @@ async function handleSubmit() {
   formRef.value?.resetValidation()
   message.value = 'Password changed successfully.'
   messageClass.value = 'text-positive'
+  notifySuccess('Password changed successfully.')
   submitting.value = false
+  setTimeout(() => router.push('/login'), 2000)
 }
 </script>

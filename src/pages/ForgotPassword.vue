@@ -46,7 +46,9 @@ async function handleSubmit() {
     return
   }
 
-  const result = await store.recoverPassword(email.value)
+  const result = await store.recoverPassword(email.value, {
+    redirectTo: 'http://localhost:9000/reset-password',
+  })
 
   if (!result) {
     message.value = store.error || 'Unable to send password reset email right now.'
@@ -64,6 +66,6 @@ async function handleSubmit() {
       },
     ],
   })
-  setTimeout(() => router.push('/login'), 3000)
+  setTimeout(() => router.push('/login'), 2000)
 }
 </script>

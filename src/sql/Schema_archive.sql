@@ -20,8 +20,6 @@ CREATE TABLE public.users (
   password text NOT NULL,
   fname text NOT NULL DEFAULT '',
   lname text NOT NULL DEFAULT '',
-  sex text NOT NULL DEFAULT '',
-  age integer CHECK (age IS NULL OR age >= 0),
   is_active boolean NOT NULL DEFAULT true,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT users_pkey PRIMARY KEY (user_id)
@@ -77,9 +75,13 @@ CREATE TABLE public.profile (
 
     goal_weight numeric(6,2) CHECK (goal_weight >= 0),
 
+	sex text NOT NULL DEFAULT '',
+
+	age integer CHECK (age IS NULL OR age >= 0),
+
     height numeric(6,2) CHECK (height >= 0), 
 
-		activity_level public.activity_level,	
+	activity_level public.activity_level,	
 
     daily_calorie_deficit integer NOT NULL DEFAULT 0
         CHECK (daily_calorie_deficit >= 0),
@@ -311,6 +313,28 @@ CREATE INDEX workout_log_date_idx ON public.workout_log(date);
 CREATE INDEX weight_log_user_id_idx ON public.weight_log(user_id); 
 CREATE INDEX weight_log_date_idx ON public.weight_log(date);
 
+
+-- ============================================================ 
+-- Get Roles
+-- ============================================================ 
+SELECT
+    schemaname,
+    tablename,
+    policyname,
+    permissive,
+    roles,
+    cmd,
+    qual AS using_expression,
+    with_check AS check_expression
+FROM pg_policies
+WHERE schemaname = 'public'
+ORDER BY tablename, policyname;
+
+
+
+-- ============================================================ 
+-- Queries
+-- ============================================================ 
 select * from public.ue
 select * from public.profile
 select * from public.supplement
