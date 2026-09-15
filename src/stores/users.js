@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 
 const CURRENT_USER_STORAGE_KEY = 'slimmacros.currentUser'
 const USERS_LOGGED_IN_FUNCTION = 'users-logged-in'
+const appUrl = import.meta.env.VITE_APP_URL
 
 function normalizeEmail(email) {
   return String(email || '')
@@ -113,22 +114,27 @@ export const useUsersStore = defineStore('Users', {
       }
 
       const normalizedEmail = normalizeEmail(email)
-      // Path doesn't matter here: the app uses hash routing, so Supabase's own
-      // "#access_token=..." fragment would collide with a "/#/reset-password"
-      // route. The auth-redirect boot file routes to /reset-password once the
-      // PASSWORD_RECOVERY event fires.
-      const redirectTo = typeof window !== 'undefined' ? window.location.origin : undefined
 
-      // Supabase Auth hashes passwords, so we can no longer recover/email the
-      // original password. This sends a password-reset link instead.
-      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, { redirectTo })
+      // Use the production URL when deployed.
+      // Use localhost when running the development server.
+      const redirectTo = import.meta.env.PROD
+        ? `${appUrl}/#/reset-password`
+        : `${window.location.origin}/#/reset-password`
+
+      console.log('[recoverPassword] redirectTo:', redirectTo)
+
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+        redirectTo,
+      })
 
       if (error) {
         this.error = error.message
         return null
       }
 
-      return { email: normalizedEmail }
+      return {
+        email: normalizedEmail,
+      }
     },
 
     async loginUser(email, password) {
