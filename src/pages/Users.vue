@@ -39,18 +39,18 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useUsersStore } from 'stores/users'
-import { useProfilesStore } from 'stores/profiles'
+import { useProfileStore } from 'stores/profile'
 
 const store = useUsersStore()
-const profilesStore = useProfilesStore()
+const profileStore = useProfileStore()
 
 function loadUsers() {
   store.loadUsers()
-  profilesStore.loadProfiles()
+  profileStore.loadProfile()
 }
 
 function getProfile(user) {
-  return profilesStore.profiles.find((profile) => profile.user_id === user.id)
+  return profileStore.profile.find((profile) => profile.user_id === user.id)
 }
 
 function roundWeight(value) {

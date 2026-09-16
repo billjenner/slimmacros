@@ -1,9 +1,9 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
 
-export const useProfilesStore = defineStore('Profiles', {
+export const useProfileStore = defineStore('Profile', {
   state: () => ({
-    profiles: [],
+    profile: [],
     currentProfile: null,
     error: null,
     loading: false,
@@ -57,7 +57,7 @@ export const useProfilesStore = defineStore('Profiles', {
       }
     },
 
-    async loadProfiles() {
+    async loadProfile() {
       this.error = null
       this.loading = true
 
@@ -77,9 +77,9 @@ export const useProfilesStore = defineStore('Profiles', {
         return []
       }
 
-      this.profiles = data || []
+      this.profile = data || []
       this.loading = false
-      return this.profiles
+      return this.profile
     },
 
     async loadCurrentProfile(userId) {
@@ -136,13 +136,13 @@ export const useProfilesStore = defineStore('Profiles', {
       }
 
       this.currentProfile = data
-      this.profiles = this.profiles.filter((item) => item.user_id !== userId)
-      this.profiles.unshift(data)
+      this.profile = this.profile.filter((item) => item.user_id !== userId)
+      this.profile.unshift(data)
       return data
     },
   },
 })
 
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useProfilesStore, import.meta.hot))
+  import.meta.hot.accept(acceptHMRUpdate(useProfileStore, import.meta.hot))
 }

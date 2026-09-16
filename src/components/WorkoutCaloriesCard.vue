@@ -46,11 +46,11 @@
 <script setup>
 import { Chart } from 'chart.js/auto'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { useProfilesStore } from 'stores/profiles'
+import { useProfileStore } from 'stores/profile'
 import { useUsersStore } from 'stores/users'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
 
-const profilesStore = useProfilesStore()
+const profileStore = useProfileStore()
 const usersStore = useUsersStore()
 const workoutLogsStore = useWorkoutLogsStore()
 const workoutCaloriesChart = ref(null)
@@ -139,7 +139,7 @@ async function renderWorkoutChart() {
     workoutCaloriesByDay.value.map((day) => [day.date, day.caloriesBurned]),
   )
   const startDateString =
-    profilesStore.currentProfile?.created_at?.substring(0, 10) ?? workoutCaloriesByDay.value[0].date
+    profileStore.currentProfile?.created_at?.substring(0, 10) ?? workoutCaloriesByDay.value[0].date
   const [startYear, startMonth, startDay] = startDateString.split('-').map(Number)
   const currentDate = new Date(startYear, startMonth - 1, startDay)
   const today = new Date()

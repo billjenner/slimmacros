@@ -12,7 +12,7 @@
 import { watch } from 'vue'
 import { useUsersStore } from 'stores/users'
 import { useFoodLogsStore } from 'stores/food-logs'
-import { useProfilesStore } from 'stores/profiles'
+import { useProfileStore } from 'stores/profile'
 import { usesupplementsLogStore } from 'stores/supplements_log'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { useWeightLogsStore } from 'stores/weight-logs'
@@ -23,7 +23,7 @@ import WorkoutCaloriesCard from 'components/WorkoutCaloriesCard.vue'
 
 const usersStore = useUsersStore()
 const foodLogsStore = useFoodLogsStore()
-const profilesStore = useProfilesStore()
+const profileStore = useProfileStore()
 const supplementLogsStore = usesupplementsLogStore()
 const workoutLogsStore = useWorkoutLogsStore()
 const weightLogsStore = useWeightLogsStore()
@@ -36,7 +36,7 @@ watch(
       foodLogsStore.logs = []
       workoutLogsStore.logs = []
       supplementLogsStore.logs = []
-      profilesStore.currentProfile = null
+      profileStore.currentProfile = null
       return
     }
 
@@ -45,7 +45,7 @@ watch(
       foodLogsStore.loadFoodLogs(userId),
       workoutLogsStore.loadWorkoutLogs(userId),
       supplementLogsStore.loadSupplementLogs(userId),
-      profilesStore.loadCurrentProfile(userId),
+      profileStore.loadCurrentProfile(userId),
     ])
   },
   { immediate: true },

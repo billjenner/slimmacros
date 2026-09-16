@@ -133,8 +133,8 @@
     <q-footer class="bg-primary text-white q-pa-sm">
       <div class="row items-center justify-end">
         <div v-if="usersStore.currentUser && usersStore.currentUser.email">
-          Current User: {{ profilesStore.currentProfile?.fname }}
-          {{ profilesStore.currentProfile?.lname }} - {{ usersStore.currentUser.email }}
+          Current User: {{ profileStore.currentProfile?.fname }}
+          {{ profileStore.currentProfile?.lname }} - {{ usersStore.currentUser.email }}
         </div>
         <div v-else class="text-caption">Not logged in</div>
       </div>
@@ -164,23 +164,23 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsersStore } from 'stores/users'
-import { useProfilesStore } from 'stores/profiles'
+import { useProfileStore } from 'stores/profile'
 
 const $q = useQuasar()
 const route = useRoute()
 const hoveredPath = ref(null)
 const usersStore = useUsersStore()
-const profilesStore = useProfilesStore()
+const profileStore = useProfileStore()
 const router = useRouter()
 const leftDrawerOpen = ref(false)
 const deferredInstallPrompt = ref(null)
 const showInstallDialog = ref(false)
 
 const userInitials = computed(() => {
-  const firstInitial = String(profilesStore.currentProfile?.fname || '')
+  const firstInitial = String(profileStore.currentProfile?.fname || '')
     .trim()
     .charAt(0)
-  const lastInitial = String(profilesStore.currentProfile?.lname || '')
+  const lastInitial = String(profileStore.currentProfile?.lname || '')
     .trim()
     .charAt(0)
 
@@ -266,7 +266,7 @@ onMounted(() => {
   window.addEventListener('appinstalled', handleAppInstalled)
 
   if (usersStore.currentUser?.user_id) {
-    profilesStore.loadCurrentProfile(usersStore.currentUser.user_id)
+    profileStore.loadCurrentProfile(usersStore.currentUser.user_id)
   }
 })
 
@@ -274,9 +274,9 @@ watch(
   () => usersStore.currentUser?.user_id,
   (userId) => {
     if (userId) {
-      profilesStore.loadCurrentProfile(userId)
+      profileStore.loadCurrentProfile(userId)
     } else {
-      profilesStore.currentProfile = null
+      profileStore.currentProfile = null
     }
   },
 )

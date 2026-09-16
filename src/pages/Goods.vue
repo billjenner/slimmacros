@@ -15,7 +15,7 @@
             <q-tab name="food" label="Food" />
             <q-tab name="workouts" label="Workouts" />
             <q-tab name="supplements" label="Supplements" />
-            <q-tab name="profiles" label="Profiles" />
+            <q-tab name="profile" label="Profile" />
           </q-tabs>
 
           <q-separator class="q-my-md" />
@@ -30,8 +30,8 @@
             <q-tab-panel name="supplements" class="q-pa-none">
               <supplements-page embedded />
             </q-tab-panel>
-            <q-tab-panel name="profiles" class="q-pa-none">
-              <profiles-page embedded />
+            <q-tab-panel name="profile" class="q-pa-none">
+              <profile-page embedded />
             </q-tab-panel>
           </q-tab-panels>
         </q-card>
@@ -41,11 +41,43 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import FoodPage from 'pages/Food.vue'
-import ProfilesPage from 'pages/Profiles.vue'
+import ProfilePage from 'src/pages/Profile.vue'
 import SupplementsPage from 'pages/Supplements.vue'
 import WorkoutsPage from 'pages/Workouts.vue'
 
-const activeTab = ref('food')
+const route = useRoute()
+const router = useRouter()
+const validTabs = ['food', 'workouts', 'supplements', 'profile']
+const activeTab = ref(getTabFromQuery(route.query.tab))
+
+function getTabFromQuery(tab) {
+  return validTabs.includes(tab) ? tab : 'food'
+}
+
+watch(activeTab, (tab) => {
+  const nextQuery = { ...route.query }
+
+  if (tab === 'food') {
+    delete nextQuery.tab
+  } else {
+    nextQuery.tab = tab
+  }
+
+  if (route.query.tab !== nextQuery.tab) {
+    router.replace({ query: nextQuery })
+  }
+})
+
+watch(
+  () => route.query.tab,
+  (tab) => {
+    const nextTab = getTabFromQuery(tab)
+    if (activeTab.value !== nextTab) {
+      activeTab.value = nextTab
+    }
+  },
+)
 </script>

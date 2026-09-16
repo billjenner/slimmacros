@@ -9,7 +9,7 @@
           :class="!embedded ? 'q-pa-md' : ''"
         >
           <div class="row items-center justify-between q-mb-md">
-            <div class="text-h5">Profiles</div>
+            <div class="text-h5">Profile</div>
             <q-btn to="/change-password" label="Change Password" color="secondary" flat />
           </div>
 
@@ -212,7 +212,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
-import { useProfilesStore } from 'stores/profiles'
+import { useProfileStore } from 'stores/profile'
 import { calculateBodyMassIndex, calculateTotalDailyCalories } from '../utils/rules'
 import { notifySuccess } from '../utils/notify'
 import macroTemplates from '../components/macros.json'
@@ -225,7 +225,7 @@ defineProps({
 })
 
 const usersStore = useUsersStore()
-const store = useProfilesStore()
+const store = useProfileStore()
 const $q = useQuasar()
 const loading = ref(false)
 

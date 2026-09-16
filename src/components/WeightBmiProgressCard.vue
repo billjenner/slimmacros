@@ -43,11 +43,11 @@
 <script setup>
 import { Chart } from 'chart.js/auto'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { useProfilesStore } from 'stores/profiles'
+import { useProfileStore } from 'stores/profile'
 import { useUsersStore } from 'stores/users'
 import { useWeightLogsStore } from 'stores/weight-logs'
 
-const profilesStore = useProfilesStore()
+const profileStore = useProfileStore()
 const usersStore = useUsersStore()
 const weightLogsStore = useWeightLogsStore()
 const weightLogChart = ref(null)
@@ -119,8 +119,8 @@ const aveWeightLoss30Days = computed(() => calculateAveWeightLoss(30))
 const aveWeightLoss7Days = computed(() => calculateAveWeightLoss(7))
 
 const weightAxisBounds = computed(() => {
-  const min = Number(profilesStore.currentProfile?.goal_weight)
-  const startWeight = Number(profilesStore.currentProfile?.start_weight)
+  const min = Number(profileStore.currentProfile?.goal_weight)
+  const startWeight = Number(profileStore.currentProfile?.start_weight)
   const max = startWeight + 5
 
   if (!Number.isFinite(min) || !Number.isFinite(max) || min >= max) {

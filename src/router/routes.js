@@ -93,14 +93,14 @@ const routes = [
         },
       },
       {
-        path: 'profiles',
-        component: () => import('pages/Profiles.vue'),
+        path: 'profile',
+        component: () => import('src/pages/Profile.vue'),
         meta: {
           requiresAuth: true,
           seo: {
-            title: 'Profiles',
+            title: 'Profile',
             description: 'Create and manage your Slim Macros profile.',
-            canonicalPath: '/profiles',
+            canonicalPath: '/profile',
           },
         },
       },

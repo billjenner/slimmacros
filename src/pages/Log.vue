@@ -331,10 +331,11 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
+import { useRoute, useRouter } from 'vue-router'
 import { useUsersStore } from 'stores/users'
 import { useFoodStore } from 'stores/food'
 import { useFoodLogsStore } from 'stores/food-logs'
-import { useProfilesStore } from 'stores/profiles'
+import { useProfileStore } from 'stores/profile'
 import { useWorkoutsStore } from 'stores/workouts'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { usesupplementsStore } from 'stores/supplements'
@@ -353,18 +354,49 @@ import { notifySuccess } from '../utils/notify'
 const usersStore = useUsersStore()
 const foodStore = useFoodStore()
 const foodLogsStore = useFoodLogsStore()
-const profilesStore = useProfilesStore()
+const profileStore = useProfileStore()
 const workoutsStore = useWorkoutsStore()
 const workoutLogsStore = useWorkoutLogsStore()
 const supplementsStore = usesupplementsStore()
 const supplementLogsStore = usesupplementsLogStore()
 const weightLogsStore = useWeightLogsStore()
 const $q = useQuasar()
-const activeTab = ref('food')
+const route = useRoute()
+const router = useRouter()
+const validTabs = ['food', 'workouts', 'supplements', 'weight']
+const activeTab = ref(getTabFromQuery(route.query.tab))
 const isFoodLogExpanded = ref(true)
 const isChartBudgetExpanded = ref(false)
 const includeSharedFood = ref(false)
 const selectedFoodLogDate = ref(getCurrentLocalDate())
+
+function getTabFromQuery(tab) {
+  return validTabs.includes(tab) ? tab : 'food'
+}
+
+watch(activeTab, (tab) => {
+  const nextQuery = { ...route.query }
+
+  if (tab === 'food') {
+    delete nextQuery.tab
+  } else {
+    nextQuery.tab = tab
+  }
+
+  if (route.query.tab !== nextQuery.tab) {
+    router.replace({ query: nextQuery })
+  }
+})
+
+watch(
+  () => route.query.tab,
+  (tab) => {
+    const nextTab = getTabFromQuery(tab)
+    if (activeTab.value !== nextTab) {
+      activeTab.value = nextTab
+    }
+  },
+)
 
 function getCurrentLocalDateTime() {
   const now = new Date()
@@ -689,7 +721,7 @@ const selectedSupplement = computed(() => {
   )
 })
 
-const currentProfile = computed(() => profilesStore.currentProfile || null)
+const currentProfile = computed(() => profileStore.currentProfile || null)
 
 const totalDailyCalories = computed(() => {
   const selectedDateKey = selectedFoodLogDate.value || getCurrentLocalDate()
@@ -924,7 +956,7 @@ watch(
 
     foodStore.food = []
     foodLogsStore.logs = []
-    profilesStore.currentProfile = null
+    profileStore.currentProfile = null
     workoutsStore.workouts = []
     workoutLogsStore.logs = []
     supplementsStore.supplements = []
@@ -978,7 +1010,7 @@ async function loadDataForUser(userId) {
   await Promise.all([
     foodStore.loadFood(userId),
     foodLogsStore.loadFoodLogs(userId),
-    profilesStore.loadCurrentProfile(userId),
+    profileStore.loadCurrentProfile(userId),
     workoutsStore.loadWorkouts(userId),
     workoutLogsStore.loadWorkoutLogs(userId),
     supplementsStore.loadSupplements(userId),

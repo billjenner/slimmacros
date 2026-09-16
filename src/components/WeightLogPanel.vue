@@ -131,14 +131,14 @@
 <script setup>
 import { computed, reactive, ref } from 'vue'
 import { useQuasar } from 'quasar'
-import { useProfilesStore } from 'stores/profiles'
+import { useProfileStore } from 'stores/profile'
 import { useUsersStore } from 'stores/users'
 import { useWeightLogsStore } from 'stores/weight-logs'
 import { calculateBodyMassIndex } from '../utils/rules'
 import { notifySuccess } from '../utils/notify'
 
 const usersStore = useUsersStore()
-const profilesStore = useProfilesStore()
+const profileStore = useProfileStore()
 const weightLogsStore = useWeightLogsStore()
 const $q = useQuasar()
 const weightLog = reactive({ weight: '', date: currentDate() })
@@ -151,7 +151,7 @@ function currentDate() {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 }
 
-const currentProfile = computed(() => profilesStore.currentProfile || null)
+const currentProfile = computed(() => profileStore.currentProfile || null)
 
 const weightLogsSortedByDate = computed(() => {
   return [...(weightLogsStore.logs || [])]

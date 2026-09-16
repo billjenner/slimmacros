@@ -46,11 +46,11 @@
 <script setup>
 import { Chart } from 'chart.js/auto'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { useProfilesStore } from 'stores/profiles'
+import { useProfileStore } from 'stores/profile'
 import { usesupplementsLogStore } from 'stores/supplements_log'
 import { useUsersStore } from 'stores/users'
 
-const profilesStore = useProfilesStore()
+const profileStore = useProfileStore()
 const supplementLogsStore = usesupplementsLogStore()
 const usersStore = useUsersStore()
 const supplementCountChart = ref(null)
@@ -137,10 +137,10 @@ async function renderSupplementChart() {
   const supplementByDate = Object.fromEntries(
     supplementCountsByDay.value.map((day) => [day.date, day.supplementCount]),
   )
-  const firstDate = new Date(profilesStore.currentProfile?.created_at)
+  const firstDate = new Date(profileStore.currentProfile?.created_at)
 
   if (Number.isNaN(firstDate.getTime())) {
-    console.error('Invalid profile creation date:', profilesStore.currentProfile?.created_at)
+    console.error('Invalid profile creation date:', profileStore.currentProfile?.created_at)
     return
   }
 
