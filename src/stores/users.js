@@ -62,6 +62,7 @@ export const useUsersStore = defineStore('Users', {
     currentUser: getPersistedCurrentUser(),
     answers: [],
     error: null,
+    isOffline: false,
   }),
 
   actions: {
@@ -263,27 +264,37 @@ export const useUsersStore = defineStore('Users', {
 
       if (!supabase) {
         this.error = 'Supabase client is not configured.'
+        this.isOffline = true
         return []
       }
 
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser()
+      try {
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser()
 
-      if (error) {
-        this.error = error.message
+        if (error) {
+          this.error = error.message
+          this.isOffline = true
+          return []
+        }
+
+        this.isOffline = false
+
+        if (user) {
+          const formatted = formatAuthUser(user)
+          this.users = [formatted]
+          return this.users
+        }
+
+        this.users = []
+        return []
+      } catch (error) {
+        this.error = error?.message || 'Unable to connect to Supabase.'
+        this.isOffline = true
         return []
       }
-
-      if (user) {
-        const formatted = formatAuthUser(user)
-        this.users = [formatted]
-        return this.users
-      }
-
-      this.users = []
-      return []
     },
 
     async clearCurrentUser() {

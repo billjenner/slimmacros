@@ -11,6 +11,15 @@
         {{ store.error }}
       </div>
 
+      <q-banner
+        v-if="store.isOffline || profileStore.isOffline"
+        class="bg-warning text-dark q-mb-sm"
+        rounded
+      >
+        No data connection. User sign-on status is temporarily offline. Try again when a connection
+        is available.
+      </q-banner>
+
       <div v-if="!store.users.length" class="text-center text-grey-7">
         No users yet. Create one from the login page or click Load users.
       </div>
@@ -29,8 +38,14 @@
         </q-item>
       </q-list>
 
-      <div v-if="store.currentUser" class="q-mt-md text-center text-caption text-positive">
+      <div
+        v-if="store.currentUser && !store.isOffline"
+        class="q-mt-md text-center text-caption text-positive"
+      >
         Current user: {{ store.currentUser.email }}
+      </div>
+      <div v-else-if="store.currentUser" class="q-mt-md text-center text-caption text-warning">
+        Current user: offline
       </div>
     </q-card>
   </q-page>

@@ -7,6 +7,7 @@ export const useProfileStore = defineStore('Profile', {
     currentProfile: null,
     error: null,
     loading: false,
+    isOffline: false,
   }),
 
   actions: {
@@ -63,23 +64,33 @@ export const useProfileStore = defineStore('Profile', {
 
       if (!supabase) {
         this.error = 'Supabase client is not configured.'
+        this.isOffline = true
         this.loading = false
         return []
       }
 
-      const { data, error } = await supabase.from('profile').select('*').order('created_at', {
-        ascending: false,
-      })
+      try {
+        const { data, error } = await supabase.from('profile').select('*').order('created_at', {
+          ascending: false,
+        })
 
-      if (error) {
-        this.error = error.message
+        if (error) {
+          this.error = error.message
+          this.isOffline = true
+          this.loading = false
+          return []
+        }
+
+        this.isOffline = false
+        this.profile = data || []
+        this.loading = false
+        return this.profile
+      } catch (error) {
+        this.error = error?.message || 'Unable to connect to Supabase.'
+        this.isOffline = true
         this.loading = false
         return []
       }
-
-      this.profile = data || []
-      this.loading = false
-      return this.profile
     },
 
     async loadCurrentProfile(userId) {
@@ -87,6 +98,7 @@ export const useProfileStore = defineStore('Profile', {
 
       if (!supabase) {
         this.error = 'Supabase client is not configured.'
+        this.isOffline = true
         return null
       }
 
@@ -95,19 +107,27 @@ export const useProfileStore = defineStore('Profile', {
         return null
       }
 
-      const { data, error } = await supabase
-        .from('profile')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle()
+      try {
+        const { data, error } = await supabase
+          .from('profile')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle()
 
-      if (error) {
-        this.error = error.message
+        if (error) {
+          this.error = error.message
+          this.isOffline = true
+          return null
+        }
+
+        this.isOffline = false
+        this.currentProfile = data || null
+        return this.currentProfile
+      } catch (error) {
+        this.error = error?.message || 'Unable to connect to Supabase.'
+        this.isOffline = true
         return null
       }
-
-      this.currentProfile = data || null
-      return this.currentProfile
     },
 
     async saveProfile(userId, profile = {}) {
