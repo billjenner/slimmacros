@@ -62,9 +62,10 @@ const foodCaloriesByDay = computed(() => {
     }
 
     if (!totals[date]) {
-      totals[date] = { proteinCalories: 0, carbCalories: 0, fatCalories: 0 }
+      totals[date] = { proteinCalories: 0, carbCalories: 0, fatCalories: 0, entryCount: 0 }
     }
 
+    totals[date].entryCount += 1
     totals[date].proteinCalories += (Number(food.protein) || 0) * servings * 4
     totals[date].carbCalories += (Number(food.carb) || 0) * servings * 4
     totals[date].fatCalories += (Number(food.fat) || 0) * servings * 9
@@ -73,6 +74,7 @@ const foodCaloriesByDay = computed(() => {
 
   return Object.entries(caloriesByDay)
     .map(([date, calories]) => ({ date, ...calories }))
+    .filter((day) => day.entryCount >= 3)
     .sort((leftDay, rightDay) => leftDay.date.localeCompare(rightDay.date))
 })
 

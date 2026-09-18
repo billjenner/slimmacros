@@ -156,6 +156,21 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <q-dialog v-model="showSignOutDialog">
+      <q-card style="min-width: 320px; max-width: 420px">
+        <q-card-section>
+          <div class="text-h6">Sign out?</div>
+        </q-card-section>
+
+        <q-card-section>Are you sure you want to sign out?</q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" @click="showSignOutDialog = false" />
+          <q-btn color="negative" label="Sign out" @click="confirmSignOut" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-layout>
 </template>
 
@@ -175,6 +190,7 @@ const router = useRouter()
 const leftDrawerOpen = ref(false)
 const deferredInstallPrompt = ref(null)
 const showInstallDialog = ref(false)
+const showSignOutDialog = ref(false)
 
 const userInitials = computed(() => {
   const firstInitial = String(profileStore.currentProfile?.fname || '')
@@ -203,6 +219,11 @@ async function navigate(path) {
 }
 
 async function signOut() {
+  showSignOutDialog.value = true
+}
+
+async function confirmSignOut() {
+  showSignOutDialog.value = false
   await usersStore.logoutUser()
   router.push('/login')
 }
