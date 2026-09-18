@@ -11,14 +11,7 @@
         {{ store.error }}
       </div>
 
-      <q-banner
-        v-if="store.isOffline || profileStore.isOffline"
-        class="bg-warning text-dark q-mb-sm"
-        rounded
-      >
-        No data connection. User sign-on status is temporarily offline. Try again when a connection
-        is available.
-      </q-banner>
+      <OfflineConnectionCard v-model="showOfflineDialog" />
 
       <div v-if="!store.users.length" class="text-center text-grey-7">
         No users yet. Create one from the login page or click Load users.
@@ -52,12 +45,14 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
 import { useProfileStore } from 'stores/profile'
+import OfflineConnectionCard from 'components/OfflineConnectionCard.vue'
 
 const store = useUsersStore()
 const profileStore = useProfileStore()
+const showOfflineDialog = ref(false)
 
 function loadUsers() {
   store.loadUsers()
@@ -78,6 +73,15 @@ function formatDate(value) {
   }
   return new Date(value).toISOString().slice(0, 10)
 }
+
+watch(
+  () => store.isOffline || profileStore.isOffline,
+  (isOffline) => {
+    if (isOffline) {
+      showOfflineDialog.value = true
+    }
+  },
+)
 
 onMounted(() => {
   loadUsers()

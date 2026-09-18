@@ -56,6 +56,11 @@ function formatAuthUser(authUser) {
   }
 }
 
+function isConnectionError(error) {
+  const message = String(error?.message || error || '').toLowerCase()
+  return message.includes('failed to fetch') || message.includes('networkerror')
+}
+
 export const useUsersStore = defineStore('Users', {
   state: () => ({
     users: [],
@@ -144,33 +149,42 @@ export const useUsersStore = defineStore('Users', {
 
       if (!supabase) {
         this.error = 'Supabase client is not configured.'
+        this.isOffline = true
         return null
       }
 
-      const normalizedEmail = normalizeEmail(email)
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: normalizedEmail,
-        password,
-      })
+      try {
+        const normalizedEmail = normalizeEmail(email)
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: normalizedEmail,
+          password,
+        })
 
-      if (signInError) {
-        this.error = signInError.message
+        if (signInError) {
+          this.error = signInError.message
+          this.isOffline = isConnectionError(signInError)
+          return null
+        }
+
+        const authUser = signInData?.user
+        if (!authUser) {
+          this.error = 'No account found for that email.'
+          return null
+        }
+
+        const savedUser = formatAuthUser(authUser)
+        this.currentUser = savedUser
+        this.users = this.users.filter((u) => u.email !== normalizedEmail)
+        this.users.push(savedUser)
+        persistCurrentUser(savedUser)
+        this.isOffline = false
+        await this.syncLoggedInSession(normalizedEmail, true)
+        return savedUser
+      } catch (error) {
+        this.error = isConnectionError(error) ? 'Unable to connect to Supabase.' : error?.message
+        this.isOffline = isConnectionError(error)
         return null
       }
-
-      const authUser = signInData?.user
-      if (!authUser) {
-        this.error = 'No account found for that email.'
-        return null
-      }
-
-      const savedUser = formatAuthUser(authUser)
-      this.currentUser = savedUser
-      this.users = this.users.filter((u) => u.email !== normalizedEmail)
-      this.users.push(savedUser)
-      persistCurrentUser(savedUser)
-      await this.syncLoggedInSession(normalizedEmail, true)
-      return savedUser
     },
 
     async restoreSessionFromAuth() {

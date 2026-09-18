@@ -53,13 +53,16 @@
         {{ message }}
       </div>
     </q-card>
+
+    <OfflineConnectionCard v-model="showOfflineDialog" />
   </q-page>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsersStore } from 'stores/users'
+import OfflineConnectionCard from 'components/OfflineConnectionCard.vue'
 
 const email = ref('')
 const password = ref('')
@@ -67,6 +70,7 @@ const showPassword = ref(false)
 const message = ref('')
 const messageClass = ref('text-positive')
 const submitting = ref(false)
+const showOfflineDialog = ref(false)
 
 const router = useRouter()
 const route = useRoute()
@@ -92,10 +96,24 @@ async function handleSubmit() {
     const redirectPath = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
     router.push(redirectPath)
   } else {
-    message.value = store.error || 'Unable to log in.'
+    if (store.isOffline) {
+      message.value = 'No data connection.'
+      showOfflineDialog.value = true
+    } else {
+      message.value = store.error || 'Unable to log in.'
+    }
     messageClass.value = 'text-negative'
   }
 
   submitting.value = false
 }
+
+watch(
+  () => store.isOffline,
+  (isOffline) => {
+    if (isOffline) {
+      showOfflineDialog.value = true
+    }
+  },
+)
 </script>
