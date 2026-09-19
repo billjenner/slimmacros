@@ -20,20 +20,22 @@
                 v-model="startDate"
                 type="date"
                 label="Start Date"
+                class="export-date"
                 filled
                 dense
-                style="width: 160px"
+                style="width: 140px"
               />
             </div>
 
-            <div class="col-auto q-ml-xl">
+            <div class="col-auto">
               <q-input
                 v-model="endDate"
                 type="date"
                 label="End Date"
+                class="export-date"
                 filled
                 dense
-                style="width: 160px"
+                style="width: 140px"
               />
             </div>
           </div>
@@ -999,6 +1001,9 @@ async function exportWeightPdf() {
 </script>
 <style scoped>
 .export-btn {
+  font-size: 12px;
+}
+.export-date {
   font-size: 12px;
 }
 </style>
