@@ -171,6 +171,8 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <OfflineConnectionCard v-model="showOfflineDialog" />
   </q-layout>
 </template>
 
@@ -180,6 +182,7 @@ import { useQuasar } from 'quasar'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsersStore } from 'stores/users'
 import { useProfileStore } from 'stores/profile'
+import OfflineConnectionCard from 'components/OfflineConnectionCard.vue'
 
 const $q = useQuasar()
 const route = useRoute()
@@ -191,6 +194,7 @@ const leftDrawerOpen = ref(false)
 const deferredInstallPrompt = ref(null)
 const showInstallDialog = ref(false)
 const showSignOutDialog = ref(false)
+const showOfflineDialog = ref(false)
 
 const userInitials = computed(() => {
   const firstInitial = String(profileStore.currentProfile?.fname || '')
@@ -298,6 +302,15 @@ watch(
       profileStore.loadCurrentProfile(userId)
     } else {
       profileStore.currentProfile = null
+    }
+  },
+)
+
+watch(
+  () => usersStore.isOffline,
+  (isOffline) => {
+    if (isOffline) {
+      showOfflineDialog.value = true
     }
   },
 )
