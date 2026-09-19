@@ -14,7 +14,7 @@
         </q-banner>
 
         <template v-else>
-          <div class="row q-col-gutter-md q-my-md">
+          <div class="row q-col-gutter-md q-ma-md">
             <div class="col-12 col-md-6">
               <q-input v-model="startDate" type="date" label="Start Date" filled dense />
             </div>
@@ -25,22 +25,44 @@
           <br />
           <hr />
           <div class="row items-center justify-between q-mt-md">
-            <q-checkbox v-model="includeSupplementLog" label="Supplement Log" />
+            <q-checkbox v-model="includeFoodLog" label="Food Log" />
             <div class="row q-gutter-sm">
               <q-btn
                 color="secondary"
                 label="Export CSV"
-                :loading="exportingCsv"
-                :disable="!includeSupplementLog"
-                @click="exportCsv"
+                :loading="exportingFoodCsv"
+                :disable="!includeFoodLog"
+                @click="exportFoodCsv"
               />
 
               <q-btn
                 color="secondary"
                 label="Export PDF"
-                :loading="exportingPdf"
-                :disable="!includeSupplementLog"
-                @click="exportPdf"
+                :loading="exportingFoodPdf"
+                :disable="!includeFoodLog"
+                @click="exportFoodPdf"
+              />
+            </div>
+          </div>
+
+          <q-separator class="q-my-md" />
+          <div class="row items-center justify-between q-mt-md">
+            <q-checkbox v-model="includeWorkoutLog" label="Workout Log" />
+            <div class="row q-gutter-sm">
+              <q-btn
+                color="secondary"
+                label="Export CSV"
+                :loading="exportingWorkoutCsv"
+                :disable="!includeWorkoutLog"
+                @click="exportWorkoutCsv"
+              />
+
+              <q-btn
+                color="secondary"
+                label="Export PDF"
+                :loading="exportingWorkoutPdf"
+                :disable="!includeWorkoutLog"
+                @click="exportWorkoutPdf"
               />
             </div>
           </div>
@@ -69,47 +91,23 @@
           </div>
 
           <q-separator class="q-my-md" />
-
           <div class="row items-center justify-between q-mt-md">
-            <q-checkbox v-model="includeWorkoutLog" label="Workout Log" />
+            <q-checkbox v-model="includeSupplementLog" label="Supplement Log" />
             <div class="row q-gutter-sm">
               <q-btn
                 color="secondary"
                 label="Export CSV"
-                :loading="exportingWorkoutCsv"
-                :disable="!includeWorkoutLog"
-                @click="exportWorkoutCsv"
+                :loading="exportingSupplimentLogCsv"
+                :disable="!includeSupplementLog"
+                @click="exportSupplimentCsv"
               />
 
               <q-btn
                 color="secondary"
                 label="Export PDF"
-                :loading="exportingWorkoutPdf"
-                :disable="!includeWorkoutLog"
-                @click="exportWorkoutPdf"
-              />
-            </div>
-          </div>
-
-          <q-separator class="q-my-md" />
-
-          <div class="row items-center justify-between q-mt-md">
-            <q-checkbox v-model="includeFoodLog" label="Food Log" />
-            <div class="row q-gutter-sm">
-              <q-btn
-                color="secondary"
-                label="Export CSV"
-                :loading="exportingFoodCsv"
-                :disable="!includeFoodLog"
-                @click="exportFoodCsv"
-              />
-
-              <q-btn
-                color="secondary"
-                label="Export PDF"
-                :loading="exportingFoodPdf"
-                :disable="!includeFoodLog"
-                @click="exportFoodPdf"
+                :loading="exportingPdf"
+                :disable="!includeSupplementLog"
+                @click="exportSupplimentPdf"
               />
             </div>
           </div>
@@ -144,7 +142,7 @@ const includeWeightLog = ref(true)
 const includeWorkoutLog = ref(true)
 const includeFoodLog = ref(true)
 
-const exportingCsv = ref(false)
+const exportingSupplimentLogCsv = ref(false)
 const exportingPdf = ref(false)
 const exportingWeightCsv = ref(false)
 const exportingWeightPdf = ref(false)
@@ -195,551 +193,25 @@ function toCsvField(value) {
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text
 }
 
-function buildSupplementLogCsv(rows) {
-  const lines = ['DESCRIPTION, SERVINGS, SERV. TYPE, DATE']
-
-  for (const row of rows) {
-    const description = row.supplement?.description || ''
-    const servings = Number(row.servings) || 0
-    const servingUnit = row.supplement?.serving_unit || ''
-    const date = row.date || ''
-
-    lines.push(
-      [
-        toCsvField(description),
-        toCsvField(servings.toFixed(2)),
-        toCsvField(servingUnit),
-        toCsvField(date),
-      ].join(','),
-    )
-  }
-
-  return lines.join('\n')
+function formatDateOnly(value) {
+  return value ? String(value).slice(0, 10) : ''
 }
 
-function downloadCsv(filename, content) {
-  const blob = new Blob([content], {
-    type: 'text/csv;charset=utf-8;',
-  })
-
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-
-  link.href = url
-  link.download = filename
-  link.click()
-
-  URL.revokeObjectURL(url)
-}
-
-async function exportCsv() {
-  if (!usersStore.currentUser?.user_id) {
-    $q.notify({
-      color: 'negative',
-      textColor: 'white',
-      message: 'No current user is available.',
-    })
-
-    return
+function formatDateTime(value) {
+  if (!value) {
+    return ''
   }
 
-  if (!includeSupplementLog.value) {
-    return
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    return String(value)
   }
 
-  exportingCsv.value = true
-
-  try {
-    const rows = await supplementLogsStore.fetchSupplementLogsForExport(
-      usersStore.currentUser.user_id,
-      startDate.value,
-      endDate.value,
-    )
-
-    if (supplementLogsStore.error) {
-      $q.notify({
-        color: 'negative',
-        textColor: 'white',
-        message: supplementLogsStore.error,
-      })
-
-      return
-    }
-
-    const fname = properCase(profileStore.currentProfile?.fname)
-    const lname = properCase(profileStore.currentProfile?.lname)
-
-    const filename = `${fname}${lname}_SupplementLogs_${timestampForFilename()}.csv`
-
-    downloadCsv(filename, buildSupplementLogCsv(rows))
-  } finally {
-    exportingCsv.value = false
-  }
-}
-
-async function exportPdf() {
-  if (!usersStore.currentUser?.user_id) {
-    $q.notify({
-      color: 'negative',
-      textColor: 'white',
-      message: 'No current user is available.',
-    })
-    return
-  }
-
-  if (!includeSupplementLog.value) {
-    return
-  }
-
-  exportingPdf.value = true
-
-  try {
-    const rows = await supplementLogsStore.fetchSupplementLogsForExport(
-      usersStore.currentUser.user_id,
-      startDate.value,
-      endDate.value,
-    )
-
-    if (supplementLogsStore.error) {
-      $q.notify({
-        color: 'negative',
-        textColor: 'white',
-        message: supplementLogsStore.error,
-      })
-      return
-    }
-
-    const fname = properCase(profileStore.currentProfile?.fname)
-    const lname = properCase(profileStore.currentProfile?.lname)
-
-    const filename = `${fname}${lname}_SupplementLogs_${timestampForFilename()}.pdf`
-
-    const doc = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'letter',
-    })
-
-    // Title
-    doc.setFontSize(16)
-    doc.setFont('helvetica', 'bold')
-    doc.text(`${fname} ${lname}`, 14, 18)
-
-    // Report title
-    doc.setFontSize(12)
-    doc.setFont('helvetica', 'normal')
-    doc.text('Supplement Log', 14, 26)
-
-    // Date range
-    doc.setFontSize(10)
-    doc.text(`Date Range: ${startDate.value} through ${endDate.value}`, 14, 33)
-
-    // Prepare table data
-    const tableRows = rows.map((row) => {
-      const description = row.supplement?.description || ''
-      const servings = Number(row.servings) || 0
-      const servingUnit = row.supplement?.serving_unit || ''
-      const date = row.date || ''
-
-      return [description, servings.toFixed(2), servingUnit, date]
-    })
-
-    // Generate table
-    autoTable(doc, {
-      startY: 40,
-
-      head: [['DESCRIPTION', 'SERVINGS', 'SERV. TYPE', 'DATE']],
-
-      body: tableRows,
-
-      theme: 'grid',
-
-      styles: {
-        fontSize: 9,
-        cellPadding: 3,
-      },
-
-      headStyles: {
-        fillColor: [25, 118, 210],
-        textColor: 255,
-        fontStyle: 'bold',
-      },
-
-      columnStyles: {
-        0: {
-          cellWidth: 75,
-        },
-        1: {
-          cellWidth: 25,
-          halign: 'right',
-        },
-        2: {
-          cellWidth: 35,
-        },
-        3: {
-          cellWidth: 40,
-        },
-      },
-
-      margin: {
-        left: 14,
-        right: 14,
-      },
-    })
-
-    // Download
-    doc.save(filename)
-  } finally {
-    exportingPdf.value = false
-  }
-}
-
-function buildWeightLogCsv(rows) {
-  const lines = ['WEIGHT, BMI, DATE']
-
-  for (const row of rows) {
-    const weight = Number(row.weight) || 0
-    const bmi = Number(row.bmi) || 0
-    const date = row.date || ''
-
-    lines.push(
-      [toCsvField(weight.toFixed(2)), toCsvField(bmi.toFixed(2)), toCsvField(date)].join(','),
-    )
-  }
-
-  return lines.join('\n')
-}
-
-async function exportWeightCsv() {
-  if (!usersStore.currentUser?.user_id) {
-    $q.notify({
-      color: 'negative',
-      textColor: 'white',
-      message: 'No current user is available.',
-    })
-
-    return
-  }
-
-  if (!includeWeightLog.value) {
-    return
-  }
-
-  exportingWeightCsv.value = true
-
-  try {
-    const rows = await weightLogsStore.fetchWeightLogsForExport(
-      usersStore.currentUser.user_id,
-      startDate.value,
-      endDate.value,
-    )
-
-    if (weightLogsStore.error) {
-      $q.notify({
-        color: 'negative',
-        textColor: 'white',
-        message: weightLogsStore.error,
-      })
-
-      return
-    }
-
-    const fname = properCase(profileStore.currentProfile?.fname)
-    const lname = properCase(profileStore.currentProfile?.lname)
-
-    const filename = `${fname}${lname}_WeightLogs_${timestampForFilename()}.csv`
-
-    downloadCsv(filename, buildWeightLogCsv(rows))
-  } finally {
-    exportingWeightCsv.value = false
-  }
-}
-
-async function exportWeightPdf() {
-  if (!usersStore.currentUser?.user_id) {
-    $q.notify({
-      color: 'negative',
-      textColor: 'white',
-      message: 'No current user is available.',
-    })
-    return
-  }
-
-  if (!includeWeightLog.value) {
-    return
-  }
-
-  exportingWeightPdf.value = true
-
-  try {
-    const rows = await weightLogsStore.fetchWeightLogsForExport(
-      usersStore.currentUser.user_id,
-      startDate.value,
-      endDate.value,
-    )
-
-    if (weightLogsStore.error) {
-      $q.notify({
-        color: 'negative',
-        textColor: 'white',
-        message: weightLogsStore.error,
-      })
-      return
-    }
-
-    const fname = properCase(profileStore.currentProfile?.fname)
-    const lname = properCase(profileStore.currentProfile?.lname)
-
-    const filename = `${fname}${lname}_WeightLogs_${timestampForFilename()}.pdf`
-
-    const doc = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'letter',
-    })
-
-    doc.setFontSize(16)
-    doc.setFont('helvetica', 'bold')
-    doc.text(`${fname} ${lname}`, 14, 18)
-
-    doc.setFontSize(12)
-    doc.setFont('helvetica', 'normal')
-    doc.text('Weight Log', 14, 26)
-
-    doc.setFontSize(10)
-    doc.text(`Date Range: ${startDate.value} through ${endDate.value}`, 14, 33)
-
-    const tableRows = rows.map((row) => {
-      const weight = Number(row.weight) || 0
-      const bmi = Number(row.bmi) || 0
-      const date = row.date || ''
-
-      return [weight.toFixed(2), bmi.toFixed(2), date]
-    })
-
-    autoTable(doc, {
-      startY: 40,
-
-      head: [['WEIGHT', 'BMI', 'DATE']],
-
-      body: tableRows,
-
-      theme: 'grid',
-
-      styles: {
-        fontSize: 9,
-        cellPadding: 3,
-      },
-
-      headStyles: {
-        fillColor: [25, 118, 210],
-        textColor: 255,
-        fontStyle: 'bold',
-      },
-
-      columnStyles: {
-        0: {
-          cellWidth: 40,
-          halign: 'right',
-        },
-        1: {
-          cellWidth: 40,
-          halign: 'right',
-        },
-        2: {
-          cellWidth: 40,
-        },
-      },
-
-      margin: {
-        left: 14,
-        right: 14,
-      },
-    })
-
-    doc.save(filename)
-  } finally {
-    exportingWeightPdf.value = false
-  }
-}
-
-function buildWorkoutLogCsv(rows) {
-  const lines = ['DESCRIPTION, W. O. TIME, CALORIES BURNED, DATE']
-
-  for (const row of rows) {
-    const description = row.workout?.type || ''
-    const workoutTime = Number(row.workout_time) || 0
-    const caloriesBurned = Number(row.calories_burned) || 0
-    const date = row.date || ''
-
-    lines.push(
-      [
-        toCsvField(description),
-        toCsvField(workoutTime),
-        toCsvField(caloriesBurned),
-        toCsvField(date),
-      ].join(','),
-    )
-  }
-
-  return lines.join('\n')
-}
-
-async function exportWorkoutCsv() {
-  if (!usersStore.currentUser?.user_id) {
-    $q.notify({
-      color: 'negative',
-      textColor: 'white',
-      message: 'No current user is available.',
-    })
-
-    return
-  }
-
-  if (!includeWorkoutLog.value) {
-    return
-  }
-
-  exportingWorkoutCsv.value = true
-
-  try {
-    const rows = await workoutLogsStore.fetchWorkoutLogsForExport(
-      usersStore.currentUser.user_id,
-      startDate.value,
-      endDate.value,
-    )
-
-    if (workoutLogsStore.error) {
-      $q.notify({
-        color: 'negative',
-        textColor: 'white',
-        message: workoutLogsStore.error,
-      })
-
-      return
-    }
-
-    const fname = properCase(profileStore.currentProfile?.fname)
-    const lname = properCase(profileStore.currentProfile?.lname)
-
-    const filename = `${fname}${lname}_WorkoutLogs_${timestampForFilename()}.csv`
-
-    downloadCsv(filename, buildWorkoutLogCsv(rows))
-  } finally {
-    exportingWorkoutCsv.value = false
-  }
-}
-
-async function exportWorkoutPdf() {
-  if (!usersStore.currentUser?.user_id) {
-    $q.notify({
-      color: 'negative',
-      textColor: 'white',
-      message: 'No current user is available.',
-    })
-    return
-  }
-
-  if (!includeWorkoutLog.value) {
-    return
-  }
-
-  exportingWorkoutPdf.value = true
-
-  try {
-    const rows = await workoutLogsStore.fetchWorkoutLogsForExport(
-      usersStore.currentUser.user_id,
-      startDate.value,
-      endDate.value,
-    )
-
-    if (workoutLogsStore.error) {
-      $q.notify({
-        color: 'negative',
-        textColor: 'white',
-        message: workoutLogsStore.error,
-      })
-      return
-    }
-
-    const fname = properCase(profileStore.currentProfile?.fname)
-    const lname = properCase(profileStore.currentProfile?.lname)
-
-    const filename = `${fname}${lname}_WorkoutLogs_${timestampForFilename()}.pdf`
-
-    const doc = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'letter',
-    })
-
-    doc.setFontSize(16)
-    doc.setFont('helvetica', 'bold')
-    doc.text(`${fname} ${lname}`, 14, 18)
-
-    doc.setFontSize(12)
-    doc.setFont('helvetica', 'normal')
-    doc.text('Workout Log', 14, 26)
-
-    doc.setFontSize(10)
-    doc.text(`Date Range: ${startDate.value} through ${endDate.value}`, 14, 33)
-
-    const tableRows = rows.map((row) => {
-      const description = row.workout?.type || ''
-      const workoutTime = Number(row.workout_time) || 0
-      const caloriesBurned = Number(row.calories_burned) || 0
-      const date = row.date || ''
-
-      return [description, workoutTime, caloriesBurned, date]
-    })
-
-    autoTable(doc, {
-      startY: 40,
-
-      head: [['DESCRIPTION', 'W. O. TIME', 'CALORIES BURNED', 'DATE']],
-
-      body: tableRows,
-
-      theme: 'grid',
-
-      styles: {
-        fontSize: 9,
-        cellPadding: 3,
-      },
-
-      headStyles: {
-        fillColor: [25, 118, 210],
-        textColor: 255,
-        fontStyle: 'bold',
-      },
-
-      columnStyles: {
-        0: {
-          cellWidth: 65,
-        },
-        1: {
-          cellWidth: 35,
-          halign: 'right',
-        },
-        2: {
-          cellWidth: 45,
-          halign: 'right',
-        },
-        3: {
-          cellWidth: 40,
-        },
-      },
-
-      margin: {
-        left: 14,
-        right: 14,
-      },
-    })
-
-    doc.save(filename)
-  } finally {
-    exportingWorkoutPdf.value = false
-  }
+  const pad = (part) => String(part).padStart(2, '0')
+
+  return `${parsed.getFullYear()}-${pad(parsed.getMonth() + 1)}-${pad(parsed.getDate())} ${pad(
+    parsed.getHours(),
+  )}:${pad(parsed.getMinutes())}`
 }
 
 function computeFoodLogValues(row) {
@@ -759,7 +231,7 @@ function computeFoodLogValues(row) {
     protein,
     carb,
     fat,
-    datetime: row.datetime || '',
+    datetime: formatDateTime(row.datetime),
   }
 }
 
@@ -953,6 +425,553 @@ async function exportFoodPdf() {
     doc.save(filename)
   } finally {
     exportingFoodPdf.value = false
+  }
+}
+
+function buildWorkoutLogCsv(rows) {
+  const lines = ['DESCRIPTION, W. O. TIME, CALORIES BURNED, DATE']
+
+  for (const row of rows) {
+    const description = row.workout?.type || ''
+    const workoutTime = Number(row.workout_time) || 0
+    const caloriesBurned = Number(row.calories_burned) || 0
+    const date = formatDateOnly(row.date)
+
+    lines.push(
+      [
+        toCsvField(description),
+        toCsvField(workoutTime),
+        toCsvField(caloriesBurned),
+        toCsvField(date),
+      ].join(','),
+    )
+  }
+
+  return lines.join('\n')
+}
+
+async function exportWorkoutCsv() {
+  if (!usersStore.currentUser?.user_id) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      message: 'No current user is available.',
+    })
+
+    return
+  }
+
+  if (!includeWorkoutLog.value) {
+    return
+  }
+
+  exportingWorkoutCsv.value = true
+
+  try {
+    const rows = await workoutLogsStore.fetchWorkoutLogsForExport(
+      usersStore.currentUser.user_id,
+      startDate.value,
+      endDate.value,
+    )
+
+    if (workoutLogsStore.error) {
+      $q.notify({
+        color: 'negative',
+        textColor: 'white',
+        message: workoutLogsStore.error,
+      })
+
+      return
+    }
+
+    const fname = properCase(profileStore.currentProfile?.fname)
+    const lname = properCase(profileStore.currentProfile?.lname)
+
+    const filename = `${fname}${lname}_WorkoutLogs_${timestampForFilename()}.csv`
+
+    downloadCsv(filename, buildWorkoutLogCsv(rows))
+  } finally {
+    exportingWorkoutCsv.value = false
+  }
+}
+
+async function exportWorkoutPdf() {
+  if (!usersStore.currentUser?.user_id) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      message: 'No current user is available.',
+    })
+    return
+  }
+
+  if (!includeWorkoutLog.value) {
+    return
+  }
+
+  exportingWorkoutPdf.value = true
+
+  try {
+    const rows = await workoutLogsStore.fetchWorkoutLogsForExport(
+      usersStore.currentUser.user_id,
+      startDate.value,
+      endDate.value,
+    )
+
+    if (workoutLogsStore.error) {
+      $q.notify({
+        color: 'negative',
+        textColor: 'white',
+        message: workoutLogsStore.error,
+      })
+      return
+    }
+
+    const fname = properCase(profileStore.currentProfile?.fname)
+    const lname = properCase(profileStore.currentProfile?.lname)
+
+    const filename = `${fname}${lname}_WorkoutLogs_${timestampForFilename()}.pdf`
+
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'letter',
+    })
+
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text(`${fname} ${lname}`, 14, 18)
+
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Workout Log', 14, 26)
+
+    doc.setFontSize(10)
+    doc.text(`Date Range: ${startDate.value} through ${endDate.value}`, 14, 33)
+
+    const tableRows = rows.map((row) => {
+      const description = row.workout?.type || ''
+      const workoutTime = Number(row.workout_time) || 0
+      const caloriesBurned = Number(row.calories_burned) || 0
+      const date = formatDateOnly(row.date)
+
+      return [description, workoutTime, caloriesBurned, date]
+    })
+
+    autoTable(doc, {
+      startY: 40,
+
+      head: [['DESCRIPTION', 'W. O. TIME', 'CALORIES BURNED', 'DATE']],
+
+      body: tableRows,
+
+      theme: 'grid',
+
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+      },
+
+      headStyles: {
+        fillColor: [25, 118, 210],
+        textColor: 255,
+        fontStyle: 'bold',
+      },
+
+      columnStyles: {
+        0: {
+          cellWidth: 65,
+        },
+        1: {
+          cellWidth: 35,
+          halign: 'right',
+        },
+        2: {
+          cellWidth: 45,
+          halign: 'right',
+        },
+        3: {
+          cellWidth: 40,
+        },
+      },
+
+      margin: {
+        left: 14,
+        right: 14,
+      },
+    })
+
+    doc.save(filename)
+  } finally {
+    exportingWorkoutPdf.value = false
+  }
+}
+
+function buildSupplementLogCsv(rows) {
+  const lines = ['DESCRIPTION, SERVINGS, SERV. TYPE, DATE']
+
+  for (const row of rows) {
+    const description = row.supplement?.description || ''
+    const servings = Number(row.servings) || 0
+    const servingUnit = row.supplement?.serving_unit || ''
+    const date = formatDateOnly(row.date)
+
+    lines.push(
+      [
+        toCsvField(description),
+        toCsvField(servings.toFixed(2)),
+        toCsvField(servingUnit),
+        toCsvField(date),
+      ].join(','),
+    )
+  }
+
+  return lines.join('\n')
+}
+
+function downloadCsv(filename, content) {
+  const blob = new Blob([content], {
+    type: 'text/csv;charset=utf-8;',
+  })
+
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+
+  link.href = url
+  link.download = filename
+  link.click()
+
+  URL.revokeObjectURL(url)
+}
+
+async function exportSupplimentCsv() {
+  if (!usersStore.currentUser?.user_id) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      message: 'No current user is available.',
+    })
+
+    return
+  }
+
+  if (!includeSupplementLog.value) {
+    return
+  }
+
+  exportingSupplimentLogCsv.value = true
+
+  try {
+    const rows = await supplementLogsStore.fetchSupplementLogsForExport(
+      usersStore.currentUser.user_id,
+      startDate.value,
+      endDate.value,
+    )
+
+    if (supplementLogsStore.error) {
+      $q.notify({
+        color: 'negative',
+        textColor: 'white',
+        message: supplementLogsStore.error,
+      })
+
+      return
+    }
+
+    const fname = properCase(profileStore.currentProfile?.fname)
+    const lname = properCase(profileStore.currentProfile?.lname)
+
+    const filename = `${fname}${lname}_SupplementLogs_${timestampForFilename()}.csv`
+
+    downloadCsv(filename, buildSupplementLogCsv(rows))
+  } finally {
+    exportingSupplimentLogCsv.value = false
+  }
+}
+
+async function exportPdf() {
+  if (!usersStore.currentUser?.user_id) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      message: 'No current user is available.',
+    })
+    return
+  }
+
+  if (!includeSupplementLog.value) {
+    return
+  }
+
+  exportingPdf.value = true
+
+  try {
+    const rows = await supplementLogsStore.fetchSupplementLogsForExport(
+      usersStore.currentUser.user_id,
+      startDate.value,
+      endDate.value,
+    )
+
+    if (supplementLogsStore.error) {
+      $q.notify({
+        color: 'negative',
+        textColor: 'white',
+        message: supplementLogsStore.error,
+      })
+      return
+    }
+
+    const fname = properCase(profileStore.currentProfile?.fname)
+    const lname = properCase(profileStore.currentProfile?.lname)
+
+    const filename = `${fname}${lname}_SupplementLogs_${timestampForFilename()}.pdf`
+
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'letter',
+    })
+
+    // Title
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text(`${fname} ${lname}`, 14, 18)
+
+    // Report title
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Supplement Log', 14, 26)
+
+    // Date range
+    doc.setFontSize(10)
+    doc.text(`Date Range: ${startDate.value} through ${endDate.value}`, 14, 33)
+
+    // Prepare table data
+    const tableRows = rows.map((row) => {
+      const description = row.supplement?.description || ''
+      const servings = Number(row.servings) || 0
+      const servingUnit = row.supplement?.serving_unit || ''
+      const date = formatDateOnly(row.date)
+
+      return [description, servings.toFixed(2), servingUnit, date]
+    })
+
+    // Generate table
+    autoTable(doc, {
+      startY: 40,
+
+      head: [['DESCRIPTION', 'SERVINGS', 'SERV. TYPE', 'DATE']],
+
+      body: tableRows,
+
+      theme: 'grid',
+
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+      },
+
+      headStyles: {
+        fillColor: [25, 118, 210],
+        textColor: 255,
+        fontStyle: 'bold',
+      },
+
+      columnStyles: {
+        0: {
+          cellWidth: 75,
+        },
+        1: {
+          cellWidth: 25,
+          halign: 'right',
+        },
+        2: {
+          cellWidth: 35,
+        },
+        3: {
+          cellWidth: 40,
+        },
+      },
+
+      margin: {
+        left: 14,
+        right: 14,
+      },
+    })
+
+    // Download
+    doc.save(filename)
+  } finally {
+    exportingPdf.value = false
+  }
+}
+
+function buildWeightLogCsv(rows) {
+  const lines = ['WEIGHT, BMI, DATE']
+
+  for (const row of rows) {
+    const weight = Number(row.weight) || 0
+    const bmi = Number(row.bmi) || 0
+    const date = formatDateOnly(row.date)
+
+    lines.push(
+      [toCsvField(weight.toFixed(2)), toCsvField(bmi.toFixed(2)), toCsvField(date)].join(','),
+    )
+  }
+
+  return lines.join('\n')
+}
+
+async function exportWeightCsv() {
+  if (!usersStore.currentUser?.user_id) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      message: 'No current user is available.',
+    })
+
+    return
+  }
+
+  if (!includeWeightLog.value) {
+    return
+  }
+
+  exportingWeightCsv.value = true
+
+  try {
+    const rows = await weightLogsStore.fetchWeightLogsForExport(
+      usersStore.currentUser.user_id,
+      startDate.value,
+      endDate.value,
+    )
+
+    if (weightLogsStore.error) {
+      $q.notify({
+        color: 'negative',
+        textColor: 'white',
+        message: weightLogsStore.error,
+      })
+
+      return
+    }
+
+    const fname = properCase(profileStore.currentProfile?.fname)
+    const lname = properCase(profileStore.currentProfile?.lname)
+
+    const filename = `${fname}${lname}_WeightLogs_${timestampForFilename()}.csv`
+
+    downloadCsv(filename, buildWeightLogCsv(rows))
+  } finally {
+    exportingWeightCsv.value = false
+  }
+}
+
+async function exportWeightPdf() {
+  if (!usersStore.currentUser?.user_id) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      message: 'No current user is available.',
+    })
+    return
+  }
+
+  if (!includeWeightLog.value) {
+    return
+  }
+
+  exportingWeightPdf.value = true
+
+  try {
+    const rows = await weightLogsStore.fetchWeightLogsForExport(
+      usersStore.currentUser.user_id,
+      startDate.value,
+      endDate.value,
+    )
+
+    if (weightLogsStore.error) {
+      $q.notify({
+        color: 'negative',
+        textColor: 'white',
+        message: weightLogsStore.error,
+      })
+      return
+    }
+
+    const fname = properCase(profileStore.currentProfile?.fname)
+    const lname = properCase(profileStore.currentProfile?.lname)
+
+    const filename = `${fname}${lname}_WeightLogs_${timestampForFilename()}.pdf`
+
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'letter',
+    })
+
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text(`${fname} ${lname}`, 14, 18)
+
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Weight Log', 14, 26)
+
+    doc.setFontSize(10)
+    doc.text(`Date Range: ${startDate.value} through ${endDate.value}`, 14, 33)
+
+    const tableRows = rows.map((row) => {
+      const weight = Number(row.weight) || 0
+      const bmi = Number(row.bmi) || 0
+      const date = formatDateOnly(row.date)
+
+      return [weight.toFixed(2), bmi.toFixed(2), date]
+    })
+
+    autoTable(doc, {
+      startY: 40,
+
+      head: [['WEIGHT', 'BMI', 'DATE']],
+
+      body: tableRows,
+
+      theme: 'grid',
+
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+      },
+
+      headStyles: {
+        fillColor: [25, 118, 210],
+        textColor: 255,
+        fontStyle: 'bold',
+      },
+
+      columnStyles: {
+        0: {
+          cellWidth: 40,
+          halign: 'right',
+        },
+        1: {
+          cellWidth: 40,
+          halign: 'right',
+        },
+        2: {
+          cellWidth: 40,
+        },
+      },
+
+      margin: {
+        left: 14,
+        right: 14,
+      },
+    })
+
+    doc.save(filename)
+  } finally {
+    exportingWeightPdf.value = false
   }
 }
 </script>
