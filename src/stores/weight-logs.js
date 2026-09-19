@@ -137,6 +137,35 @@ export const useWeightLogsStore = defineStore('WeightLogs', {
       }
     },
 
+    async fetchWeightLogsForExport(userId, startDate, endDate) {
+      this.error = null
+
+      if (!supabase) {
+        this.error = 'Supabase client is not configured.'
+        return []
+      }
+
+      if (!userId) {
+        this.error = 'No current user is available.'
+        return []
+      }
+
+      const { data, error } = await supabase
+        .from('weight_log')
+        .select('weight_log_id, weight, bmi, date')
+        .eq('user_id', userId)
+        .gte('date', startDate)
+        .lte('date', endDate)
+        .order('date', { ascending: false })
+
+      if (error) {
+        this.error = error.message
+        return []
+      }
+
+      return data || []
+    },
+
     async deleteWeightLog(userId, weightLogId) {
       this.error = null
       this.loading = true

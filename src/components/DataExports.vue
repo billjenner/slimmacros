@@ -14,7 +14,7 @@
         </q-banner>
 
         <template v-else>
-          <div class="row q-col-gutter-md">
+          <div class="row q-col-gutter-md q-my-md">
             <div class="col-12 col-md-6">
               <q-input v-model="startDate" type="date" label="Start Date" filled dense />
             </div>
@@ -22,7 +22,8 @@
               <q-input v-model="endDate" type="date" label="End Date" filled dense />
             </div>
           </div>
-
+          <br />
+          <hr />
           <div class="row items-center justify-between q-mt-md">
             <q-checkbox v-model="includeSupplementLog" label="Supplement Log" />
             <div class="row q-gutter-sm">
@@ -43,6 +44,29 @@
               />
             </div>
           </div>
+
+          <q-separator class="q-my-md" />
+
+          <div class="row items-center justify-between q-mt-md">
+            <q-checkbox v-model="includeWeightLog" label="Weight Log" />
+            <div class="row q-gutter-sm">
+              <q-btn
+                color="secondary"
+                label="Export CSV"
+                :loading="exportingWeightCsv"
+                :disable="!includeWeightLog"
+                @click="exportWeightCsv"
+              />
+
+              <q-btn
+                color="secondary"
+                label="Export PDF"
+                :loading="exportingWeightPdf"
+                :disable="!includeWeightLog"
+                @click="exportWeightPdf"
+              />
+            </div>
+          </div>
         </template>
       </q-card-section>
     </q-expansion-item>
@@ -56,17 +80,22 @@ import { ref } from 'vue'
 import { useQuasar } from 'quasar'
 import { useProfileStore } from 'stores/profile'
 import { usesupplementsLogStore } from 'stores/supplements_log'
+import { useWeightLogsStore } from 'stores/weight-logs'
 import { useUsersStore } from 'stores/users'
 
 const profileStore = useProfileStore()
 const supplementLogsStore = usesupplementsLogStore()
+const weightLogsStore = useWeightLogsStore()
 const usersStore = useUsersStore()
 const $q = useQuasar()
 
 const includeSupplementLog = ref(true)
+const includeWeightLog = ref(true)
 
 const exportingCsv = ref(false)
 const exportingPdf = ref(false)
+const exportingWeightCsv = ref(false)
+const exportingWeightPdf = ref(false)
 
 function formatDate(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
@@ -306,6 +335,175 @@ async function exportPdf() {
     doc.save(filename)
   } finally {
     exportingPdf.value = false
+  }
+}
+
+function buildWeightLogCsv(rows) {
+  const lines = ['WEIGHT, BMI, DATE']
+
+  for (const row of rows) {
+    const weight = Number(row.weight) || 0
+    const bmi = Number(row.bmi) || 0
+    const date = row.date || ''
+
+    lines.push(
+      [toCsvField(weight.toFixed(2)), toCsvField(bmi.toFixed(2)), toCsvField(date)].join(','),
+    )
+  }
+
+  return lines.join('\n')
+}
+
+async function exportWeightCsv() {
+  if (!usersStore.currentUser?.user_id) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      message: 'No current user is available.',
+    })
+
+    return
+  }
+
+  if (!includeWeightLog.value) {
+    return
+  }
+
+  exportingWeightCsv.value = true
+
+  try {
+    const rows = await weightLogsStore.fetchWeightLogsForExport(
+      usersStore.currentUser.user_id,
+      startDate.value,
+      endDate.value,
+    )
+
+    if (weightLogsStore.error) {
+      $q.notify({
+        color: 'negative',
+        textColor: 'white',
+        message: weightLogsStore.error,
+      })
+
+      return
+    }
+
+    const fname = properCase(profileStore.currentProfile?.fname)
+    const lname = properCase(profileStore.currentProfile?.lname)
+
+    const filename = `${fname}${lname}_WeightLogs_${timestampForFilename()}.csv`
+
+    downloadCsv(filename, buildWeightLogCsv(rows))
+  } finally {
+    exportingWeightCsv.value = false
+  }
+}
+
+async function exportWeightPdf() {
+  if (!usersStore.currentUser?.user_id) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      message: 'No current user is available.',
+    })
+    return
+  }
+
+  if (!includeWeightLog.value) {
+    return
+  }
+
+  exportingWeightPdf.value = true
+
+  try {
+    const rows = await weightLogsStore.fetchWeightLogsForExport(
+      usersStore.currentUser.user_id,
+      startDate.value,
+      endDate.value,
+    )
+
+    if (weightLogsStore.error) {
+      $q.notify({
+        color: 'negative',
+        textColor: 'white',
+        message: weightLogsStore.error,
+      })
+      return
+    }
+
+    const fname = properCase(profileStore.currentProfile?.fname)
+    const lname = properCase(profileStore.currentProfile?.lname)
+
+    const filename = `${fname}${lname}_WeightLogs_${timestampForFilename()}.pdf`
+
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'letter',
+    })
+
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text(`${fname} ${lname}`, 14, 18)
+
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Weight Log', 14, 26)
+
+    doc.setFontSize(10)
+    doc.text(`Date Range: ${startDate.value} through ${endDate.value}`, 14, 33)
+
+    const tableRows = rows.map((row) => {
+      const weight = Number(row.weight) || 0
+      const bmi = Number(row.bmi) || 0
+      const date = row.date || ''
+
+      return [weight.toFixed(2), bmi.toFixed(2), date]
+    })
+
+    autoTable(doc, {
+      startY: 40,
+
+      head: [['WEIGHT', 'BMI', 'DATE']],
+
+      body: tableRows,
+
+      theme: 'grid',
+
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+      },
+
+      headStyles: {
+        fillColor: [25, 118, 210],
+        textColor: 255,
+        fontStyle: 'bold',
+      },
+
+      columnStyles: {
+        0: {
+          cellWidth: 40,
+          halign: 'right',
+        },
+        1: {
+          cellWidth: 40,
+          halign: 'right',
+        },
+        2: {
+          cellWidth: 40,
+        },
+      },
+
+      margin: {
+        left: 14,
+        right: 14,
+      },
+    })
+
+    doc.save(filename)
+  } finally {
+    exportingWeightPdf.value = false
   }
 }
 </script>
