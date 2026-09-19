@@ -226,7 +226,7 @@ function computeFoodLogValues(row) {
   return {
     description: food.description || '',
     servings,
-    servingSize: food.serving_size ?? '',
+    servingSize: `${food.serving_unit || ''}(${food.serving_size ?? ''})`,
     calories,
     protein,
     carb,
@@ -689,7 +689,7 @@ async function exportSupplimentCsv() {
   }
 }
 
-async function exportPdf() {
+async function exportSupplimentPdf() {
   if (!usersStore.currentUser?.user_id) {
     $q.notify({
       color: 'negative',

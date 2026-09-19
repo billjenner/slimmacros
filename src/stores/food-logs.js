@@ -153,7 +153,8 @@ export const useFoodLogsStore = defineStore('FoodLogs', {
           carb,
           fat,
           calories_extra,
-          serving_size
+          serving_size,
+          serving_unit
         )
       `,
         )
