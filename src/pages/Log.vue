@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page>
     <div class="row justify-center">
       <div class="col-12 col-md-10 col-lg-8">
         <q-card flat bordered class="q-pa-md">
@@ -165,6 +165,7 @@
 
                 <div v-show="isChartBudgetExpanded">
                   <div class="row items-center q-px-md q-py-sm">
+                    <div class="col text-subtitle2 text-center">{{ selectedFoodLogDayOfWeek }}</div>
                     <div class="row items-center no-wrap q-gutter-xs">
                       <q-btn flat dense type="button" label="<" @click="goToPreviousFoodLogDate" />
                       <q-input
@@ -176,11 +177,6 @@
                       />
                       <q-btn flat dense type="button" label=">" @click="goToNextFoodLogDate" />
                     </div>
-                    <div class="col text-subtitle2 text-center">{{ selectedFoodLogDayOfWeek }}</div>
-
-                    <q-chip :color="weightChangeChip.color" text-color="white" square>
-                      {{ weightChangeChip.label }}
-                    </q-chip>
                   </div>
                   <q-markup-table flat bordered dense separator="horizontal">
                     <tbody>
@@ -256,6 +252,9 @@
               <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
                 <div class="row items-center justify-between q-px-md q-py-sm">
                   <div class="text-subtitle1">Logged Food</div>
+                  <q-chip :color="weightChangeChip.color" text-color="white" square>
+                    {{ weightChangeChip.label }}
+                  </q-chip>
                 </div>
 
                 <q-table
