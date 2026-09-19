@@ -14,22 +14,38 @@
         </q-banner>
 
         <template v-else>
-          <div class="row q-col-gutter-md q-ma-md">
-            <div class="col-12 col-md-6">
-              <q-input v-model="startDate" type="date" label="Start Date" filled dense />
+          <div class="row q-col-gutter-md justify-center">
+            <div class="col-auto">
+              <q-input
+                v-model="startDate"
+                type="date"
+                label="Start Date"
+                filled
+                dense
+                style="width: 160px"
+              />
             </div>
-            <div class="col-12 col-md-6">
-              <q-input v-model="endDate" type="date" label="End Date" filled dense />
+
+            <div class="col-auto q-ml-xl">
+              <q-input
+                v-model="endDate"
+                type="date"
+                label="End Date"
+                filled
+                dense
+                style="width: 160px"
+              />
             </div>
           </div>
           <br />
           <hr />
-          <div class="row items-center justify-between q-mt-md q-px-md">
+          <div class="row items-center justify-between q-mt-md">
             <q-checkbox v-model="includeFoodLog" label="Food Log" />
             <div class="row q-gutter-sm">
               <q-btn
                 color="secondary"
                 label="Export CSV"
+                class="export-btn"
                 :loading="exportingFoodCsv"
                 :disable="!includeFoodLog"
                 @click="exportFoodCsv"
@@ -38,6 +54,7 @@
               <q-btn
                 color="secondary"
                 label="Export PDF"
+                class="export-btn"
                 :loading="exportingFoodPdf"
                 :disable="!includeFoodLog"
                 @click="exportFoodPdf"
@@ -46,12 +63,13 @@
           </div>
 
           <q-separator class="q-my-md" />
-          <div class="row items-center justify-between q-mt-md q-px-md">
+          <div class="row items-center justify-between q-mt-md">
             <q-checkbox v-model="includeWorkoutLog" label="Workout Log" />
             <div class="row q-gutter-sm">
               <q-btn
                 color="secondary"
                 label="Export CSV"
+                class="export-btn"
                 :loading="exportingWorkoutCsv"
                 :disable="!includeWorkoutLog"
                 @click="exportWorkoutCsv"
@@ -60,6 +78,7 @@
               <q-btn
                 color="secondary"
                 label="Export PDF"
+                class="export-btn"
                 :loading="exportingWorkoutPdf"
                 :disable="!includeWorkoutLog"
                 @click="exportWorkoutPdf"
@@ -69,12 +88,13 @@
 
           <q-separator class="q-my-md" />
 
-          <div class="row items-center justify-between q-mt-md q-px-md">
+          <div class="row items-center justify-between q-mt-md">
             <q-checkbox v-model="includeWeightLog" label="Weight Log" />
             <div class="row q-gutter-sm">
               <q-btn
                 color="secondary"
                 label="Export CSV"
+                class="export-btn"
                 :loading="exportingWeightCsv"
                 :disable="!includeWeightLog"
                 @click="exportWeightCsv"
@@ -83,6 +103,7 @@
               <q-btn
                 color="secondary"
                 label="Export PDF"
+                class="export-btn"
                 :loading="exportingWeightPdf"
                 :disable="!includeWeightLog"
                 @click="exportWeightPdf"
@@ -91,12 +112,13 @@
           </div>
 
           <q-separator class="q-my-md" />
-          <div class="row items-center justify-between q-mt-md q-px-md">
+          <div class="row items-center justify-between q-mt-md">
             <q-checkbox v-model="includeSupplementLog" label="Supplement Log" />
             <div class="row q-gutter-sm">
               <q-btn
                 color="secondary"
                 label="Export CSV"
+                class="export-btn"
                 :loading="exportingSupplimentLogCsv"
                 :disable="!includeSupplementLog"
                 @click="exportSupplimentCsv"
@@ -105,6 +127,7 @@
               <q-btn
                 color="secondary"
                 label="Export PDF"
+                class="export-btn"
                 :loading="exportingPdf"
                 :disable="!includeSupplementLog"
                 @click="exportSupplimentPdf"
@@ -975,3 +998,8 @@ async function exportWeightPdf() {
   }
 }
 </script>
+<style scoped>
+.export-btn {
+  font-size: 12px;
+}
+</style>
