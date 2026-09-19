@@ -175,6 +175,47 @@ export const usesupplementsLogStore = defineStore('supplementsLog', {
       }
     },
 
+    async fetchSupplementLogsForExport(userId, startDate, endDate) {
+      this.error = null
+
+      if (!supabase) {
+        this.error = 'Supabase client is not configured.'
+        return []
+      }
+
+      if (!userId) {
+        this.error = 'No current user is available.'
+        return []
+      }
+
+      const { data, error } = await supabase
+        .from('supplement_log')
+        .select(
+          `
+        supplement_log_id,
+        supplement_id,
+        user_id,
+        servings,
+        date,
+        supplement:supplement_id (
+          description,
+          serving_unit
+        )
+      `,
+        )
+        .eq('user_id', userId)
+        .gte('date', startDate)
+        .lte('date', endDate)
+        .order('date', { ascending: true })
+
+      if (error) {
+        this.error = error.message
+        return []
+      }
+
+      return data || []
+    },
+
     async deleteSupplementLog(userId, supplementLogId) {
       this.error = null
       this.loading = true

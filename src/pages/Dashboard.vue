@@ -5,6 +5,7 @@
     <food-calories-card />
     <workout-calories-card />
     <supplement-count-card />
+    <data-exports />
   </q-page>
 </template>
 
@@ -20,6 +21,7 @@ import FoodCaloriesCard from 'components/FoodCaloriesCard.vue'
 import SupplementCountCard from 'components/SupplementCountCard.vue'
 import WeightBmiProgressCard from 'components/WeightBmiProgressCard.vue'
 import WorkoutCaloriesCard from 'components/WorkoutCaloriesCard.vue'
+import DataExports from 'components/DataExports.vue'
 
 const usersStore = useUsersStore()
 const foodLogsStore = useFoodLogsStore()
