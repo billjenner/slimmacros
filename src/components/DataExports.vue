@@ -87,31 +87,6 @@
           </div>
 
           <q-separator class="q-my-md" />
-
-          <div class="row items-center justify-between q-mt-md">
-            <q-checkbox v-model="includeWeightLog" label="Weight Log" />
-            <div class="row q-gutter-sm">
-              <q-btn
-                color="secondary"
-                label="Export CSV"
-                class="export-btn"
-                :loading="exportingWeightCsv"
-                :disable="!includeWeightLog"
-                @click="exportWeightCsv"
-              />
-
-              <q-btn
-                color="secondary"
-                label="Export PDF"
-                class="export-btn"
-                :loading="exportingWeightPdf"
-                :disable="!includeWeightLog"
-                @click="exportWeightPdf"
-              />
-            </div>
-          </div>
-
-          <q-separator class="q-my-md" />
           <div class="row items-center justify-between q-mt-md">
             <q-checkbox v-model="includeSupplementLog" label="Supplement Log" />
             <div class="row q-gutter-sm">
@@ -131,6 +106,30 @@
                 :loading="exportingPdf"
                 :disable="!includeSupplementLog"
                 @click="exportSupplimentPdf"
+              />
+            </div>
+          </div>
+
+          <q-separator class="q-my-md" />
+          <div class="row items-center justify-between q-mt-md">
+            <q-checkbox v-model="includeWeightLog" label="Weight Log" />
+            <div class="row q-gutter-sm">
+              <q-btn
+                color="secondary"
+                label="Export CSV"
+                class="export-btn"
+                :loading="exportingWeightCsv"
+                :disable="!includeWeightLog"
+                @click="exportWeightCsv"
+              />
+
+              <q-btn
+                color="secondary"
+                label="Export PDF"
+                class="export-btn"
+                :loading="exportingWeightPdf"
+                :disable="!includeWeightLog"
+                @click="exportWeightPdf"
               />
             </div>
           </div>
