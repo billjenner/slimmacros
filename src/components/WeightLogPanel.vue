@@ -9,11 +9,11 @@
 
     <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
       <div class="row items-center q-px-md q-py-sm no-wrap q-gutter-sm">
-        <q-chip color="secondary" text-color="white" square>
+        <q-chip color="accent" text-color="white" square>
           {{ Math.round(currentProfile?.start_weight ?? 0) }}
         </q-chip>
-        <div class="col text-subtitle1 text-center">Weight progress</div>
-        <q-chip color="secondary" text-color="white" square>
+        <div class="col text-subtitle1 text-center">Weight Progress</div>
+        <q-chip color="accent" text-color="white" square>
           {{ Math.round(weightProgressGoalValue ?? 0) }}
         </q-chip>
       </div>
@@ -21,11 +21,13 @@
         <q-linear-progress
           class="col"
           :value="weightProgressValue"
-          color="accent"
-          size="12px"
+          color="secondary"
+          size="20px"
           rounded
         />
-        <q-chip dense color="accent" text-color="white" square>{{ projectedGoalDateLabel }}</q-chip>
+        <q-chip dense color="secondary" text-color="white" square>{{
+          projectedGoalDateLabel
+        }}</q-chip>
       </div>
     </q-card>
 
@@ -75,7 +77,7 @@
     </q-form>
 
     <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
-      <div class="text-subtitle1 q-px-md q-pt-md q-pb-sm">Logged weight</div>
+      <div class="text-subtitle1 q-px-md q-pt-md q-pb-sm">Logged Weight</div>
       <q-table
         :rows="weightTableRows"
         :columns="columns"
@@ -91,6 +93,17 @@
         :loading="weightLogsStore.loading"
         no-data-label="No weight log records yet."
       >
+        <template #top-row>
+          <q-tr class="bg-accent text-white">
+            <q-td
+              colspan="1"
+              class="text-left text-white q-py-none q-px-sm"
+              style="font-size: 10px; letter-spacing: 0.02em"
+            >
+              WEIGHT | BMI | DATE
+            </q-td>
+          </q-tr>
+        </template>
         <template #body="props">
           <q-tr :props="props">
             <q-td key="summary" :props="props">

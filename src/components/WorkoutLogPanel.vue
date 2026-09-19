@@ -76,7 +76,7 @@
     </q-form>
     <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
       <div class="row items-center justify-between q-px-md q-py-sm">
-        <div class="text-subtitle1">Logged workouts</div>
+        <div class="text-subtitle1">Logged Workouts</div>
         <div class="row items-center no-wrap q-gutter-xs" style="justify-content: center; flex: 1">
           <q-btn flat dense type="button" label="<" @click="shiftDate(-1)" />
           <q-input
@@ -107,6 +107,13 @@
         :loading="workoutLogsStore.loading"
         no-data-label="No workout log records yet."
       >
+        <template #top-row>
+          <q-tr class="bg-accent text-white text-caption text-weight-medium">
+            <q-td colspan="1" class="text-left text-white"
+              >DESCRIPTION | W. O. TIME | CALORIES BURNED | DATE</q-td
+            >
+          </q-tr>
+        </template>
         <template #body="props"
           ><q-tr :props="props" :style="props.row.isSelected ? 'background-color: #D0D0D0' : ''"
             ><q-td key="summary" :props="props"

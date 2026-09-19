@@ -10,7 +10,7 @@
 
     <q-form @submit.prevent="submitSupplementLog" class="q-gutter-md">
       <q-card flat bordered class="q-pa-md bg-grey-1">
-        <div class="text-subtitle1 q-mb-sm">Log supplement</div>
+        <div class="text-subtitle1 q-mb-sm">Log Supplement</div>
         <div class="row q-col-gutter-md">
           <div class="col-12 col-md-6">
             <q-select
@@ -84,7 +84,7 @@
 
     <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
       <div class="row items-center justify-between q-px-md q-py-sm">
-        <div class="text-subtitle1">Logged supplements</div>
+        <div class="text-subtitle1">Logged Supplements</div>
         <div class="row items-center no-wrap q-gutter-xs" style="justify-content: center; flex: 1">
           <q-btn flat dense type="button" label="<" @click="shiftDate(-1)" />
           <q-input
@@ -116,6 +116,13 @@
         :loading="supplementLogsStore.loading"
         no-data-label="No supplement log records yet."
       >
+        <template #top-row>
+          <q-tr class="bg-accent text-white text-caption text-weight-medium">
+            <q-td colspan="1" class="text-left text-white"
+              >DESCRIPTION | SERVINGS | SERV. TYPE | DATE</q-td
+            >
+          </q-tr>
+        </template>
         <template #body="props">
           <q-tr :props="props" :style="props.row.isSelected ? 'background-color: #D0D0D0' : ''">
             <q-td key="summary" :props="props">

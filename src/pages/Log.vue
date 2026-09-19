@@ -165,7 +165,6 @@
 
                 <div v-show="isChartBudgetExpanded">
                   <div class="row items-center q-px-md q-py-sm">
-                    <div class="col text-subtitle2 text-center">{{ selectedFoodLogDayOfWeek }}</div>
                     <div class="row items-center no-wrap q-gutter-xs">
                       <q-btn flat dense type="button" label="<" @click="goToPreviousFoodLogDate" />
                       <q-input
@@ -177,6 +176,11 @@
                       />
                       <q-btn flat dense type="button" label=">" @click="goToNextFoodLogDate" />
                     </div>
+                    <div class="col text-subtitle2 text-center">{{ selectedFoodLogDayOfWeek }}</div>
+
+                    <q-chip :color="weightChangeChip.color" text-color="white" square>
+                      {{ weightChangeChip.label }}
+                    </q-chip>
                   </div>
                   <q-markup-table flat bordered dense separator="horizontal">
                     <tbody>
@@ -184,7 +188,7 @@
                         <td style="width: 84%">
                           <q-linear-progress
                             :value="foodLogProgress"
-                            color="accent"
+                            color="brown"
                             size="18px"
                             rounded
                           />
@@ -251,10 +255,7 @@
 
               <q-card flat bordered class="q-pa-none bg-grey-1 q-mt-md">
                 <div class="row items-center justify-between q-px-md q-py-sm">
-                  <div class="text-subtitle1">Logged food</div>
-                  <q-chip :color="weightChangeChip.color" text-color="white" square>
-                    {{ weightChangeChip.label }}
-                  </q-chip>
+                  <div class="text-subtitle1">Logged Food</div>
                 </div>
 
                 <q-table
@@ -272,6 +273,14 @@
                   :loading="foodLogsStore.loading"
                   no-data-label="No food log records yet."
                 >
+                  <template #top-row>
+                    <q-tr class="bg-accent text-white text-caption text-weight-medium">
+                      <q-td colspan="1" class="text-left text-white"
+                        >DESCRIPTION | SERVINGS | SERV. SIZE | CALORIES | DT</q-td
+                      >
+                    </q-tr>
+                  </template>
+
                   <template #body="props">
                     <q-tr
                       :props="props"
