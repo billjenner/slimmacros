@@ -90,6 +90,29 @@
               />
             </div>
           </div>
+
+          <q-separator class="q-my-md" />
+
+          <div class="row items-center justify-between q-mt-md">
+            <q-checkbox v-model="includeFoodLog" label="Food Log" />
+            <div class="row q-gutter-sm">
+              <q-btn
+                color="secondary"
+                label="Export CSV"
+                :loading="exportingFoodCsv"
+                :disable="!includeFoodLog"
+                @click="exportFoodCsv"
+              />
+
+              <q-btn
+                color="secondary"
+                label="Export PDF"
+                :loading="exportingFoodPdf"
+                :disable="!includeFoodLog"
+                @click="exportFoodPdf"
+              />
+            </div>
+          </div>
         </template>
       </q-card-section>
     </q-expansion-item>
@@ -105,18 +128,21 @@ import { useProfileStore } from 'stores/profile'
 import { usesupplementsLogStore } from 'stores/supplements_log'
 import { useWeightLogsStore } from 'stores/weight-logs'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
+import { useFoodLogsStore } from 'stores/food-logs'
 import { useUsersStore } from 'stores/users'
 
 const profileStore = useProfileStore()
 const supplementLogsStore = usesupplementsLogStore()
 const weightLogsStore = useWeightLogsStore()
 const workoutLogsStore = useWorkoutLogsStore()
+const foodLogsStore = useFoodLogsStore()
 const usersStore = useUsersStore()
 const $q = useQuasar()
 
 const includeSupplementLog = ref(true)
 const includeWeightLog = ref(true)
 const includeWorkoutLog = ref(true)
+const includeFoodLog = ref(true)
 
 const exportingCsv = ref(false)
 const exportingPdf = ref(false)
@@ -124,6 +150,8 @@ const exportingWeightCsv = ref(false)
 const exportingWeightPdf = ref(false)
 const exportingWorkoutCsv = ref(false)
 const exportingWorkoutPdf = ref(false)
+const exportingFoodCsv = ref(false)
+const exportingFoodPdf = ref(false)
 
 function formatDate(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
@@ -711,6 +739,220 @@ async function exportWorkoutPdf() {
     doc.save(filename)
   } finally {
     exportingWorkoutPdf.value = false
+  }
+}
+
+function computeFoodLogValues(row) {
+  const food = row.food || {}
+  const servings = Number(row.servings) || 0
+  const protein = servings * (Number(food.protein) || 0) * 4
+  const carb = servings * (Number(food.carb) || 0) * 4
+  const fat = servings * (Number(food.fat) || 0) * 9
+  const caloriesExtra = Number(food.calories_extra) || 0
+  const calories = protein + carb + fat + caloriesExtra
+
+  return {
+    description: food.description || '',
+    servings,
+    servingSize: food.serving_size ?? '',
+    calories,
+    protein,
+    carb,
+    fat,
+    datetime: row.datetime || '',
+  }
+}
+
+function buildFoodLogCsv(rows) {
+  const lines = [
+    'DESCRIPTION, SERVINGS, SERV. SIZE, CALORIES, PROTEIN (g), CARBS (g), FAT (g), Date Time',
+  ]
+
+  for (const row of rows) {
+    const values = computeFoodLogValues(row)
+
+    lines.push(
+      [
+        toCsvField(values.description),
+        toCsvField(values.servings.toFixed(2)),
+        toCsvField(values.servingSize),
+        toCsvField(values.calories.toFixed(2)),
+        toCsvField(values.protein.toFixed(2)),
+        toCsvField(values.carb.toFixed(2)),
+        toCsvField(values.fat.toFixed(2)),
+        toCsvField(values.datetime),
+      ].join(','),
+    )
+  }
+
+  return lines.join('\n')
+}
+
+async function exportFoodCsv() {
+  if (!usersStore.currentUser?.user_id) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      message: 'No current user is available.',
+    })
+
+    return
+  }
+
+  if (!includeFoodLog.value) {
+    return
+  }
+
+  exportingFoodCsv.value = true
+
+  try {
+    const rows = await foodLogsStore.fetchFoodLogsForExport(
+      usersStore.currentUser.user_id,
+      startDate.value,
+      endDate.value,
+    )
+
+    if (foodLogsStore.error) {
+      $q.notify({
+        color: 'negative',
+        textColor: 'white',
+        message: foodLogsStore.error,
+      })
+
+      return
+    }
+
+    const fname = properCase(profileStore.currentProfile?.fname)
+    const lname = properCase(profileStore.currentProfile?.lname)
+
+    const filename = `${fname}${lname}_FoodLogs_${timestampForFilename()}.csv`
+
+    downloadCsv(filename, buildFoodLogCsv(rows))
+  } finally {
+    exportingFoodCsv.value = false
+  }
+}
+
+async function exportFoodPdf() {
+  if (!usersStore.currentUser?.user_id) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      message: 'No current user is available.',
+    })
+    return
+  }
+
+  if (!includeFoodLog.value) {
+    return
+  }
+
+  exportingFoodPdf.value = true
+
+  try {
+    const rows = await foodLogsStore.fetchFoodLogsForExport(
+      usersStore.currentUser.user_id,
+      startDate.value,
+      endDate.value,
+    )
+
+    if (foodLogsStore.error) {
+      $q.notify({
+        color: 'negative',
+        textColor: 'white',
+        message: foodLogsStore.error,
+      })
+      return
+    }
+
+    const fname = properCase(profileStore.currentProfile?.fname)
+    const lname = properCase(profileStore.currentProfile?.lname)
+
+    const filename = `${fname}${lname}_FoodLogs_${timestampForFilename()}.pdf`
+
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'letter',
+    })
+
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text(`${fname} ${lname}`, 14, 18)
+
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Food Log', 14, 26)
+
+    doc.setFontSize(10)
+    doc.text(`Date Range: ${startDate.value} through ${endDate.value}`, 14, 33)
+
+    const tableRows = rows.map((row) => {
+      const values = computeFoodLogValues(row)
+
+      return [
+        values.description,
+        values.servings.toFixed(2),
+        values.servingSize,
+        values.calories.toFixed(2),
+        values.protein.toFixed(2),
+        values.carb.toFixed(2),
+        values.fat.toFixed(2),
+        values.datetime,
+      ]
+    })
+
+    autoTable(doc, {
+      startY: 40,
+
+      head: [
+        [
+          'DESCRIPTION',
+          'SERVINGS',
+          'SERV. SIZE',
+          'CALORIES',
+          'PROTEIN (g)',
+          'CARBS (g)',
+          'FAT (g)',
+          'DATE TIME',
+        ],
+      ],
+
+      body: tableRows,
+
+      theme: 'grid',
+
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+      },
+
+      headStyles: {
+        fillColor: [25, 118, 210],
+        textColor: 255,
+        fontStyle: 'bold',
+      },
+
+      columnStyles: {
+        0: { cellWidth: 55 },
+        1: { cellWidth: 22, halign: 'right' },
+        2: { cellWidth: 25, halign: 'right' },
+        3: { cellWidth: 25, halign: 'right' },
+        4: { cellWidth: 28, halign: 'right' },
+        5: { cellWidth: 25, halign: 'right' },
+        6: { cellWidth: 22, halign: 'right' },
+        7: { cellWidth: 40 },
+      },
+
+      margin: {
+        left: 14,
+        right: 14,
+      },
+    })
+
+    doc.save(filename)
+  } finally {
+    exportingFoodPdf.value = false
   }
 }
 </script>

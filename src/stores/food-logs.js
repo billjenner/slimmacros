@@ -125,6 +125,51 @@ export const useFoodLogsStore = defineStore('FoodLogs', {
       }
     },
 
+    async fetchFoodLogsForExport(userId, startDate, endDate) {
+      this.error = null
+
+      if (!supabase) {
+        this.error = 'Supabase client is not configured.'
+        return []
+      }
+
+      if (!userId) {
+        this.error = 'No current user is available.'
+        return []
+      }
+
+      const { data, error } = await supabase
+        .from('food_log')
+        .select(
+          `
+        food_log_id,
+        food_id,
+        user_id,
+        servings,
+        datetime,
+        food:food_id (
+          description,
+          protein,
+          carb,
+          fat,
+          calories_extra,
+          serving_size
+        )
+      `,
+        )
+        .eq('user_id', userId)
+        .gte('datetime', startDate)
+        .lte('datetime', `${endDate}T23:59:59.999`)
+        .order('datetime', { ascending: false })
+
+      if (error) {
+        this.error = error.message
+        return []
+      }
+
+      return data || []
+    },
+
     async deleteFoodLog(userId, foodLogId) {
       this.error = null
       this.loading = true
