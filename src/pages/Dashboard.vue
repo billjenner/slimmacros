@@ -5,6 +5,7 @@
     <food-calories-card />
     <workout-calories-card />
     <supplement-count-card />
+    <hr />
     <data-exports />
   </q-page>
 </template>
@@ -53,3 +54,13 @@ watch(
   { immediate: true },
 )
 </script>
+<style scoped>
+.data-exports-spacing {
+  margin-top: 1rem;
+}
+hr {
+  width: 60%;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+</style>

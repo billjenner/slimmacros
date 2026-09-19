@@ -106,6 +106,9 @@
         <q-item clickable v-ripple @click="navigateAndClose('/docs')">
           <q-item-section>Docs</q-item-section>
         </q-item>
+        <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/users')">
+          <q-item-section>Users</q-item-section>
+        </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/feedback')">
           <q-item-section>Feedback</q-item-section>
         </q-item>
