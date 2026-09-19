@@ -144,7 +144,9 @@ createQuasarApp(createApp, quasarUserOptions)
 
     return Promise[ method ]([
       
-      import('boot/auth-redirect')
+      import('boot/auth-redirect'),
+      
+      import('boot/connectivity')
       
     ]).then(bootFiles => {
       const boot = mapFn(bootFiles).filter(entry => typeof entry === 'function')

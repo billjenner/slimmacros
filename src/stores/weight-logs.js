@@ -1,5 +1,7 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
+import { useUsersStore } from './users'
+import { isConnectionError } from '../utils/connection'
 
 export const useWeightLogsStore = defineStore('WeightLogs', {
   state: () => ({
@@ -69,9 +71,17 @@ export const useWeightLogsStore = defineStore('WeightLogs', {
           return null
         }
 
+        useUsersStore().isOffline = false
         this.currentLog = data
         this.logs = [data, ...this.logs]
         return data
+      } catch (error) {
+        if (isConnectionError(error)) {
+          useUsersStore().isOffline = true
+        } else {
+          this.error = error?.message || 'Unable to save weight log.'
+        }
+        return null
       } finally {
         this.loading = false
       }
@@ -112,8 +122,16 @@ export const useWeightLogsStore = defineStore('WeightLogs', {
           return []
         }
 
+        useUsersStore().isOffline = false
         this.logs = data || []
         return this.logs
+      } catch (error) {
+        if (isConnectionError(error)) {
+          useUsersStore().isOffline = true
+        } else {
+          this.error = error?.message || 'Unable to load weight logs.'
+        }
+        return []
       } finally {
         this.loading = false
       }
@@ -145,8 +163,16 @@ export const useWeightLogsStore = defineStore('WeightLogs', {
           return { error: this.error }
         }
 
+        useUsersStore().isOffline = false
         this.logs = this.logs.filter((log) => log.weight_log_id !== weightLogId)
         return { error: null }
+      } catch (error) {
+        if (isConnectionError(error)) {
+          useUsersStore().isOffline = true
+          return { error: 'Unable to connect to Supabase.' }
+        }
+        this.error = error?.message || 'Unable to delete weight log.'
+        return { error: this.error }
       } finally {
         this.loading = false
       }

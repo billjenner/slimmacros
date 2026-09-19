@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
+import { isConnectionError } from '../utils/connection'
 
 const CURRENT_USER_STORAGE_KEY = 'slimmacros.currentUser'
 const USERS_LOGGED_IN_FUNCTION = 'users-logged-in'
@@ -54,11 +55,6 @@ function formatAuthUser(authUser) {
     created_at: authUser.created_at,
     user_metadata: authUser.user_metadata || {},
   }
-}
-
-function isConnectionError(error) {
-  const message = String(error?.message || error || '').toLowerCase()
-  return message.includes('failed to fetch') || message.includes('networkerror')
 }
 
 export const useUsersStore = defineStore('Users', {
