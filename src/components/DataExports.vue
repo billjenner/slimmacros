@@ -24,7 +24,7 @@
           </div>
           <br />
           <hr />
-          <div class="row items-center justify-between q-mt-md">
+          <div class="row items-center justify-between q-mt-md q-px-md">
             <q-checkbox v-model="includeFoodLog" label="Food Log" />
             <div class="row q-gutter-sm">
               <q-btn
@@ -46,7 +46,7 @@
           </div>
 
           <q-separator class="q-my-md" />
-          <div class="row items-center justify-between q-mt-md">
+          <div class="row items-center justify-between q-mt-md q-px-md">
             <q-checkbox v-model="includeWorkoutLog" label="Workout Log" />
             <div class="row q-gutter-sm">
               <q-btn
@@ -69,7 +69,7 @@
 
           <q-separator class="q-my-md" />
 
-          <div class="row items-center justify-between q-mt-md">
+          <div class="row items-center justify-between q-mt-md q-px-md">
             <q-checkbox v-model="includeWeightLog" label="Weight Log" />
             <div class="row q-gutter-sm">
               <q-btn
@@ -91,7 +91,7 @@
           </div>
 
           <q-separator class="q-my-md" />
-          <div class="row items-center justify-between q-mt-md">
+          <div class="row items-center justify-between q-mt-md q-px-md">
             <q-checkbox v-model="includeSupplementLog" label="Supplement Log" />
             <div class="row q-gutter-sm">
               <q-btn
