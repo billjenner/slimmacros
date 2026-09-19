@@ -48,6 +48,7 @@
                 color="secondary"
                 label="Export CSV"
                 class="export-btn"
+                dense
                 :loading="exportingFoodCsv"
                 :disable="!includeFoodLog"
                 @click="exportFoodCsv"
@@ -57,6 +58,7 @@
                 color="secondary"
                 label="Export PDF"
                 class="export-btn"
+                dense
                 :loading="exportingFoodPdf"
                 :disable="!includeFoodLog"
                 @click="exportFoodPdf"
@@ -72,6 +74,7 @@
                 color="secondary"
                 label="Export CSV"
                 class="export-btn"
+                dense
                 :loading="exportingWorkoutCsv"
                 :disable="!includeWorkoutLog"
                 @click="exportWorkoutCsv"
@@ -81,6 +84,7 @@
                 color="secondary"
                 label="Export PDF"
                 class="export-btn"
+                dense
                 :loading="exportingWorkoutPdf"
                 :disable="!includeWorkoutLog"
                 @click="exportWorkoutPdf"
@@ -96,6 +100,7 @@
                 color="secondary"
                 label="Export CSV"
                 class="export-btn"
+                dense
                 :loading="exportingSupplimentLogCsv"
                 :disable="!includeSupplementLog"
                 @click="exportSupplimentCsv"
@@ -105,6 +110,7 @@
                 color="secondary"
                 label="Export PDF"
                 class="export-btn"
+                dense
                 :loading="exportingPdf"
                 :disable="!includeSupplementLog"
                 @click="exportSupplimentPdf"
@@ -120,6 +126,7 @@
                 color="secondary"
                 label="Export CSV"
                 class="export-btn"
+                dense
                 :loading="exportingWeightCsv"
                 :disable="!includeWeightLog"
                 @click="exportWeightCsv"
@@ -129,6 +136,7 @@
                 color="secondary"
                 label="Export PDF"
                 class="export-btn"
+                dense
                 :loading="exportingWeightPdf"
                 :disable="!includeWeightLog"
                 @click="exportWeightPdf"
