@@ -109,7 +109,7 @@
       >
         <template #top-row>
           <q-tr class="bg-accent text-white text-caption text-weight-medium">
-            <q-td colspan="1" class="text-left text-white"
+            <q-td colspan="1" class="text-left text-white" style="font-size: 9px"
               >DESCRIPTION | W. O. TIME | CALORIES BURNED | DATE</q-td
             >
           </q-tr>

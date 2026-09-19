@@ -22,7 +22,7 @@
           class="col"
           :value="weightProgressValue"
           color="secondary"
-          size="20px"
+          size="16px"
           rounded
         />
         <q-chip dense color="secondary" text-color="white" square>{{
@@ -95,11 +95,7 @@
       >
         <template #top-row>
           <q-tr class="bg-accent text-white">
-            <q-td
-              colspan="1"
-              class="text-left text-white q-py-none q-px-sm"
-              style="font-size: 10px; letter-spacing: 0.02em"
-            >
+            <q-td colspan="1" class="text-left text-white q-py-none q-px-sm" style="font-size: 9px">
               WEIGHT | BMI | DATE
             </q-td>
           </q-tr>
