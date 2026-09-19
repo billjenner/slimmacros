@@ -4,7 +4,7 @@
 import { defineConfig } from '#q-app/wrappers'
 import { execSync } from 'child_process'
 
-const gitDate = execSync('git log -1 --format=%cd --date=format:%Y.%m.%d.%H%M').toString().trim()
+const gitDate = execSync('git log -1 --format=%cd --date=format:%Y.%m.%d').toString().trim()
 
 const gitHash = execSync('git rev-parse --short HEAD').toString().trim()
 

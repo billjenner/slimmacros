@@ -132,9 +132,9 @@
     </q-page-container>
     <q-footer class="bg-primary text-white q-pa-sm">
       <div class="row items-center justify-between">
-        <div class="text-caption">Version: {{ appVersion }}-{{ appCommit }}</div>
+        <div class="text-caption">V: {{ appVersion }}-{{ appCommit }}</div>
         <div v-if="usersStore.currentUser && usersStore.currentUser.email">
-          Current User: {{ profileStore.currentProfile?.fname }}
+          {{ profileStore.currentProfile?.fname }}
           {{ profileStore.currentProfile?.lname }} - {{ usersStore.currentUser.email }}
         </div>
         <div v-else class="text-caption">Not logged in</div>
