@@ -60,18 +60,64 @@ async function setConnectivityStatus(isOffline) {
   await broadcastConnectivityStatus(isOffline)
 }
 
+// Cache Storage also holds the logged-in state, so once a user signs in they
+// stay signed in indefinitely (including offline) until an explicit log out
+// clears it, regardless of what happens to in-page state or localStorage.
+const LOGIN_STATUS_CACHE_NAME = 'login-status'
+const LOGIN_STATUS_CACHE_URL = 'https://slimmacros.internal/login-status'
+
+async function readLoginStatus() {
+  const cache = await caches.open(LOGIN_STATUS_CACHE_NAME)
+  const cached = await cache.match(LOGIN_STATUS_CACHE_URL)
+  if (!cached) {
+    return { loggedIn: false, user: null }
+  }
+  return cached.json()
+}
+
+async function broadcastLoginStatus(loggedIn, user) {
+  const clientsList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+  for (const client of clientsList) {
+    client.postMessage({ type: 'login-status', loggedIn, user })
+  }
+}
+
+async function setLoginStatus(loggedIn, user) {
+  const cache = await caches.open(LOGIN_STATUS_CACHE_NAME)
+  await cache.put(
+    LOGIN_STATUS_CACHE_URL,
+    new Response(JSON.stringify({ loggedIn, user: loggedIn ? user : null }), {
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  )
+  await broadcastLoginStatus(loggedIn, loggedIn ? user : null)
+}
+
 // Report the last known status to a client as soon as it asks (e.g. on boot).
 self.addEventListener('message', (event) => {
-  if (event.data?.type !== 'request-connectivity-status') {
+  if (event.data?.type === 'request-connectivity-status') {
+    event.waitUntil(
+      (async () => {
+        const isOffline = (await readConnectivityStatus()) ?? false
+        event.source?.postMessage({ type: 'connectivity-status', isOffline })
+      })(),
+    )
     return
   }
 
-  event.waitUntil(
-    (async () => {
-      const isOffline = (await readConnectivityStatus()) ?? false
-      event.source?.postMessage({ type: 'connectivity-status', isOffline })
-    })(),
-  )
+  if (event.data?.type === 'request-login-status') {
+    event.waitUntil(
+      (async () => {
+        const { loggedIn, user } = await readLoginStatus()
+        event.source?.postMessage({ type: 'login-status', loggedIn, user })
+      })(),
+    )
+    return
+  }
+
+  if (event.data?.type === 'set-login-status') {
+    event.waitUntil(setLoginStatus(Boolean(event.data.loggedIn), event.data.user ?? null))
+  }
 })
 
 // Runtime network requests (API calls, XHR/fetch), excluding navigations and

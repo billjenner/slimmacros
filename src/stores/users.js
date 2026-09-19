@@ -1,6 +1,7 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
 import { isConnectionError } from '../utils/connection'
+import { setServiceWorkerLoginStatus } from '../utils/serviceWorker'
 
 const CURRENT_USER_STORAGE_KEY = 'slimmacros.currentUser'
 const USERS_LOGGED_IN_FUNCTION = 'users-logged-in'
@@ -103,6 +104,7 @@ export const useUsersStore = defineStore('Users', {
       this.users.push(savedUser)
       this.currentUser = savedUser
       persistCurrentUser(savedUser)
+      setServiceWorkerLoginStatus(true, savedUser)
       await this.syncLoggedInSession(normalizedEmail, true)
       return savedUser
     },
@@ -174,6 +176,7 @@ export const useUsersStore = defineStore('Users', {
         this.users.push(savedUser)
         persistCurrentUser(savedUser)
         this.isOffline = false
+        setServiceWorkerLoginStatus(true, savedUser)
         await this.syncLoggedInSession(normalizedEmail, true)
         return savedUser
       } catch (error) {
@@ -201,7 +204,22 @@ export const useUsersStore = defineStore('Users', {
       this.users = this.users.filter((u) => u.email !== savedUser.email)
       this.users.push(savedUser)
       persistCurrentUser(savedUser)
+      setServiceWorkerLoginStatus(true, savedUser)
       return savedUser
+    },
+
+    // Restores a session reported by the service worker's cached login status
+    // (the source of truth), used when local state was lost but the SW still
+    // considers the user logged in.
+    restoreCurrentUser(user) {
+      if (!user) {
+        return
+      }
+
+      this.currentUser = user
+      this.users = this.users.filter((u) => u.email !== user.email)
+      this.users.push(user)
+      persistCurrentUser(user)
     },
 
     async logoutUser() {
@@ -315,6 +333,7 @@ export const useUsersStore = defineStore('Users', {
 
       this.currentUser = null
       persistCurrentUser(null)
+      setServiceWorkerLoginStatus(false, null)
     },
   },
 })
