@@ -132,6 +132,47 @@ export const useWorkoutLogsStore = defineStore('WorkoutLogs', {
       }
     },
 
+    async fetchWorkoutLogsForExport(userId, startDate, endDate) {
+      this.error = null
+
+      if (!supabase) {
+        this.error = 'Supabase client is not configured.'
+        return []
+      }
+
+      if (!userId) {
+        this.error = 'No current user is available.'
+        return []
+      }
+
+      const { data, error } = await supabase
+        .from('workout_log')
+        .select(
+          `
+        workout_log_id,
+        workout_id,
+        user_id,
+        workout_time,
+        calories_burned,
+        date,
+        workout:workout_id (
+          type
+        )
+      `,
+        )
+        .eq('user_id', userId)
+        .gte('date', startDate)
+        .lte('date', endDate)
+        .order('date', { ascending: false })
+
+      if (error) {
+        this.error = error.message
+        return []
+      }
+
+      return data || []
+    },
+
     async deleteWorkoutLog(userId, workoutLogId) {
       this.error = null
       this.loading = true

@@ -67,6 +67,29 @@
               />
             </div>
           </div>
+
+          <q-separator class="q-my-md" />
+
+          <div class="row items-center justify-between q-mt-md">
+            <q-checkbox v-model="includeWorkoutLog" label="Workout Log" />
+            <div class="row q-gutter-sm">
+              <q-btn
+                color="secondary"
+                label="Export CSV"
+                :loading="exportingWorkoutCsv"
+                :disable="!includeWorkoutLog"
+                @click="exportWorkoutCsv"
+              />
+
+              <q-btn
+                color="secondary"
+                label="Export PDF"
+                :loading="exportingWorkoutPdf"
+                :disable="!includeWorkoutLog"
+                @click="exportWorkoutPdf"
+              />
+            </div>
+          </div>
         </template>
       </q-card-section>
     </q-expansion-item>
@@ -81,21 +104,26 @@ import { useQuasar } from 'quasar'
 import { useProfileStore } from 'stores/profile'
 import { usesupplementsLogStore } from 'stores/supplements_log'
 import { useWeightLogsStore } from 'stores/weight-logs'
+import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { useUsersStore } from 'stores/users'
 
 const profileStore = useProfileStore()
 const supplementLogsStore = usesupplementsLogStore()
 const weightLogsStore = useWeightLogsStore()
+const workoutLogsStore = useWorkoutLogsStore()
 const usersStore = useUsersStore()
 const $q = useQuasar()
 
 const includeSupplementLog = ref(true)
 const includeWeightLog = ref(true)
+const includeWorkoutLog = ref(true)
 
 const exportingCsv = ref(false)
 const exportingPdf = ref(false)
 const exportingWeightCsv = ref(false)
 const exportingWeightPdf = ref(false)
+const exportingWorkoutCsv = ref(false)
+const exportingWorkoutPdf = ref(false)
 
 function formatDate(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
@@ -504,6 +532,185 @@ async function exportWeightPdf() {
     doc.save(filename)
   } finally {
     exportingWeightPdf.value = false
+  }
+}
+
+function buildWorkoutLogCsv(rows) {
+  const lines = ['DESCRIPTION, W. O. TIME, CALORIES BURNED, DATE']
+
+  for (const row of rows) {
+    const description = row.workout?.type || ''
+    const workoutTime = Number(row.workout_time) || 0
+    const caloriesBurned = Number(row.calories_burned) || 0
+    const date = row.date || ''
+
+    lines.push(
+      [
+        toCsvField(description),
+        toCsvField(workoutTime),
+        toCsvField(caloriesBurned),
+        toCsvField(date),
+      ].join(','),
+    )
+  }
+
+  return lines.join('\n')
+}
+
+async function exportWorkoutCsv() {
+  if (!usersStore.currentUser?.user_id) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      message: 'No current user is available.',
+    })
+
+    return
+  }
+
+  if (!includeWorkoutLog.value) {
+    return
+  }
+
+  exportingWorkoutCsv.value = true
+
+  try {
+    const rows = await workoutLogsStore.fetchWorkoutLogsForExport(
+      usersStore.currentUser.user_id,
+      startDate.value,
+      endDate.value,
+    )
+
+    if (workoutLogsStore.error) {
+      $q.notify({
+        color: 'negative',
+        textColor: 'white',
+        message: workoutLogsStore.error,
+      })
+
+      return
+    }
+
+    const fname = properCase(profileStore.currentProfile?.fname)
+    const lname = properCase(profileStore.currentProfile?.lname)
+
+    const filename = `${fname}${lname}_WorkoutLogs_${timestampForFilename()}.csv`
+
+    downloadCsv(filename, buildWorkoutLogCsv(rows))
+  } finally {
+    exportingWorkoutCsv.value = false
+  }
+}
+
+async function exportWorkoutPdf() {
+  if (!usersStore.currentUser?.user_id) {
+    $q.notify({
+      color: 'negative',
+      textColor: 'white',
+      message: 'No current user is available.',
+    })
+    return
+  }
+
+  if (!includeWorkoutLog.value) {
+    return
+  }
+
+  exportingWorkoutPdf.value = true
+
+  try {
+    const rows = await workoutLogsStore.fetchWorkoutLogsForExport(
+      usersStore.currentUser.user_id,
+      startDate.value,
+      endDate.value,
+    )
+
+    if (workoutLogsStore.error) {
+      $q.notify({
+        color: 'negative',
+        textColor: 'white',
+        message: workoutLogsStore.error,
+      })
+      return
+    }
+
+    const fname = properCase(profileStore.currentProfile?.fname)
+    const lname = properCase(profileStore.currentProfile?.lname)
+
+    const filename = `${fname}${lname}_WorkoutLogs_${timestampForFilename()}.pdf`
+
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'letter',
+    })
+
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text(`${fname} ${lname}`, 14, 18)
+
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Workout Log', 14, 26)
+
+    doc.setFontSize(10)
+    doc.text(`Date Range: ${startDate.value} through ${endDate.value}`, 14, 33)
+
+    const tableRows = rows.map((row) => {
+      const description = row.workout?.type || ''
+      const workoutTime = Number(row.workout_time) || 0
+      const caloriesBurned = Number(row.calories_burned) || 0
+      const date = row.date || ''
+
+      return [description, workoutTime, caloriesBurned, date]
+    })
+
+    autoTable(doc, {
+      startY: 40,
+
+      head: [['DESCRIPTION', 'W. O. TIME', 'CALORIES BURNED', 'DATE']],
+
+      body: tableRows,
+
+      theme: 'grid',
+
+      styles: {
+        fontSize: 9,
+        cellPadding: 3,
+      },
+
+      headStyles: {
+        fillColor: [25, 118, 210],
+        textColor: 255,
+        fontStyle: 'bold',
+      },
+
+      columnStyles: {
+        0: {
+          cellWidth: 65,
+        },
+        1: {
+          cellWidth: 35,
+          halign: 'right',
+        },
+        2: {
+          cellWidth: 45,
+          halign: 'right',
+        },
+        3: {
+          cellWidth: 40,
+        },
+      },
+
+      margin: {
+        left: 14,
+        right: 14,
+      },
+    })
+
+    doc.save(filename)
+  } finally {
+    exportingWorkoutPdf.value = false
   }
 }
 </script>
