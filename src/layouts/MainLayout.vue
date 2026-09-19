@@ -132,7 +132,7 @@
     </q-page-container>
     <q-footer class="bg-primary text-white q-pa-sm">
       <div class="row items-center justify-between">
-        <div class="text-caption">Version: {{ appVersion }}</div>
+        <div class="text-caption">Version: {{ appVersion }}-{{ appCommit }}</div>
         <div v-if="usersStore.currentUser && usersStore.currentUser.email">
           Current User: {{ profileStore.currentProfile?.fname }}
           {{ profileStore.currentProfile?.lname }} - {{ usersStore.currentUser.email }}
@@ -197,16 +197,8 @@ const showInstallDialog = ref(false)
 const showSignOutDialog = ref(false)
 const showOfflineDialog = ref(false)
 
-const pad = (value) => String(value).padStart(2, '0')
-
-const now = new Date()
-
-const appVersion =
-  `${now.getFullYear()}.` +
-  `${pad(now.getMonth() + 1)}.` +
-  `${pad(now.getDate())}.` +
-  `${pad(now.getHours())}.` +
-  `${pad(now.getMinutes())}`
+const appVersion = process.env.APP_VERSION
+const appCommit = process.env.APP_COMMIT
 
 const userInitials = computed(() => {
   const firstInitial = String(profileStore.currentProfile?.fname || '')

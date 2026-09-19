@@ -2,6 +2,11 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers'
+import { execSync } from 'child_process'
+
+const gitDate = execSync('git log -1 --format=%cd --date=format:%Y.%m.%d.%H%M').toString().trim()
+
+const gitHash = execSync('git rev-parse --short HEAD').toString().trim()
 
 export default defineConfig((/* ctx */) => {
   return {
@@ -36,7 +41,10 @@ export default defineConfig((/* ctx */) => {
         browser: 'baseline-widely-available',
         node: 'node22',
       },
-
+      env: {
+        APP_VERSION: JSON.stringify(gitDate),
+        APP_COMMIT: JSON.stringify(gitHash),
+      },
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
