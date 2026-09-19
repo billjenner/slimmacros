@@ -1,7 +1,7 @@
 <template>
   <q-card flat bordered class="q-ma-md">
     <q-expansion-item
-      label="DataExports"
+      label="Data Exports"
       expand-icon="keyboard_arrow_down"
       expanded-icon="keyboard_arrow_up"
       transition-show="jump-down"
@@ -168,7 +168,7 @@ function daysAgo(days) {
 }
 
 // Default to a 30-day window so the export isn't empty when opened.
-const startDate = ref(daysAgo(30))
+const startDate = ref(daysAgo(90))
 const endDate = ref(currentDate())
 
 function properCase(value) {
