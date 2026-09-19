@@ -135,7 +135,7 @@
         <div class="text-caption">V: {{ appVersion }}-{{ appCommit }}</div>
         <div v-if="usersStore.currentUser && usersStore.currentUser.email">
           {{ profileStore.currentProfile?.fname }}
-          {{ profileStore.currentProfile?.lname }} - {{ usersStore.currentUser.email }}
+          {{ profileStore.currentProfile?.lname }}
         </div>
         <div v-else class="text-caption">Not logged in</div>
       </div>
