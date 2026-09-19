@@ -131,7 +131,8 @@
       </router-view>
     </q-page-container>
     <q-footer class="bg-primary text-white q-pa-sm">
-      <div class="row items-center justify-end">
+      <div class="row items-center justify-between">
+        <div class="text-caption">Version: {{ appVersion }}</div>
         <div v-if="usersStore.currentUser && usersStore.currentUser.email">
           Current User: {{ profileStore.currentProfile?.fname }}
           {{ profileStore.currentProfile?.lname }} - {{ usersStore.currentUser.email }}
@@ -195,6 +196,17 @@ const deferredInstallPrompt = ref(null)
 const showInstallDialog = ref(false)
 const showSignOutDialog = ref(false)
 const showOfflineDialog = ref(false)
+
+const pad = (value) => String(value).padStart(2, '0')
+
+const now = new Date()
+
+const appVersion =
+  `${now.getFullYear()}.` +
+  `${pad(now.getMonth() + 1)}.` +
+  `${pad(now.getDate())}.` +
+  `${pad(now.getHours())}.` +
+  `${pad(now.getMinutes())}`
 
 const userInitials = computed(() => {
   const firstInitial = String(profileStore.currentProfile?.fname || '')
