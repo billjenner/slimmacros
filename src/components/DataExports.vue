@@ -14,7 +14,7 @@
         </q-banner>
 
         <template v-else>
-          <div class="row q-col-gutter-md justify-center">
+          <div class="row q-col-gutter-md justify-center q-mx-md q-mb-xl">
             <div class="col-auto">
               <q-input
                 v-model="startDate"
@@ -39,8 +39,7 @@
               />
             </div>
           </div>
-          <br />
-          <hr />
+          <q-separator class="q-my-md" />
           <div class="row items-center justify-between q-mt-md">
             <q-checkbox v-model="includeFoodLog" label="Food Log" />
             <div class="row q-gutter-sm">

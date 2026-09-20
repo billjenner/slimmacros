@@ -2,8 +2,8 @@
   <q-page>
     <div class="row justify-center">
       <div class="col-12 col-md-10 col-lg-8">
-        <q-card flat bordered class="q-pa-md">
-          <div class="text-h5 q-mb-md">Log</div>
+        <q-card flat bordered>
+          <div class="text-h5 q-ma-md">Log</div>
 
           <q-tabs
             v-model="activeTab"

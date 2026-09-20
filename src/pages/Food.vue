@@ -8,7 +8,7 @@
           :bordered="!embedded"
           :class="!embedded ? 'q-pa-md' : ''"
         >
-          <div class="row items-center justify-between q-mb-md">
+          <div class="row items-center justify-between q-mx-md q-mb-md">
             <div class="text-h5">Food</div>
             <q-btn
               color="primary"
