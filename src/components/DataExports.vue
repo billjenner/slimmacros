@@ -14,7 +14,7 @@
         </q-banner>
 
         <template v-else>
-          <div class="row q-col-gutter-md justify-center q-mx-md q-mb-xl">
+          <div class="row q-col-gutter-md justify-center q-mx-md">
             <div class="col-auto">
               <q-input
                 v-model="startDate"
@@ -41,7 +41,11 @@
           </div>
           <q-separator class="q-my-md" />
           <div class="row items-center justify-between q-mt-md">
-            <q-checkbox v-model="includeFoodLog" label="Food Log" />
+            <q-toggle
+              v-model="includeFoodLog"
+              label="Food Log"
+              @update:model-value="setActiveExport('food', $event)"
+            />
             <div class="row q-gutter-sm">
               <q-btn
                 color="secondary"
@@ -67,7 +71,11 @@
 
           <q-separator class="q-my-md" />
           <div class="row items-center justify-between q-mt-md">
-            <q-checkbox v-model="includeWorkoutLog" label="Workout Log" />
+            <q-toggle
+              v-model="includeWorkoutLog"
+              label="Workout Log"
+              @update:model-value="setActiveExport('workout', $event)"
+            />
             <div class="row q-gutter-sm">
               <q-btn
                 color="secondary"
@@ -93,7 +101,11 @@
 
           <q-separator class="q-my-md" />
           <div class="row items-center justify-between q-mt-md">
-            <q-checkbox v-model="includeSupplementLog" label="Supplement Log" />
+            <q-toggle
+              v-model="includeSupplementLog"
+              label="Supplement Log"
+              @update:model-value="setActiveExport('supplement', $event)"
+            />
             <div class="row q-gutter-sm">
               <q-btn
                 color="secondary"
@@ -119,7 +131,11 @@
 
           <q-separator class="q-my-md" />
           <div class="row items-center justify-between q-mt-md">
-            <q-checkbox v-model="includeWeightLog" label="Weight Log" />
+            <q-toggle
+              v-model="includeWeightLog"
+              label="Weight Log"
+              @update:model-value="setActiveExport('weight', $event)"
+            />
             <div class="row q-gutter-sm">
               <q-btn
                 color="secondary"
@@ -181,6 +197,38 @@ const exportingWorkoutCsv = ref(false)
 const exportingWorkoutPdf = ref(false)
 const exportingFoodCsv = ref(false)
 const exportingFoodPdf = ref(false)
+
+function resetExportSelections() {
+  includeFoodLog.value = false
+  includeWorkoutLog.value = false
+  includeSupplementLog.value = false
+  includeWeightLog.value = false
+}
+
+function setActiveExport(exportType, enabled) {
+  if (!enabled) {
+    return
+  }
+
+  resetExportSelections()
+
+  const selections = {
+    food: includeFoodLog,
+    workout: includeWorkoutLog,
+    supplement: includeSupplementLog,
+    weight: includeWeightLog,
+  }
+
+  selections[exportType].value = true
+}
+
+async function NotifyUser() {
+  $q.notify({
+    color: 'positive',
+    textColor: 'white',
+    message: 'Export Completed',
+  })
+}
 
 function formatDate(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
@@ -333,6 +381,8 @@ async function exportFoodCsv() {
     downloadCsv(filename, buildFoodLogCsv(rows))
   } finally {
     exportingFoodCsv.value = false
+    resetExportSelections()
+    await NotifyUser()
   }
 }
 
@@ -456,6 +506,8 @@ async function exportFoodPdf() {
     doc.save(filename)
   } finally {
     exportingFoodPdf.value = false
+    resetExportSelections()
+    await NotifyUser()
   }
 }
 
@@ -523,6 +575,8 @@ async function exportWorkoutCsv() {
     downloadCsv(filename, buildWorkoutLogCsv(rows))
   } finally {
     exportingWorkoutCsv.value = false
+    resetExportSelections()
+    await NotifyUser()
   }
 }
 
@@ -635,6 +689,8 @@ async function exportWorkoutPdf() {
     doc.save(filename)
   } finally {
     exportingWorkoutPdf.value = false
+    resetExportSelections()
+    await NotifyUser()
   }
 }
 
@@ -672,7 +728,9 @@ function downloadCsv(filename, content) {
   link.download = filename
   link.click()
 
-  URL.revokeObjectURL(url)
+  setTimeout(() => {
+    URL.revokeObjectURL(url)
+  }, 1000)
 }
 
 async function exportSupplimentCsv() {
@@ -717,6 +775,8 @@ async function exportSupplimentCsv() {
     downloadCsv(filename, buildSupplementLogCsv(rows))
   } finally {
     exportingSupplimentLogCsv.value = false
+    resetExportSelections()
+    await NotifyUser()
   }
 }
 
@@ -834,6 +894,8 @@ async function exportSupplimentPdf() {
     doc.save(filename)
   } finally {
     exportingPdf.value = false
+    resetExportSelections()
+    await NotifyUser()
   }
 }
 
@@ -895,6 +957,8 @@ async function exportWeightCsv() {
     downloadCsv(filename, buildWeightLogCsv(rows))
   } finally {
     exportingWeightCsv.value = false
+    resetExportSelections()
+    await NotifyUser()
   }
 }
 
@@ -1003,6 +1067,8 @@ async function exportWeightPdf() {
     doc.save(filename)
   } finally {
     exportingWeightPdf.value = false
+    resetExportSelections()
+    await NotifyUser()
   }
 }
 </script>
