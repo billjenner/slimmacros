@@ -1,5 +1,5 @@
 <template>
-  <q-card flat bordered class="q-ma-md">
+  <q-card flat bordered class="q-mb-md">
     <q-expansion-item
       label="Weight and BMI progress"
       expand-icon="keyboard_arrow_down"

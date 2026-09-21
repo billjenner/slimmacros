@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pt-md">
-    <div class="text-h4 text-center">Dashboard</div>
+    <div class="text-h4 text-center q-mb-md">Dashboard</div>
     <weight-bmi-progress-card />
     <food-calories-card />
     <workout-calories-card />
