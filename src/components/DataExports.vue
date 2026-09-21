@@ -39,6 +39,11 @@
               />
             </div>
           </div>
+          <div class="row q-col-gutter-md justify-center q-mx-md">
+            <div class="text-center text-italic text-bold q-mt-md text-grey-7">
+              Note: Exports may only work on desktop
+            </div>
+          </div>
           <q-separator class="q-my-md" />
           <div class="row items-center justify-between q-mt-md">
             <q-toggle
