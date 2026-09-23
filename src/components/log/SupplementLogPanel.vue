@@ -166,7 +166,7 @@ import { useQuasar } from 'quasar'
 import { usesupplementsLogStore } from 'stores/supplements_log'
 import { usesupplementsStore } from 'stores/supplements'
 import { useUsersStore } from 'stores/users'
-import { notifySuccess } from '../utils/notify'
+import { notifySuccess } from '../../utils/notify'
 
 const usersStore = useUsersStore()
 const supplementsStore = usesupplementsStore()

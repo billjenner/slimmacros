@@ -10,7 +10,7 @@
         >
           <template v-slot:header>
             <q-item-section class="text-center">
-              <div class="text-h4">Nutrition</div>
+              <div class="text-h4">Instructions</div>
             </q-item-section>
           </template>
           <div class="row q-col-gutter-md q-pa-md">
@@ -312,7 +312,23 @@
                 </q-expansion-item>
               </q-card>
             </div>
+          </div>
+        </q-expansion-item>
+      </q-card>
 
+      <q-card flat bordered class="q-mb-md">
+        <q-expansion-item
+          expand-icon="keyboard_arrow_down"
+          expanded-icon="keyboard_arrow_up"
+          transition-show="jump-down"
+          transition-hide="jump-up"
+        >
+          <template v-slot:header>
+            <q-item-section class="text-center">
+              <div class="text-h4">Nutrition</div>
+            </q-item-section>
+          </template>
+          <div class="row q-col-gutter-md q-pa-md">
             <div class="col-12 col-sm-6 col-md-6 col-lg-6 flex justify-center">
               <q-card style="width: 95%">
                 <q-card-section class="bg-secondary text-white text-center">
@@ -629,7 +645,7 @@
         >
           <template v-slot:header>
             <q-item-section class="text-center">
-              <div class="text-h4">Fitness</div>
+              <div class="text-h4">Exercise</div>
             </q-item-section>
           </template>
           <div class="row q-col-gutter-md q-pa-md">

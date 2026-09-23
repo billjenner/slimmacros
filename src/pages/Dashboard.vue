@@ -18,11 +18,11 @@ import { useProfileStore } from 'stores/profile'
 import { usesupplementsLogStore } from 'stores/supplements_log'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { useWeightLogsStore } from 'stores/weight-logs'
-import FoodCaloriesCard from 'components/FoodCaloriesCard.vue'
-import SupplementCountCard from 'components/SupplementCountCard.vue'
-import WeightBmiProgressCard from 'components/WeightBmiProgressCard.vue'
-import WorkoutCaloriesCard from 'components/WorkoutCaloriesCard.vue'
-import DataExports from 'components/DataExports.vue'
+import FoodCaloriesCard from 'src/components/dashboard/FoodCaloriesCard.vue'
+import SupplementCountCard from 'src/components/dashboard/SupplementCountCard.vue'
+import WeightBmiProgressCard from 'src/components/dashboard/WeightBmiProgressCard.vue'
+import WorkoutCaloriesCard from 'src/components/dashboard/WorkoutCaloriesCard.vue'
+import DataExports from 'src/components/dashboard/DataExports.vue'
 
 const usersStore = useUsersStore()
 const foodLogsStore = useFoodLogsStore()

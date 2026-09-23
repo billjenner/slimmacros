@@ -3,7 +3,7 @@
     <div class="row justify-center">
       <div class="col-12 col-md-10 col-lg-8">
         <q-card flat bordered>
-          <div class="text-h5 q-ma-md">Goods</div>
+          <div class="text-h5 q-ma-md">Items</div>
 
           <q-tabs
             v-model="activeTab"

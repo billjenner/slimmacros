@@ -156,7 +156,7 @@ import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
 import { useWorkoutsStore } from 'stores/workouts'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
-import { notifySuccess } from '../utils/notify'
+import { notifySuccess } from '../../utils/notify'
 
 const usersStore = useUsersStore()
 const workoutsStore = useWorkoutsStore()

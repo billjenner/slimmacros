@@ -143,8 +143,8 @@ import { useQuasar } from 'quasar'
 import { useProfileStore } from 'stores/profile'
 import { useUsersStore } from 'stores/users'
 import { useWeightLogsStore } from 'stores/weight-logs'
-import { calculateBodyMassIndex } from '../utils/rules'
-import { notifySuccess } from '../utils/notify'
+import { calculateBodyMassIndex } from '../../utils/rules'
+import { notifySuccess } from '../../utils/notify'
 
 const usersStore = useUsersStore()
 const profileStore = useProfileStore()

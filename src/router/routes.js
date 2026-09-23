@@ -105,14 +105,14 @@ const routes = [
         },
       },
       {
-        path: 'goods',
-        component: () => import('pages/Goods.vue'),
+        path: 'items',
+        component: () => import('pages/Items.vue'),
         meta: {
           requiresAuth: true,
           seo: {
-            title: 'Goods',
+            title: 'Items',
             description: 'Manage food, workouts, supplements, and your profile.',
-            canonicalPath: '/goods',
+            canonicalPath: '/items',
           },
         },
       },

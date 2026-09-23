@@ -35,12 +35,12 @@
           />
           <q-btn
             flat
-            label="Goods"
-            to="/goods"
+            label="Items"
+            to="/items"
             class="q-mx-sm"
             style="min-width: 126px"
-            :style="buttonStyle('/goods')"
-            @mouseover="hoveredPath = '/goods'"
+            :style="buttonStyle('/items')"
+            @mouseover="hoveredPath = '/items'"
             @mouseleave="hoveredPath = null"
           />
           <q-btn
@@ -97,8 +97,8 @@
         <q-item clickable v-ripple @click="navigateAndClose('/food-log')">
           <q-item-section>Log</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/goods')">
-          <q-item-section>Goods</q-item-section>
+        <q-item clickable v-ripple @click="navigateAndClose('/items')">
+          <q-item-section>Items</q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/dashboard')">
           <q-item-section>Dashboard</q-item-section>
