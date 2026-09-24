@@ -62,87 +62,95 @@ async function getCameras() {
   }
 }
 
-Quagga.init(
-  {
-    inputStream: {
-      type: 'LiveStream',
+function initScanner() {
+  if (!scannerContainer.value) {
+    return
+  }
 
-      target: scannerContainer.value,
+  Quagga.onDetected(handleDetected)
 
-      constraints: {
-        facingMode: {
-          ideal: 'environment',
-        },
+  Quagga.init(
+    {
+      inputStream: {
+        type: 'LiveStream',
 
-        width: {
-          min: 640,
-          ideal: 1280,
-          max: 1920,
-        },
+        target: scannerContainer.value,
 
-        height: {
-          min: 480,
-          ideal: 720,
-          max: 1080,
-        },
+        constraints: {
+          facingMode: {
+            ideal: 'environment',
+          },
 
-        aspectRatio: {
-          ideal: 16 / 9,
+          width: {
+            min: 640,
+            ideal: 1280,
+            max: 1920,
+          },
+
+          height: {
+            min: 480,
+            ideal: 720,
+            max: 1080,
+          },
+
+          aspectRatio: {
+            ideal: 16 / 9,
+          },
         },
       },
+
+      locator: {
+        patchSize: 'medium',
+        halfSample: false,
+      },
+
+      numOfWorkers: navigator.hardwareConcurrency ? Math.min(navigator.hardwareConcurrency, 4) : 2,
+
+      frequency: 15,
+
+      decoder: {
+        readers: ['ean_reader', 'upc_reader'],
+      },
+
+      locate: true,
     },
 
-    locator: {
-      patchSize: 'medium',
-      halfSample: false,
-    },
+    function (err) {
+      if (err) {
+        console.error('Quagga initialization error:', err)
 
-    numOfWorkers: navigator.hardwareConcurrency ? Math.min(navigator.hardwareConcurrency, 4) : 2,
+        error.value = 'Unable to access the camera. Please check your camera permissions.'
 
-    frequency: 15,
-
-    decoder: {
-      readers: ['ean_reader', 'upc_reader'],
-    },
-
-    locate: true,
-  },
-
-  function (err) {
-    if (err) {
-      console.error('Quagga initialization error:', err)
-
-      error.value = 'Unable to access the camera. Please check your camera permissions.'
-
-      return
-    }
-
-    console.log('Quagga initialized successfully')
-
-    scannerStarted = true
-
-    Quagga.start()
-
-    console.log('Quagga started')
-
-    // Give the camera a moment to initialize,
-    // then report the actual video resolution.
-    setTimeout(() => {
-      const video = scannerContainer.value?.querySelector('video')
-
-      if (video) {
-        console.log('Camera resolution:', {
-          width: video.videoWidth,
-          height: video.videoHeight,
-        })
-
-        console.log('Camera element:', video)
-      } else {
-        console.warn('Quagga started but video element was not found')
+        return
       }
-    }, 1000)
-  },
-)
+
+      console.log('Quagga initialized successfully')
+
+      scannerStarted = true
+
+      Quagga.start()
+
+      console.log('Quagga started')
+
+      // Give the camera a moment to initialize,
+      // then report the actual video resolution.
+      setTimeout(() => {
+        const video = scannerContainer.value?.querySelector('video')
+
+        if (video) {
+          console.log('Camera resolution:', {
+            width: video.videoWidth,
+            height: video.videoHeight,
+          })
+
+          console.log('Camera element:', video)
+        } else {
+          console.warn('Quagga started but video element was not found')
+        }
+      }, 1000)
+    },
+  )
+}
 
 function handleDetected(result) {
   if (detected) {
@@ -243,7 +251,8 @@ function close() {
   emit('close')
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await getCameras()
   initScanner()
 })
 
