@@ -6,6 +6,8 @@
       <span>Scan Barcode</span>
     </div>
 
+    <div v-if="lastBarcode" class="barcode-result">Last scanned barcode: {{ lastBarcode }}</div>
+
     <div ref="scannerContainer" class="scanner-container">
       <div class="scanner-overlay">
         <div class="scanner-target">
@@ -33,7 +35,7 @@ const error = ref(null)
 
 let scannerStarted = false
 let detected = false
-
+const lastBarcode = ref(null)
 // Track repeated detections
 const barcodeCandidates = new Map()
 
@@ -43,6 +45,8 @@ function initScanner() {
   if (!scannerContainer.value) {
     return
   }
+
+  Quagga.onDetected(handleDetected)
 
   Quagga.init(
     {
@@ -108,8 +112,6 @@ function initScanner() {
     },
   )
 
-  Quagga.onDetected(handleDetected)
-
   // Clear candidate detections periodically
   candidateTimer = setInterval(() => {
     barcodeCandidates.clear()
@@ -157,6 +159,7 @@ function handleDetected(result) {
   console.log(`Barcode ${code} detected ${count} time(s)`)
 
   // Require 3 matching detections
+  lastBarcode.value = code
   if (count >= 3) {
     confirmBarcode(code)
   }
@@ -168,6 +171,8 @@ function confirmBarcode(code) {
   }
 
   detected = true
+
+  lastBarcode.value = code
 
   console.log('CONFIRMED BARCODE:', code)
 
@@ -183,21 +188,17 @@ function isValidBarcode(code) {
 
   let sum = 0
 
-  // Work backwards from the digit immediately before
-  // the check digit.
+  // Starting from the rightmost data digit,
+  // multiply alternating digits by 3.
   for (let i = digits.length - 1; i >= 0; i--) {
-    const positionFromRight = digits.length - i
+    const position = digits.length - i
 
-    if (positionFromRight % 2 === 1) {
-      sum += digits[i] * 3
-    } else {
-      sum += digits[i]
-    }
+    sum += digits[i] * (position % 2 === 1 ? 3 : 1)
   }
 
-  const calculatedCheckDigit = (10 - (sum % 10)) % 10
+  const calculated = (10 - (sum % 10)) % 10
 
-  return calculatedCheckDigit === checkDigit
+  return calculated === checkDigit
 }
 
 function stopScanner() {
@@ -209,6 +210,8 @@ function stopScanner() {
 }
 
 function close() {
+  console.log('Closing barcode scanner')
+
   stopScanner()
 
   emit('close')
@@ -317,10 +320,10 @@ onBeforeUnmount(() => {
 .scanner-target {
   position: relative;
 
-  width: 82%;
-  max-width: 420px;
+  width: 90%;
+  max-width: 500px;
 
-  height: 150px;
+  height: 120px;
 
   border: 2px solid #22c55e;
 

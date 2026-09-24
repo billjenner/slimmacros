@@ -56,13 +56,20 @@
               <q-card flat bordered class="q-pa-md bg-grey-1">
                 <div class="row items-center justify-between q-mb-sm">
                   <div class="text-subtitle1">Serving information</div>
-                  <q-btn
+                  <!-- <q-btn
                     type="button"
                     color="secondary"
                     label="Get Macros"
                     :loading="isGettingMacros"
                     :disable="!canGetMacros || store.loading"
                     @click="getMacrosFromAi"
+                  /> -->
+                  <q-btn
+                    type="button"
+                    color="secondary"
+                    label="Scan Bar Code"
+                    :disable="store.loading"
+                    @click="scannerOpen = true"
                   />
                 </div>
                 <div class="row q-col-gutter-md">
@@ -172,6 +179,8 @@
               </div>
             </q-form>
           </transition>
+
+          <BarcodeScanner v-if="scannerOpen" @detected="barcodeDetected" @close="closeScanner" />
 
           <q-dialog v-model="confirmDeleteOpen">
             <q-card style="min-width: 320px">
@@ -383,6 +392,7 @@ import { useUsersStore } from 'stores/users'
 import { useFoodStore } from 'stores/food'
 import { calculateFoodCalories, calculateTotalCaloriesForPerson } from '../utils/rules'
 import { notifySuccess } from '../utils/notify'
+import BarcodeScanner from './BarcodeScanner.vue'
 
 defineProps({
   embedded: {
@@ -467,15 +477,16 @@ const confirmDeleteOpen = ref(false)
 const pendingDeleteFood = ref(null)
 const expandedFoodIds = ref([])
 const editingFoodId = ref(null)
-const isGettingMacros = ref(false)
+//const isGettingMacros = ref(false)
+const scannerOpen = ref(false)
 
-const canGetMacros = computed(() => {
-  const description = String(food.description || '').trim()
-  const servingSize = Number(food.serving_size)
-  const servingUnit = String(food.serving_unit || '').trim()
+//const canGetMacros = computed(() => {
+//   const description = String(food.description || '').trim()
+//   const servingSize = Number(food.serving_size)
+//   const servingUnit = String(food.serving_unit || '').trim()
 
-  return Boolean(description && Number.isFinite(servingSize) && servingSize > 0 && servingUnit)
-})
+//   return Boolean(description && Number.isFinite(servingSize) && servingSize > 0 && servingUnit)
+// })
 
 onMounted(() => {
   if (usersStore.currentUser?.user_id) {
@@ -608,103 +619,112 @@ function resetFoodForm() {
   editingFoodId.value = null
 }
 
+function closeScanner() {
+  scannerOpen.value = false
+}
+
+function barcodeDetected(barcode) {
+  food.description = String(barcode || '').trim()
+  closeScanner()
+}
+
 // Get key from here: https://auth.openai.com/log-in/password
-function normalizeMacroValue(value) {
-  const numericValue = Number(value)
-  if (!Number.isFinite(numericValue) || numericValue < 0) {
-    return 0
-  }
+// function normalizeMacroValue(value) {
+//   const numericValue = Number(value)
+//   if (!Number.isFinite(numericValue) || numericValue < 0) {
+//     return 0
+//   }
 
-  return Math.round(numericValue * 100) / 100
-}
+//   return Math.round(numericValue * 100) / 100
+// }
 
-function parseMacroPayload(content) {
-  if (!content) {
-    return null
-  }
+// function parseMacroPayload(content) {
+//   if (!content) {
+//     return null
+//   }
 
-  const trimmed = String(content).trim()
-  const withoutFence = trimmed
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/```$/i, '')
-    .trim()
+//   const trimmed = String(content).trim()
+//   const withoutFence = trimmed
+//     .replace(/^```json\s*/i, '')
+//     .replace(/^```\s*/i, '')
+//     .replace(/```$/i, '')
+//     .trim()
 
-  try {
-    const parsed = JSON.parse(withoutFence)
-    return {
-      protein: normalizeMacroValue(parsed?.protein),
-      carb: normalizeMacroValue(parsed?.carb),
-      fat: normalizeMacroValue(parsed?.fat),
-      calories_extra: normalizeMacroValue(parsed?.calories_extra),
-    }
-  } catch {
-    return null
-  }
-}
+//   try {
+//     const parsed = JSON.parse(withoutFence)
+//     return {
+//       protein: normalizeMacroValue(parsed?.protein),
+//       carb: normalizeMacroValue(parsed?.carb),
+//       fat: normalizeMacroValue(parsed?.fat),
+//       calories_extra: normalizeMacroValue(parsed?.calories_extra),
+//     }
+//   } catch {
+//     return null
+//   }
+// }
 
-async function getMacrosFromAi() {
-  if (!canGetMacros.value) {
-    store.error = 'Enter description, serving size, and serving unit first.'
-    return
-  }
+// async function getMacrosFromAi() {
+//   if (!canGetMacros.value) {
+//     store.error = 'Enter description, serving size, and serving unit first.'
+//     return
+//   }
 
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY
-  if (!apiKey) {
-    store.error = 'Missing VITE_OPENAI_API_KEY. Add it to your environment to use Get Macros.'
-    return
-  }
+//   const apiKey = import.meta.env.VITE_OPENAI_API_KEY
+//   if (!apiKey) {
+//     store.error = 'Missing VITE_OPENAI_API_KEY. Add it to your environment to use Get Macros.'
+//     return
+//   }
 
-  isGettingMacros.value = true
-  store.error = ''
+//   isGettingMacros.value = true
+//   store.error = ''
 
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        temperature: 0,
-        messages: [
-          {
-            role: 'system',
-            content:
-              'You estimate nutrition macros for food. Return only JSON with numeric keys: protein, carb, fat, calories_extra. Protein/carb/fat are grams for the provided serving. calories_extra is non-macro calories for that serving.',
-          },
-          {
-            role: 'user',
-            content: `Food description: ${String(food.description || '').trim()}\nServing size: ${food.serving_size}\nServing unit: ${food.serving_unit}`,
-          },
-        ],
-      }),
-    })
+//   try {
+//     const response = await fetch('https://api.openai.com/v1/chat/completions', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${apiKey}`,
+//       },
+//       body: JSON.stringify({
+//         model: 'gpt-4o-mini',
+//         temperature: 0,
+//         messages: [
+//           {
+//             role: 'system',
+//             content:
+//               'You estimate nutrition macros for food. Return only JSON with numeric keys: protein, carb, fat, calories_extra. Protein/carb/fat are grams for the provided serving. calories_extra is non-macro calories for that serving.',
+//           },
+//           {
+//             role: 'user',
+//             content: `Food description: ${String(food.description || '').trim()}\nServing size: ${food.serving_size}\nServing unit: ${food.serving_unit}`,
+//           },
+//         ],
+//       }),
+//     })
 
-    if (!response.ok) {
-      throw new Error('AI request failed')
-    }
+//     if (!response.ok) {
+//       throw new Error('AI request failed')
+//     }
 
-    const data = await response.json()
-    const content = data?.choices?.[0]?.message?.content
-    const macros = parseMacroPayload(content)
+//     const data = await response.json()
+//     const content = data?.choices?.[0]?.message?.content
+//     const macros = parseMacroPayload(content)
 
-    if (!macros) {
-      throw new Error('Could not parse AI macro response')
-    }
+//     if (!macros) {
+//       throw new Error('Could not parse AI macro response')
+//     }
 
-    food.protein = macros.protein
-    food.carb = macros.carb
-    food.fat = macros.fat
-    food.calories_extra = macros.calories_extra
-  } catch (error) {
-    console.warn('Get Macros request failed.', error)
-    store.error = 'Unable to get macros from AI right now. Please enter values manually.'
-  } finally {
-    isGettingMacros.value = false
-  }
-}
+//     food.protein = macros.protein
+//     food.carb = macros.carb
+//     food.fat = macros.fat
+//     food.calories_extra = macros.calories_extra
+//   } catch (error) {
+//     console.warn('Get Macros request failed.', error)
+//     store.error = 'Unable to get macros from AI right now. Please enter values manually.'
+//   } finally {
+//     isGettingMacros.value = false
+//   }
+// }
 
 function requestDeleteFood(row) {
   pendingDeleteFood.value = row
