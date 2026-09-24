@@ -33,6 +33,9 @@ const emit = defineEmits(['detected', 'close'])
 const scannerContainer = ref(null)
 const error = ref(null)
 
+const cameras = ref([])
+const selectedCamera = ref(null)
+
 let scannerStarted = false
 let detected = false
 const lastBarcode = ref(null)
@@ -41,82 +44,105 @@ const barcodeCandidates = new Map()
 
 let candidateTimer = null
 
-function initScanner() {
-  if (!scannerContainer.value) {
-    return
+async function getCameras() {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices()
+
+    cameras.value = devices.filter((device) => device.kind === 'videoinput')
+
+    console.log('Available cameras:', cameras.value)
+
+    const rearCamera = cameras.value.find((camera) => /back|rear|environment/i.test(camera.label))
+
+    if (rearCamera) {
+      selectedCamera.value = rearCamera.deviceId
+    }
+  } catch (err) {
+    console.error('Unable to enumerate cameras:', err)
   }
-
-  Quagga.onDetected(handleDetected)
-
-  Quagga.init(
-    {
-      inputStream: {
-        type: 'LiveStream',
-
-        target: scannerContainer.value,
-
-        constraints: {
-          facingMode: 'environment',
-
-          width: {
-            min: 640,
-            ideal: 1920,
-            max: 2560,
-          },
-
-          height: {
-            min: 480,
-            ideal: 1080,
-            max: 1440,
-          },
-        },
-
-        area: {
-          top: '20%',
-          right: '10%',
-          left: '10%',
-          bottom: '20%',
-        },
-      },
-
-      locator: {
-        patchSize: 'medium',
-        halfSample: false,
-      },
-
-      numOfWorkers: 4,
-
-      frequency: 15,
-
-      decoder: {
-        readers: ['ean_reader', 'upc_reader'],
-      },
-
-      locate: true,
-    },
-
-    function (err) {
-      if (err) {
-        console.error('Quagga initialization error:', err)
-
-        error.value = 'Unable to access the camera. Please check your camera permissions.'
-
-        return
-      }
-
-      console.log('Quagga started')
-
-      scannerStarted = true
-
-      Quagga.start()
-    },
-  )
-
-  // Clear candidate detections periodically
-  candidateTimer = setInterval(() => {
-    barcodeCandidates.clear()
-  }, 2000)
 }
+
+Quagga.init(
+  {
+    inputStream: {
+      type: 'LiveStream',
+
+      target: scannerContainer.value,
+
+      constraints: {
+        facingMode: {
+          ideal: 'environment',
+        },
+
+        width: {
+          min: 640,
+          ideal: 1280,
+          max: 1920,
+        },
+
+        height: {
+          min: 480,
+          ideal: 720,
+          max: 1080,
+        },
+
+        aspectRatio: {
+          ideal: 16 / 9,
+        },
+      },
+    },
+
+    locator: {
+      patchSize: 'medium',
+      halfSample: false,
+    },
+
+    numOfWorkers: navigator.hardwareConcurrency ? Math.min(navigator.hardwareConcurrency, 4) : 2,
+
+    frequency: 15,
+
+    decoder: {
+      readers: ['ean_reader', 'upc_reader'],
+    },
+
+    locate: true,
+  },
+
+  function (err) {
+    if (err) {
+      console.error('Quagga initialization error:', err)
+
+      error.value = 'Unable to access the camera. Please check your camera permissions.'
+
+      return
+    }
+
+    console.log('Quagga initialized successfully')
+
+    scannerStarted = true
+
+    Quagga.start()
+
+    console.log('Quagga started')
+
+    // Give the camera a moment to initialize,
+    // then report the actual video resolution.
+    setTimeout(() => {
+      const video = scannerContainer.value?.querySelector('video')
+
+      if (video) {
+        console.log('Camera resolution:', {
+          width: video.videoWidth,
+          height: video.videoHeight,
+        })
+
+        console.log('Camera element:', video)
+      } else {
+        console.warn('Quagga started but video element was not found')
+      }
+    }, 1000)
+  },
+)
 
 function handleDetected(result) {
   if (detected) {
