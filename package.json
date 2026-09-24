@@ -15,6 +15,7 @@
     "postinstall": "quasar prepare"
   },
   "dependencies": {
+    "@ericblade/quagga2": "^1.12.1",
     "@quasar/extras": "^1.16.4",
     "@supabase/supabase-js": "^2.111.0",
     "chart.js": "^4.5.1",
