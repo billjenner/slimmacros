@@ -1,0 +1,169 @@
+-- Tables and their row-level security status
+| schema_name | table_name     | rls_enabled | rls_forced |
+| ----------- | -------------- | ----------- | ---------- |
+| auth        | users          | true        | false      |
+| public      | feedback       | true        | false      |
+| public      | food           | true        | false      |
+| public      | food_log       | true        | false      |
+| public      | profile        | true        | false      |
+| public      | supplement     | true        | false      |
+| public      | supplement_log | true        | false      |
+| public      | weight_log     | true        | false      |
+| public      | workout        | true        | false      |
+| public      | workout_log    | true        | false      |
+
+
+-- Columns and their details
+| table_schema | table_name     | column                      | type                     | udt         | nullable | default_value           |
+| public       | feedback       | feedback_id                 | bigint                   | int8        | NO       | null                    |
+| public       | feedback       | user_id                     | uuid                     | uuid        | NO       | null                    |
+| public       | feedback       | created_at                  | timestamp with time zone | timestamptz | NO       | now()                   |
+| public       | feedback       | feedback_type               | text                     | text        | NO       | null                    |
+| public       | feedback       | subject                     | text                     | text        | NO       | null                    |
+| public       | feedback       | description                 | text                     | text        | NO       | null                    |
+| public       | feedback       | contact                     | text                     | text        | YES      | null                    |
+| public       | feedback       | email                       | text                     | text        | YES      | null                    |
+| public       | feedback       | allow_contact               | boolean                  | bool        | NO       | false                   |
+| public       | food           | food_id                     | bigint                   | int8        | NO       | null                    |
+| public       | food           | user_id                     | uuid                     | uuid        | NO       | null                    |
+| public       | food           | description                 | text                     | text        | NO       | null                    |
+| public       | food           | protein                     | numeric                  | numeric     | NO       | 0                       |
+| public       | food           | fat                         | numeric                  | numeric     | NO       | 0                       |
+| public       | food           | carb                        | numeric                  | numeric     | NO       | 0                       |
+| public       | food           | calories_extra              | numeric                  | numeric     | NO       | 0                       |
+| public       | food           | my_food                     | boolean                  | bool        | NO       | true                    |
+| public       | food           | favorite_food               | boolean                  | bool        | NO       | false                   |
+| public       | food           | share_with_others           | boolean                  | bool        | NO       | false                   |
+| public       | food           | serving_size                | numeric                  | numeric     | NO       | 1                       |
+| public       | food           | serving_unit                | text                     | text        | NO       | null                    |
+| public       | food           | is_active                   | boolean                  | bool        | NO       | true                    |
+| public       | food           | created_at                  | timestamp with time zone | timestamptz | NO       | now()                   |
+| public       | food_log       | food_log_id                 | bigint                   | int8        | NO       | null                    |
+| public       | food_log       | food_id                     | bigint                   | int8        | NO       | null                    |
+| public       | food_log       | user_id                     | uuid                     | uuid        | NO       | null                    |
+| public       | food_log       | servings                    | numeric                  | numeric     | NO       | 1                       |
+| public       | food_log       | datetime                    | timestamp with time zone | timestamptz | NO       | now()                   |
+| public       | profile        | profile_id                  | bigint                   | int8        | NO       | null                    |
+| public       | profile        | user_id                     | uuid                     | uuid        | NO       | null                    |
+| public       | profile        | sex                         | text                     | text        | YES      | 'M'::text               |
+| public       | profile        | age                         | integer                  | int4        | YES      | null                    |
+| public       | profile        | height                      | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | start_weight                | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | goal_weight                 | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | activity_level              | text                     | text        | YES      | null                    |
+| public       | profile        | daily_calorie_deficit       | integer                  | int4        | YES      | 0                       |
+| public       | profile        | diet_type                   | text                     | text        | YES      | null                    |
+| public       | profile        | sunday_protein              | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | sunday_carbs                | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | sunday_fat                  | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | monday_protein              | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | monday_carbs                | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | monday_fat                  | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | tuesday_protein             | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | tuesday_carbs               | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | tuesday_fat                 | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | wednesday_protein           | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | wednesday_carbs             | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | wednesday_fat               | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | thursday_protein            | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | thursday_carbs              | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | thursday_fat                | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | friday_protein              | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | friday_carbs                | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | friday_fat                  | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | saturday_protein            | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | saturday_carbs              | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | saturday_fat                | numeric                  | numeric     | YES      | null                    |
+| public       | profile        | is_active                   | boolean                  | bool        | NO       | true                    |
+| public       | profile        | created_at                  | timestamp with time zone | timestamptz | NO       | now()                   |
+| public       | profile        | fname                       | text                     | text        | NO       | ''::text                |
+| public       | profile        | lname                       | text                     | text        | NO       | ''::text                |
+| public       | supplement     | supplement_id               | bigint                   | int8        | NO       | null                    |
+| public       | supplement     | user_id                     | uuid                     | uuid        | NO       | null                    |
+| public       | supplement     | description                 | text                     | text        | NO       | null                    |
+| public       | supplement     | serving_size                | numeric                  | numeric     | NO       | 1                       |
+| public       | supplement     | serving_unit                | text                     | text        | NO       | 'other'::text           |
+| public       | supplement     | share_with_others           | boolean                  | bool        | NO       | false                   |
+| public       | supplement     | is_active                   | boolean                  | bool        | NO       | true                    |
+| public       | supplement     | created_at                  | timestamp with time zone | timestamptz | NO       | now()                   |
+| public       | supplement_log | supplement_log_id           | bigint                   | int8        | NO       | null                    |
+| public       | supplement_log | supplement_id               | bigint                   | int8        | NO       | null                    |
+| public       | supplement_log | user_id                     | uuid                     | uuid        | NO       | null                    |
+| public       | supplement_log | servings                    | numeric                  | numeric     | NO       | 1                       |
+| public       | supplement_log | date                        | date                     | date        | NO       | CURRENT_DATE            |
+| public       | weight_log     | weight_log_id               | bigint                   | int8        | NO       | null                    |
+| public       | weight_log     | user_id                     | uuid                     | uuid        | NO       | null                    |
+| public       | weight_log     | weight                      | numeric                  | numeric     | NO       | null                    |
+| public       | weight_log     | bmi                         | numeric                  | numeric     | YES      | null                    |
+| public       | weight_log     | date                        | date                     | date        | NO       | CURRENT_DATE            |
+| public       | workout        | workout_id                  | bigint                   | int8        | NO       | null                    |
+| public       | workout        | user_id                     | uuid                     | uuid        | NO       | null                    |
+| public       | workout        | type                        | text                     | text        | NO       | null                    |
+| public       | workout        | average_workout_time        | integer                  | int4        | YES      | null                    |
+| public       | workout        | calories_burned             | integer                  | int4        | NO       | 0                       |
+| public       | workout        | share_with_others           | boolean                  | bool        | NO       | false                   |
+| public       | workout        | is_active                   | boolean                  | bool        | NO       | true                    |
+| public       | workout        | created_at                  | timestamp with time zone | timestamptz | NO       | now()                   |
+| public       | workout_log    | workout_log_id              | bigint                   | int8        | NO       | null                    |
+| public       | workout_log    | workout_id                  | bigint                   | int8        | NO       | null                    |
+| public       | workout_log    | user_id                     | uuid                     | uuid        | NO       | null                    |
+| public       | workout_log    | workout_time                | integer                  | int4        | YES      | null                    |
+| public       | workout_log    | calories_burned             | integer                  | int4        | NO       | 0                       |
+| public       | workout_log    | date                        | date                     | date        | NO       | CURRENT_DATE            |
+
+
+-- Constraints and their details
+| table_schema | table_name     | column            | references_schema | references_table | references_column | constraint_type | constraint                        |
+| ------------ | -------------- | ----------------- | ----------------- | ---------------- | ----------------- | --------------- | --------------------------------- |
+| public       | feedback       | feedback_id       | public            | feedback         | feedback_id       | PRIMARY KEY     | feedback_pkey                     |
+| public       | food           | food_id           | public            | food             | food_id           | PRIMARY KEY     | food_pkey                         |
+| public       | food_log       | food_id           | public            | food             | food_id           | FOREIGN KEY     | food_log_food_id_fkey1            |
+| public       | food_log       | food_log_id       | public            | food_log         | food_log_id       | PRIMARY KEY     | food_log_pkey1                    |
+| public       | profile        | profile_id        | public            | profile          | profile_id        | PRIMARY KEY     | profile_pkey                      |
+| public       | profile        | user_id           | public            | profile          | user_id           | UNIQUE          | profile_user_id_key               |
+| public       | supplement     | supplement_id     | public            | supplement       | supplement_id     | PRIMARY KEY     | supplement_pkey                   |
+| public       | supplement_log | supplement_log_id | public            | supplement_log   | supplement_log_id | PRIMARY KEY     | supplement_log_pkey               |
+| public       | supplement_log | supplement_id     | public            | supplement       | supplement_id     | FOREIGN KEY     | supplement_log_supplement_id_fkey |
+| public       | weight_log     | weight_log_id     | public            | weight_log       | weight_log_id     | PRIMARY KEY     | weight_log_pkey1                  |
+| public       | workout        | workout_id        | public            | workout          | workout_id        | PRIMARY KEY     | workout_pkey                      |
+| public       | workout_log    | workout_log_id    | public            | workout_log      | workout_log_id    | PRIMARY KEY     | workout_log_pkey                  |
+| public       | workout_log    | workout_id        | public            | workout          | workout_id        | FOREIGN KEY     | workout_log_workout_id_fkey       |
+
+
+-- Policies
+| schema_name | table_name     | policy_name                     | command | permissive | roles    | using_expression                                       | check_expression       |
+| ----------- | -------------- | ------------------------------- | ------- | ---------- | -------- | ------------------------------------------------------ | ---------------------- |
+| public      | feedback       | feedback_insert_own             | INSERT  | PERMISSIVE | {public} | null                                                   | (auth.uid() = user_id) |
+| public      | feedback       | feedback_select_own             | SELECT  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | food           | food_delete_own                 | DELETE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | food           | food_insert_own                 | INSERT  | PERMISSIVE | {public} | null                                                   | (auth.uid() = user_id) |
+| public      | food           | food_select_own_or_shared       | SELECT  | PERMISSIVE | {public} | ((auth.uid() = user_id) OR (share_with_others = true)) | null                   |
+| public      | food           | food_update_own                 | UPDATE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | (auth.uid() = user_id) |
+| public      | food_log       | food_log_delete_own             | DELETE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | food_log       | food_log_insert_own             | INSERT  | PERMISSIVE | {public} | null                                                   | (auth.uid() = user_id) |
+| public      | food_log       | food_log_select_own             | SELECT  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | food_log       | food_log_update_own             | UPDATE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | (auth.uid() = user_id) |
+| public      | profile        | profile_delete_own              | DELETE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | profile        | profile_insert_own              | INSERT  | PERMISSIVE | {public} | null                                                   | (auth.uid() = user_id) |
+| public      | profile        | profile_select_own              | SELECT  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | profile        | profile_update_own              | UPDATE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | (auth.uid() = user_id) |
+| public      | supplement     | supplement_delete_own           | DELETE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | supplement     | supplement_insert_own           | INSERT  | PERMISSIVE | {public} | null                                                   | (auth.uid() = user_id) |
+| public      | supplement     | supplement_select_own_or_shared | SELECT  | PERMISSIVE | {public} | ((auth.uid() = user_id) OR (share_with_others = true)) | null                   |
+| public      | supplement     | supplement_update_own           | UPDATE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | (auth.uid() = user_id) |
+| public      | supplement_log | supplement_log_delete_own       | DELETE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | supplement_log | supplement_log_insert_own       | INSERT  | PERMISSIVE | {public} | null                                                   | (auth.uid() = user_id) |
+| public      | supplement_log | supplement_log_select_own       | SELECT  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | supplement_log | supplement_log_update_own       | UPDATE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | (auth.uid() = user_id) |
+| public      | weight_log     | weight_log_delete_own           | DELETE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | weight_log     | weight_log_insert_own           | INSERT  | PERMISSIVE | {public} | null                                                   | (auth.uid() = user_id) |
+| public      | weight_log     | weight_log_select_own           | SELECT  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | weight_log     | weight_log_update_own           | UPDATE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | (auth.uid() = user_id) |
+| public      | workout        | workout_delete_own              | DELETE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | workout        | workout_insert_own              | INSERT  | PERMISSIVE | {public} | null                                                   | (auth.uid() = user_id) |
+| public      | workout        | workout_select_own_or_shared    | SELECT  | PERMISSIVE | {public} | ((auth.uid() = user_id) OR (share_with_others = true)) | null                   |
+| public      | workout        | workout_update_own              | UPDATE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | (auth.uid() = user_id) |
+| public      | workout_log    | workout_log_delete_own          | DELETE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | workout_log    | workout_log_insert_own          | INSERT  | PERMISSIVE | {public} | null                                                   | (auth.uid() = user_id) |
+| public      | workout_log    | workout_log_select_own          | SELECT  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | null                   |
+| public      | workout_log    | workout_log_update_own          | UPDATE  | PERMISSIVE | {public} | (auth.uid() = user_id)                                 | (auth.uid() = user_id) |\

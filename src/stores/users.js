@@ -68,7 +68,7 @@ export const useUsersStore = defineStore('Users', {
   }),
 
   actions: {
-    async registerUser(email, password) {
+    async registerUser(email, password, profile = {}) {
       this.error = null
 
       if (!supabase) {
@@ -81,6 +81,12 @@ export const useUsersStore = defineStore('Users', {
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: normalizedEmail,
         password,
+        options: {
+          data: {
+            fname: profile.fname || '',
+            lname: profile.lname || '',
+          },
+        },
       })
 
       if (signUpError) {
@@ -88,14 +94,21 @@ export const useUsersStore = defineStore('Users', {
         return null
       }
 
-      if (!signUpData?.session && !signUpData?.user) {
-        this.error = 'Account created, but email confirmation is required before logging in.'
+      const authUser = signUpData?.user
+      if (!authUser) {
+        this.error = 'Unable to complete user registration.'
         return null
       }
 
-      const authUser = signUpData.user
-      if (!authUser) {
-        this.error = 'Unable to complete user registration.'
+      // Supabase returns a user object with no identities (and no session) when the
+      // email is already registered, to avoid leaking account existence.
+      if (Array.isArray(authUser.identities) && authUser.identities.length === 0) {
+        this.error = 'An account with that email already exists.'
+        return null
+      }
+
+      if (!signUpData.session) {
+        this.error = 'Account created. Please check your email to confirm before logging in.'
         return null
       }
 

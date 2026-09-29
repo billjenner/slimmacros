@@ -5,6 +5,24 @@
 
       <q-form @submit.prevent="handleSubmit" class="q-gutter-y-md full-width">
         <q-input
+          v-model="fname"
+          label="First name"
+          outlined
+          dense
+          autocomplete="given-name"
+          :rules="[(val) => !!val || 'First name is required']"
+        />
+
+        <q-input
+          v-model="lname"
+          label="Last name"
+          outlined
+          dense
+          autocomplete="family-name"
+          :rules="[(val) => !!val || 'Last name is required']"
+        />
+
+        <q-input
           v-model="email"
           label="Email"
           type="email"
@@ -54,12 +72,18 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
+import { useProfileStore } from 'stores/profile'
 import { notifySuccess } from '../utils/notify'
 
 const router = useRouter()
 const store = useUsersStore()
+const profileStore = useProfileStore()
+const $q = useQuasar()
 
+const fname = ref('')
+const lname = ref('')
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
@@ -72,18 +96,25 @@ async function handleSubmit() {
     return
   }
 
-  if (!email.value.trim() || !password.value) {
+  if (!fname.value.trim() || !lname.value.trim() || !email.value.trim() || !password.value) {
     message.value = 'Please fill in all required fields.'
     messageClass.value = 'text-negative'
     return
   }
 
   submitting.value = true
-  const result = await store.registerUser(email.value, password.value)
+  const result = await store.registerUser(email.value, password.value, {
+    fname: fname.value.trim(),
+    lname: lname.value.trim(),
+  })
 
   if (result) {
+    await profileStore.saveProfile(result.user_id, {
+      fname: fname.value.trim(),
+      lname: lname.value.trim(),
+    })
     message.value = `User created for ${store.currentUser?.email}`
-    notifySuccess(`User created for ${store.currentUser?.email}`)
+    notifySuccess($q, `User created for ${store.currentUser?.email}`)
     messageClass.value = 'text-positive'
     setTimeout(() => router.push('/login'), 2000)
   } else {

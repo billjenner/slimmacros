@@ -67,12 +67,14 @@
 <script setup>
 import { nextTick, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
 import { supabase } from '../lib/supabase'
 import { useUsersStore } from 'stores/users'
 import { notifySuccess } from '../utils/notify'
 
 const router = useRouter()
 const store = useUsersStore()
+const $q = useQuasar()
 
 const formRef = ref(null)
 const currentPassword = ref('')
@@ -143,7 +145,7 @@ async function handleSubmit() {
   formRef.value?.resetValidation()
   message.value = 'Password changed successfully.'
   messageClass.value = 'text-positive'
-  notifySuccess('Password changed successfully.')
+  notifySuccess($q, 'Password changed successfully.')
   submitting.value = false
   setTimeout(() => router.push('/login'), 2000)
 }

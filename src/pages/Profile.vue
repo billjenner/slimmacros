@@ -29,11 +29,11 @@
               <div class="text-subtitle1 q-mb-sm">User details</div>
               <div class="row q-col-gutter-md">
                 <div class="col-12 col-md-4">
-                  <q-input v-model="profile.fname" label="First name" readonly filled dense />
+                  <q-input v-model="profile.fname" label="First name" filled dense />
                 </div>
 
                 <div class="col-12 col-md-4">
-                  <q-input v-model="profile.lname" label="Last name" readonly filled dense />
+                  <q-input v-model="profile.lname" label="Last name" filled dense />
                 </div>
 
                 <div class="col-12 col-md-4">
@@ -49,7 +49,7 @@
                 </div>
 
                 <div class="col-12 col-md-4">
-                  <q-input v-model="profile.age" label="Age" readonly filled dense />
+                  <q-input v-model="profile.age" type="number" label="Age" min="0" filled dense />
                 </div>
               </div>
             </q-card>
@@ -172,7 +172,7 @@
                       type="number"
                       min="0"
                       max="100"
-                      step="0.01"
+                      step="1"
                       :label="field.label"
                       filled
                       dense
@@ -445,11 +445,47 @@ async function loadProfile() {
   loading.value = false
 }
 
+function validateDailyMacros() {
+  for (const day of dayGroups) {
+    const [proteinKey, carbsKey, fatKey] = day.fields.map((field) => field.key)
+    const protein = profile[proteinKey]
+    const carbs = profile[carbsKey]
+    const fat = profile[fatKey]
+
+    if (
+      protein === null ||
+      protein === '' ||
+      carbs === null ||
+      carbs === '' ||
+      fat === null ||
+      fat === ''
+    ) {
+      return `${day.label}: protein, carbs, and fat are required.`
+    }
+
+    const total = Number(protein) + Number(carbs) + Number(fat)
+    if (Math.abs(total - 100) > 0.01) {
+      return `${day.label}: protein, carbs, and fat must add up to 100% (currently ${total}%).`
+    }
+  }
+
+  return null
+}
+
 async function saveProfile() {
   if (!currentUserId.value) {
     return
   }
 
+  const validationError = validateDailyMacros()
+  if (validationError) {
+    store.error = validationError
+    notifySuccess($q, validationError, { color: 'negative' })
+    notifySuccess($q, 'If necessary - LOAD TEMPLATE', { color: 'warning' })
+    return
+  }
+
+  store.error = null
   loading.value = true
   const savedProfile = await store.saveProfile(currentUserId.value, {
     fname: profile.fname,

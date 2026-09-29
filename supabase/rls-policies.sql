@@ -55,7 +55,6 @@ CREATE TRIGGER on_auth_user_created
 -- ROW LEVEL SECURITY
 -- ============================================================
 
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.profile ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.food ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.food_log ENABLE ROW LEVEL SECURITY;
@@ -66,12 +65,8 @@ ALTER TABLE public.workout_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.weight_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.feedback ENABLE ROW LEVEL SECURITY;
 
--- ---------------- users ----------------
--- No INSERT policy: rows are only ever created by the handle_new_user trigger.
-CREATE POLICY "users_select_own" ON public.users
-  FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "users_update_own" ON public.users
-  FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+-- public.users has been dropped; fname/lname/sex/age now live on public.profile
+-- (see create-trigger.sql), so there are no more users_* policies to (re)create.
 
 -- ---------------- profile ----------------
 CREATE POLICY "profile_select_own" ON public.profile
