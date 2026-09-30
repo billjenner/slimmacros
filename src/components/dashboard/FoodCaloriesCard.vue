@@ -44,12 +44,32 @@
 import { Chart } from 'chart.js/auto'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useFoodLogsStore } from 'stores/food-logs'
+import { useProfileStore } from 'stores/profile'
 import { useUsersStore } from 'stores/users'
+import { useWeightLogsStore } from 'stores/weight-logs'
+import { useWorkoutLogsStore } from 'stores/workout-logs'
+import { calculateTotalCaloriesForPerson, calculateTotalDailyCalories } from '../../utils/rules'
 
 const foodLogsStore = useFoodLogsStore()
 const usersStore = useUsersStore()
+const profileStore = useProfileStore()
+const weightLogsStore = useWeightLogsStore()
+const workoutLogsStore = useWorkoutLogsStore()
 const foodCaloriesChart = ref(null)
 let foodChart = null
+
+const currentProfile = computed(() => profileStore.currentProfile || null)
+
+const weightLogsSortedByDate = computed(() => {
+  return [...(weightLogsStore.logs || [])]
+    .filter((log) => Number.isFinite(Number(log?.weight)) && Number(log?.weight) > 0)
+    .sort((leftLog, rightLog) => {
+      const leftKey = String(leftLog?.date || '').slice(0, 10)
+      const rightKey = String(rightLog?.date || '').slice(0, 10)
+
+      return leftKey.localeCompare(rightKey)
+    })
+})
 
 const foodCaloriesByDay = computed(() => {
   const caloriesByDay = (foodLogsStore.logs || []).reduce((totals, log) => {
@@ -95,6 +115,73 @@ function getCurrentLocalDateString() {
   const day = String(now.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
+function getWeightForDate(dateKey) {
+  const latestWeightLog = weightLogsSortedByDate.value.reduce((latestLog, log) => {
+    const logDateKey = String(log?.date || '').slice(0, 10)
+
+    if (logDateKey > dateKey) {
+      return latestLog
+    }
+
+    if (!latestLog) {
+      return log
+    }
+
+    const latestDateKey = String(latestLog?.date || '').slice(0, 10)
+    const latestWeightLogId = Number(latestLog?.weight_log_id) || 0
+    const currentWeightLogId = Number(log?.weight_log_id) || 0
+
+    if (logDateKey > latestDateKey) {
+      return log
+    }
+
+    if (logDateKey === latestDateKey && currentWeightLogId > latestWeightLogId) {
+      return log
+    }
+
+    return latestLog
+  }, null)
+
+  const resolvedWeight = Number(latestWeightLog?.weight)
+  if (Number.isFinite(resolvedWeight) && resolvedWeight > 0) {
+    return resolvedWeight
+  }
+
+  const profileStartWeight = Number(currentProfile.value?.start_weight)
+  return Number.isFinite(profileStartWeight) && profileStartWeight > 0 ? profileStartWeight : null
+}
+
+function getWorkoutCaloriesBurnedForDate(dateKey) {
+  return (workoutLogsStore.logs || []).reduce((sum, log) => {
+    const logDate = String(log?.date || '').slice(0, 10)
+    if (logDate !== dateKey) {
+      return sum
+    }
+
+    return sum + (Number(log?.calories_burned) || 0)
+  }, 0)
+}
+
+function calculateCalorieGoalForDate(dateKey) {
+  const totalDailyCalories = calculateTotalDailyCalories({
+    weight: getWeightForDate(dateKey),
+    height: currentProfile.value?.height,
+    age: currentProfile.value?.age,
+    sex: currentProfile.value?.sex,
+    activityLevel: currentProfile.value?.activity_level,
+  })
+
+  return calculateTotalCaloriesForPerson({
+    totalDailyCalories,
+    dailyCalorieDeficit: currentProfile.value?.daily_calorie_deficit,
+    totalWorkoutCaloriesBurnedbyFoodDay: getWorkoutCaloriesBurnedForDate(dateKey),
+  })
+}
+
+const calorieGoalByDay = computed(() => {
+  return foodCaloriesByDay.value.map((day) => calculateCalorieGoalForDate(day.date))
+})
 
 function calculateAveCalories(daysBack) {
   const days = foodCaloriesByDay.value
@@ -163,6 +250,16 @@ async function renderFoodChart() {
           data: foodCaloriesByDay.value.map((day) => day.fatCalories),
           backgroundColor: 'rgba(54, 162, 235, 0.7)',
         },
+        {
+          label: 'Calorie Budget (includes workouts)',
+          type: 'line',
+          data: calorieGoalByDay.value,
+          borderColor: '#f44336',
+          borderWidth: 2,
+          pointRadius: 0,
+          fill: false,
+          order: 1,
+        },
       ],
     },
     options: {
@@ -199,7 +296,7 @@ function getLocalDateKey(datetime) {
   return `${year}-${month}-${day}`
 }
 
-watch(foodCaloriesByDay, renderFoodChart)
+watch([foodCaloriesByDay, calorieGoalByDay], renderFoodChart)
 
 onBeforeUnmount(destroyFoodChart)
 </script>
