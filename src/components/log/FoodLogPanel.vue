@@ -656,8 +656,8 @@ const totalDailyCalories = computed(() => {
   const calories = calculateTotalDailyCalories({
     weight: Number.isFinite(weight) && weight > 0 ? weight : null,
     height: currentProfile.value?.height,
-    age: usersStore.currentUser?.age,
-    sex: usersStore.currentUser?.sex,
+    age: currentProfile.value?.age,
+    sex: currentProfile.value?.sex,
     activityLevel: currentProfile.value?.activity_level,
   })
 
