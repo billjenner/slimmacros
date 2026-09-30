@@ -25,13 +25,13 @@
           <hr />
           <div class="row justify-between items-center q-mt-md">
             <q-chip class="resize-chip" color="secondary" text-color="white" square>
-              1 year ave: {{ aveCalories1Year }}
+              1 year ave: {{ aveCalories1Year }} | deficit: {{ aveCalorieDeficit1Year }}
             </q-chip>
             <q-chip class="resize-chip" color="secondary" text-color="white" square>
-              30 days ave: {{ aveCalories30Days }}
+              30 days ave: {{ aveCalories30Days }} | deficit: {{ aveCalorieDeficit30Days }}
             </q-chip>
             <q-chip class="resize-chip" color="secondary" text-color="white" square>
-              7 days ave: {{ aveCalories7Days }}
+              7 days ave: {{ aveCalories7Days }} | deficit: {{ aveCalorieDeficit7Days }}
             </q-chip>
           </div>
         </div>
@@ -213,9 +213,48 @@ function calculateAveCalories(daysBack) {
   return Math.round(avg)
 }
 
+function getPeriodEntriesWithGoal(daysBack) {
+  const days = foodCaloriesByDay.value
+  const goals = calorieGoalByDay.value
+  if (!days || !days.length) {
+    return []
+  }
+
+  const todayStr = getCurrentLocalDateString()
+
+  return days
+    .map((day, index) => ({ day, goal: Number(goals[index]) || 0 }))
+    .filter(({ day }) => {
+      const dayDateStr = String(day.date).slice(0, 10)
+      const daysFromToday = getDaysBetween(dayDateStr, todayStr)
+      return daysFromToday >= 0 && daysFromToday <= daysBack
+    })
+}
+
+function calculateAveCalorieDeficit(daysBack) {
+  const periodEntries = getPeriodEntriesWithGoal(daysBack)
+  if (!periodEntries.length) {
+    return '----'
+  }
+
+  const totalDeficitSum = periodEntries.reduce((sum, { day, goal }) => {
+    const dailyTotal =
+      (Number(day.proteinCalories) || 0) +
+      (Number(day.carbCalories) || 0) +
+      (Number(day.fatCalories) || 0)
+    return sum + (dailyTotal - goal)
+  }, 0)
+
+  return Math.round(totalDeficitSum / periodEntries.length)
+}
+
 const aveCalories1Year = computed(() => calculateAveCalories(365))
 const aveCalories30Days = computed(() => calculateAveCalories(30))
 const aveCalories7Days = computed(() => calculateAveCalories(7))
+
+const aveCalorieDeficit1Year = computed(() => calculateAveCalorieDeficit(365))
+const aveCalorieDeficit30Days = computed(() => calculateAveCalorieDeficit(30))
+const aveCalorieDeficit7Days = computed(() => calculateAveCalorieDeficit(7))
 
 function destroyFoodChart() {
   foodChart?.destroy()
