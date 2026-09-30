@@ -360,7 +360,7 @@ onBeforeUnmount(destroyFoodChart)
   .resize-chip {
     font-size: 10px;
     line-height: 1.2;
-    padding: 0 0 0 0px;
+    padding: 0 8px;
     min-height: 22px;
   }
 }
