@@ -238,17 +238,17 @@ async function renderFoodChart() {
         {
           label: 'Protein Calories',
           data: foodCaloriesByDay.value.map((day) => day.proteinCalories),
-          backgroundColor: 'rgba(76, 175, 80, 0.7)',
+          backgroundColor: 'rgba(76, 175, 80, 0.5)',
         },
         {
           label: 'Carb Calories',
           data: foodCaloriesByDay.value.map((day) => day.carbCalories),
-          backgroundColor: 'rgba(255, 206, 86, 0.7)',
+          backgroundColor: 'rgba(255, 206, 86, 0.5)',
         },
         {
           label: 'Fat Calories',
           data: foodCaloriesByDay.value.map((day) => day.fatCalories),
-          backgroundColor: 'rgba(54, 162, 235, 0.7)',
+          backgroundColor: 'rgba(54, 162, 235, 0.5)',
         },
         {
           label: 'Calorie Budget (includes workouts)',

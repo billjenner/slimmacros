@@ -154,7 +154,12 @@
           <tbody>
             <tr>
               <td style="width: 84%">
-                <q-linear-progress :value="foodLogProgress" color="brown" size="18px" rounded />
+                <q-linear-progress
+                  :value="foodLogProgress"
+                  color="custom-red"
+                  size="18px"
+                  rounded
+                />
               </td>
               <td style="width: 16%">
                 <q-chip dense color="secondary" text-color="white" square>
@@ -270,6 +275,12 @@
     </q-dialog>
   </div>
 </template>
+
+<style scoped>
+.text-custom-red {
+  color: #f44336;
+}
+</style>
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
