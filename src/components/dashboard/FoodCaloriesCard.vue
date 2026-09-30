@@ -23,7 +23,8 @@
             <canvas ref="foodCaloriesChart"></canvas>
           </div>
           <hr />
-          <div class="row justify-between items-center q-mt-md">
+          <div class="text-h6 text-center q-mt-md">Calories Consumed</div>
+          <div class="row justify-between items-center">
             <q-chip class="resize-chip" color="secondary" text-color="white" square>
               1 year ave: {{ aveCalories1Year }}
             </q-chip>
@@ -34,15 +35,17 @@
               7 days ave: {{ aveCalories7Days }}
             </q-chip>
           </div>
+
+          <div class="text-h6 text-center q-mt-md">Consumed vs. Budget</div>
           <div class="row justify-between items-center">
             <q-chip class="resize-chip" color="secondary" text-color="white" square>
-              1 year gap: {{ aveCalorieDeficit1Year }}
+              1 year ave: {{ aveCalorieDeficit1Year }}
             </q-chip>
             <q-chip class="resize-chip" color="secondary" text-color="white" square>
-              30 days gap: {{ aveCalorieDeficit30Days }}
+              30 days ave: {{ aveCalorieDeficit30Days }}
             </q-chip>
             <q-chip class="resize-chip" color="secondary" text-color="white" square>
-              7 days gap: {{ aveCalorieDeficit7Days }}
+              7 days ave: {{ aveCalorieDeficit7Days }}
             </q-chip>
           </div>
         </div>
