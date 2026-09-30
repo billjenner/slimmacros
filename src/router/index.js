@@ -102,11 +102,24 @@ export default defineRouter(async (/* { store, ssrContext } */) => {
       const requiresAdmin = to.matched.some((record) => record.meta?.requiresAdmin)
 
       if (requiresAuth && !loggedIn) {
-        const restoredUser =
-          (await store.restoreSessionFromAuth())
+        const restoredUser = await store.restoreSessionFromAuth()
 
         if (!restoredUser) {
           return { path: '/login', query: { redirect: to.fullPath } }
+        }
+      }
+
+      if (requiresAuth && to.path !== '/profile') {
+        const { useProfileStore } = await import('../stores/profile')
+        const profileStore = useProfileStore()
+        const userId = store.currentUser?.user_id
+
+        if (userId && !profileStore.currentProfile) {
+          await profileStore.loadCurrentProfile(userId)
+        }
+
+        if (!profileStore.currentProfile) {
+          return { path: '/profile', query: { redirect: to.fullPath } }
         }
       }
 

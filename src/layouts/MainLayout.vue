@@ -317,7 +317,7 @@ watch(
 )
 
 watch(
-  () => usersStore.isOffline,
+  () => usersStore.isOffline || profileStore.isOffline,
   (isOffline) => {
     if (isOffline) {
       showOfflineDialog.value = true
