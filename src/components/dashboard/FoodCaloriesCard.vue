@@ -25,13 +25,24 @@
           <hr />
           <div class="row justify-between items-center q-mt-md">
             <q-chip class="resize-chip" color="secondary" text-color="white" square>
-              1 year ave: {{ aveCalories1Year }} | deficit: {{ aveCalorieDeficit1Year }}
+              1 year ave: {{ aveCalories1Year }}
             </q-chip>
             <q-chip class="resize-chip" color="secondary" text-color="white" square>
-              30 days ave: {{ aveCalories30Days }} | deficit: {{ aveCalorieDeficit30Days }}
+              30 days ave: {{ aveCalories30Days }}
             </q-chip>
             <q-chip class="resize-chip" color="secondary" text-color="white" square>
-              7 days ave: {{ aveCalories7Days }} | deficit: {{ aveCalorieDeficit7Days }}
+              7 days ave: {{ aveCalories7Days }}
+            </q-chip>
+          </div>
+          <div class="row justify-between items-center">
+            <q-chip class="resize-chip" color="secondary" text-color="white" square>
+              1 year gap: {{ aveCalorieDeficit1Year }}
+            </q-chip>
+            <q-chip class="resize-chip" color="secondary" text-color="white" square>
+              30 days gap: {{ aveCalorieDeficit30Days }}
+            </q-chip>
+            <q-chip class="resize-chip" color="secondary" text-color="white" square>
+              7 days gap: {{ aveCalorieDeficit7Days }}
             </q-chip>
           </div>
         </div>
@@ -345,16 +356,11 @@ onBeforeUnmount(destroyFoodChart)
   height: 320px;
 }
 
-.resize-chip {
-  /* normal size */
-}
-
 @media (max-width: 780px) {
   .resize-chip {
-    /* styles for small screens */
     font-size: 10px;
     line-height: 1.2;
-    padding: 0 8px;
+    padding: 0 0 0 0px;
     min-height: 22px;
   }
 }
