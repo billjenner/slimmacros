@@ -22,6 +22,12 @@ grant select, insert, update, delete
 on public.food_database
 to authenticated;
 
+create policy "food_database_select_authenticated"
+on public.food_database
+for select
+to authenticated
+using (true);
+
 
 
 INSERT INTO public.food_database (

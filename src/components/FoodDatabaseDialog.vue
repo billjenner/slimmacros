@@ -3,8 +3,8 @@
     <q-card style="width: 500px; max-width: 95vw">
       <q-card-section class="text-h6">Get Food</q-card-section>
 
-      <q-card-section class="q-gutter-md">
-        <q-banner v-if="store.error" class="bg-negative text-white" rounded>
+      <q-card-section>
+        <q-banner v-if="store.error" class="bg-negative text-white q-mb-md" rounded>
           {{ store.error }}
         </q-banner>
 
@@ -14,6 +14,7 @@
           option-label="description"
           option-value="food_db_id"
           label="Description"
+          class="q-mb-md"
           filled
           dense
           use-input
