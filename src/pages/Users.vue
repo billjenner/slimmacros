@@ -18,10 +18,10 @@
       </div>
 
       <q-list v-else bordered separator class="rounded-borders">
-        <q-item v-for="user in store.users" :key="user.email" clickable>
+        <q-item v-for="user in store.users" :key="user.id" clickable>
           <q-item-section>
             <q-item-label caption>
-              {{ getProfile(user)?.fname }} {{ getProfile(user)?.lname }} | {{ user.email }} |
+              {{ getProfile(user)?.fname }} {{ getProfile(user)?.lname }} |
               {{ getProfile(user)?.sex }} | {{ getProfile(user)?.age }} |
               {{ roundWeight(getProfile(user)?.start_weight) }} |
               {{ roundWeight(getProfile(user)?.goal_weight) }} |

@@ -310,10 +310,10 @@ export const useUsersStore = defineStore('Users', {
       }
 
       try {
-        const {
-          data: { user },
-          error,
-        } = await supabase.auth.getUser()
+        const { data, error } = await supabase
+          .from('profile')
+          .select('user_id, created_at')
+          .order('created_at', { ascending: false })
 
         if (error) {
           this.error = error.message
@@ -322,15 +322,13 @@ export const useUsersStore = defineStore('Users', {
         }
 
         this.isOffline = false
-
-        if (user) {
-          const formatted = formatAuthUser(user)
-          this.users = [formatted]
-          return this.users
-        }
-
-        this.users = []
-        return []
+        // RLS limits this to rows the current session is allowed to read.
+        this.users = (data || []).map((row) => ({
+          id: row.user_id,
+          user_id: row.user_id,
+          created_at: row.created_at,
+        }))
+        return this.users
       } catch (error) {
         this.error = error?.message || 'Unable to connect to Supabase.'
         this.isOffline = true
