@@ -45,7 +45,7 @@ export default defineConfig((/* ctx */) => {
         APP_VERSION: JSON.stringify(gitDate),
         APP_COMMIT: JSON.stringify(gitHash),
       },
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
