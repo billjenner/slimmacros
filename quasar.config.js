@@ -147,10 +147,7 @@ export default defineConfig((/* ctx */) => {
     pwa: {
       workboxMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       extendGenerateSWOptions(workboxOptions) {
-        workboxOptions.globIgnores = [
-          ...(workboxOptions.globIgnores || []),
-          '**/SlimMacros.png',
-        ]
+        workboxOptions.globIgnores = [...(workboxOptions.globIgnores || []), '**/SlimMacros.png']
         workboxOptions.runtimeCaching = [
           ...(workboxOptions.runtimeCaching || []),
           {
@@ -209,7 +206,7 @@ export default defineConfig((/* ctx */) => {
       builder: {
         // https://www.electron.build/configuration
 
-        appId: 'thecubegame',
+        appId: 'slimmacros',
       },
     },
 
