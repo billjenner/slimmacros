@@ -132,20 +132,17 @@ export const useUsersStore = defineStore('Users', {
       }
 
       const normalizedEmail = normalizeEmail(email)
-      const xxx = `${appUrl}/reset-password`
-      console.log('[recoverPassword1] import.meta.env.PROD:', xxx)
-      // Use the production URL when deployed.
-      // Use localhost when running the development server.
+
       const redirectTo = import.meta.env.PROD
         ? `${appUrl}/reset-password`
         : `${window.location.origin}/reset-password`
 
-      console.log('[recoverPassword] redirectTo:', redirectTo)
-      console.log('[recoverPassword] appUrl:', appUrl)
-      console.log('[recoverPassword] window.location.origin:', window.location.origin)
-      console.log('[recoverPassword] import.meta.env.PROD:', import.meta.env.PROD)
+      // debug
+      //console.log('[recoverPassword] redirectTo:', redirectTo)
+      //console.log('[recoverPassword] appUrl:', appUrl)
+      //console.log('[recoverPassword] window.location.origin:', window.location.origin)
+      //console.log('[recoverPassword] import.meta.env.PROD:', import.meta.env.PROD)
 
-      // todo fix code here
       const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
         redirectTo,
       })
