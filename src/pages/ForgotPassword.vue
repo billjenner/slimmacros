@@ -46,9 +46,7 @@ async function handleSubmit() {
     return
   }
 
-  const result = await store.recoverPassword(email.value, {
-    redirectTo: 'http://localhost:9000/reset-password',
-  })
+  const result = await store.recoverPassword(email.value)
 
   if (!result) {
     message.value = store.error || 'Unable to send password reset email right now.'

@@ -141,15 +141,19 @@ export const useUsersStore = defineStore('Users', {
         : `${window.location.origin}/#/reset-password`
 
       console.log('[recoverPassword] redirectTo:', redirectTo)
+      console.log('[recoverPassword] appUrl:', appUrl)
+      console.log('[recoverPassword] window.location.origin:', window.location.origin)
+      console.log('[recoverPassword] import.meta.env.PROD:', import.meta.env.PROD)
 
-      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-        redirectTo,
-      })
+      // todo fix code here
+      // const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+      //   redirectTo,
+      // })
 
-      if (error) {
-        this.error = error.message
-        return null
-      }
+      // if (error) {
+      //   this.error = error.message
+      //   return null
+      // }
 
       return {
         email: normalizedEmail,
