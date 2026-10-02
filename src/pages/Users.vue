@@ -21,11 +21,10 @@
         <q-item v-for="user in store.users" :key="user.id" clickable>
           <q-item-section>
             <q-item-label caption>
-              {{ getProfile(user)?.fname }} {{ getProfile(user)?.lname }} |
-              {{ getProfile(user)?.sex }} | {{ getProfile(user)?.age }} |
-              {{ roundWeight(getProfile(user)?.start_weight) }} |
-              {{ roundWeight(getProfile(user)?.goal_weight) }} |
-              {{ formatDate(getProfile(user)?.created_at) }}
+              {{ user.fname }} {{ user.lname }} | {{ user.email }} | {{ user.sex }} |
+              {{ user.age }} | {{ roundWeight(user.start_weight) }} |
+              {{ roundWeight(user.goal_weight) }} |
+              {{ formatDate(user.created_at) }}
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -47,20 +46,13 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import { useUsersStore } from 'stores/users'
-import { useProfileStore } from 'stores/profile'
 import OfflineConnectionCard from 'components/OfflineConnectionCard.vue'
 
 const store = useUsersStore()
-const profileStore = useProfileStore()
 const showOfflineDialog = ref(false)
 
 function loadUsers() {
   store.loadUsers()
-  profileStore.loadProfile()
-}
-
-function getProfile(user) {
-  return profileStore.profile.find((profile) => profile.user_id === user.id)
 }
 
 function roundWeight(value) {
@@ -75,7 +67,7 @@ function formatDate(value) {
 }
 
 watch(
-  () => store.isOffline || profileStore.isOffline,
+  () => store.isOffline,
   (isOffline) => {
     if (isOffline) {
       showOfflineDialog.value = true

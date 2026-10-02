@@ -5,6 +5,7 @@ import { setServiceWorkerLoginStatus } from '../utils/serviceWorker'
 
 const CURRENT_USER_STORAGE_KEY = 'slimmacros.currentUser'
 const USERS_LOGGED_IN_FUNCTION = 'users-logged-in'
+const LIST_PROFILES_FUNCTION = 'list-profiles'
 const appUrl = import.meta.env.VITE_APP_URL
 
 function normalizeEmail(email) {
@@ -310,24 +311,23 @@ export const useUsersStore = defineStore('Users', {
       }
 
       try {
-        const { data, error } = await supabase
-          .from('profile')
-          .select('user_id, created_at')
-          .order('created_at', { ascending: false })
+        // Profile RLS only allows a session to read its own row, so listing
+        // every user requires a service-role Edge Function to bypass it.
+        const { data, error } = await supabase.functions.invoke(LIST_PROFILES_FUNCTION)
 
         if (error) {
           this.error = error.message
-          this.isOffline = true
+          this.isOffline = isConnectionError(error)
+          return []
+        }
+
+        if (data?.error) {
+          this.error = data.error
           return []
         }
 
         this.isOffline = false
-        // RLS limits this to rows the current session is allowed to read.
-        this.users = (data || []).map((row) => ({
-          id: row.user_id,
-          user_id: row.user_id,
-          created_at: row.created_at,
-        }))
+        this.users = data?.users || []
         return this.users
       } catch (error) {
         this.error = error?.message || 'Unable to connect to Supabase.'
