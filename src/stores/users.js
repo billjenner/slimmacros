@@ -200,26 +200,35 @@ export const useUsersStore = defineStore('Users', {
       }
     },
 
+    // Validates the local login state against Supabase's own session record,
+    // rather than trusting whatever was persisted in localStorage.
     async restoreSessionFromAuth() {
       if (!supabase) {
         return null
       }
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession()
 
-      if (!session?.user) {
+        if (error || !session?.user) {
+          return null
+        }
+
+        const savedUser = formatAuthUser(session.user)
+        this.currentUser = savedUser
+        this.users = this.users.filter((u) => u.email !== savedUser.email)
+        this.users.push(savedUser)
+        persistCurrentUser(savedUser)
+        setServiceWorkerLoginStatus(true, savedUser)
+        return savedUser
+      } catch {
+        // Unable to confirm the session (e.g. offline) - leave existing
+        // local state untouched rather than logging the user out.
         return null
       }
-
-      const savedUser = formatAuthUser(session.user)
-      this.currentUser = savedUser
-      this.users = this.users.filter((u) => u.email !== savedUser.email)
-      this.users.push(savedUser)
-      persistCurrentUser(savedUser)
-      setServiceWorkerLoginStatus(true, savedUser)
-      return savedUser
     },
 
     // Restores a session reported by the service worker's cached login status

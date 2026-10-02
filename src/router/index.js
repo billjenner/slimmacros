@@ -97,14 +97,15 @@ export default defineRouter(async (/* { store, ssrContext } */) => {
     const store = useUsersStore()
 
     Router.beforeEach(async (to) => {
-      const loggedIn = Boolean(store.currentUser?.user_id || store.currentUser?.email)
       const requiresAuth = to.matched.some((record) => record.meta?.requiresAuth)
       const requiresAdmin = to.matched.some((record) => record.meta?.requiresAdmin)
 
-      if (requiresAuth && !loggedIn) {
-        const restoredUser = await store.restoreSessionFromAuth()
+      if (requiresAuth) {
+        // Always re-validate against Supabase's own session rather than
+        // trusting a possibly stale/local currentUser.
+        const validatedUser = await store.restoreSessionFromAuth()
 
-        if (!restoredUser) {
+        if (!validatedUser) {
           return { path: '/login', query: { redirect: to.fullPath } }
         }
       }
@@ -119,6 +120,10 @@ export default defineRouter(async (/* { store, ssrContext } */) => {
         }
 
         if (!profileStore.currentProfile) {
+          if (profileStore.isOffline) {
+            return { path: '/login', query: { redirect: to.fullPath } }
+          }
+
           return { path: '/profile', query: { redirect: to.fullPath } }
         }
       }
