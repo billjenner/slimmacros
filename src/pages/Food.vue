@@ -63,13 +63,20 @@
                     :loading="isGettingMacros"
                     :disable="!canGetMacros || store.loading"
                     @click="getMacrosFromAi"
-                  /> -->
-                  <q-btn
+                  />
+                                    <q-btn
                     type="button"
                     color="secondary"
                     label="Scan Bar Code"
                     :disable="store.loading"
                     @click="scannerOpen = true"
+                  />-->
+                  <q-btn
+                    type="button"
+                    color="secondary"
+                    label="Get Food"
+                    :disable="store.loading"
+                    @click="getFoodOpen = true"
                   />
                 </div>
                 <div class="row q-col-gutter-md">
@@ -179,6 +186,8 @@
               </div>
             </q-form>
           </transition>
+
+          <FoodDatabaseDialog v-model="getFoodOpen" @use-food="applyDatabaseFood" />
 
           <BarcodeScanner v-if="scannerOpen" @detected="barcodeDetected" @close="closeScanner" />
 
@@ -393,6 +402,7 @@ import { useFoodStore } from 'stores/food'
 import { calculateFoodCalories, calculateTotalCaloriesForPerson } from '../utils/rules'
 import { notifySuccess } from '../utils/notify'
 import BarcodeScanner from './BarcodeScanner.vue'
+import FoodDatabaseDialog from '../components/FoodDatabaseDialog.vue'
 
 defineProps({
   embedded: {
@@ -479,6 +489,19 @@ const expandedFoodIds = ref([])
 const editingFoodId = ref(null)
 //const isGettingMacros = ref(false)
 const scannerOpen = ref(false)
+const getFoodOpen = ref(false)
+
+function applyDatabaseFood(selectedFood) {
+  Object.assign(food, {
+    description: selectedFood.description,
+    serving_size: selectedFood.serving_size,
+    serving_unit: selectedFood.serving_unit,
+    protein: selectedFood.protein,
+    carb: selectedFood.carb,
+    fat: selectedFood.fat,
+    calories_extra: selectedFood.calories_extra,
+  })
+}
 
 //const canGetMacros = computed(() => {
 //   const description = String(food.description || '').trim()
