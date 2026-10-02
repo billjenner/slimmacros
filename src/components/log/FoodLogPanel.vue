@@ -136,7 +136,7 @@
       </div>
 
       <div v-show="isChartBudgetExpanded">
-        <div class="row items-center q-px-md q-py-sm">
+        <div class="row items-center q-px-md">
           <div class="col text-subtitle2 text-center">{{ selectedFoodLogDayOfWeek }}</div>
           <div class="row items-center no-wrap q-gutter-xs">
             <q-btn flat dense type="button" label="<" @click="goToPreviousFoodLogDate" />
@@ -150,10 +150,10 @@
             <q-btn flat dense type="button" label=">" @click="goToNextFoodLogDate" />
           </div>
         </div>
-        <q-markup-table flat bordered dense separator="horizontal">
+        <q-markup-table flat bordered dense separator="horizontal" class="nutrition-table">
           <tbody>
             <tr>
-              <td style="width: 84%">
+              <td style="width: 86%">
                 <q-linear-progress
                   :value="foodLogProgress"
                   color="custom-red"
@@ -161,7 +161,7 @@
                   rounded
                 />
               </td>
-              <td style="width: 16%">
+              <td style="width: 14%">
                 <q-chip dense color="secondary" text-color="white" square>
                   Calories: {{ Math.round(totalLoggedCalories) }} /
                   {{ Math.round(totalCaloriesForPerson || 2000) }}
@@ -275,12 +275,6 @@
     </q-dialog>
   </div>
 </template>
-
-<style scoped>
-.text-custom-red {
-  color: #f44336;
-}
-</style>
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
@@ -929,3 +923,11 @@ async function loadDataForUser(userId) {
   ])
 }
 </script>
+<style scoped>
+.nutrition-table td {
+  padding: 0 2px;
+}
+.text-custom-red {
+  color: #f44336;
+}
+</style>
