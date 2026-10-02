@@ -128,3 +128,5 @@ Use **Slim Macros** regularly to:
 ### Multifactor Auth - Off / On
 
 > Supabase > DB > Authentication > Sign In / PRoviders > Confirm Email = Off,
+
+## To Do List

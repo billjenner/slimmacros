@@ -146,6 +146,20 @@ export default defineConfig((/* ctx */) => {
     // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
     pwa: {
       workboxMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
+      extendGenerateSWOptions(workboxOptions) {
+        workboxOptions.globIgnores = [
+          ...(workboxOptions.globIgnores || []),
+          '**/SlimMacros.png',
+        ]
+        workboxOptions.runtimeCaching = [
+          ...(workboxOptions.runtimeCaching || []),
+          {
+            urlPattern: /\/SlimMacros\.png$/,
+            handler: 'StaleWhileRevalidate',
+            options: { cacheName: 'slimmacros-image' },
+          },
+        ]
+      },
       // swFilename: 'sw.js',
       // manifestFilename: 'manifest.json',
       // extendManifestJson (json) {},
