@@ -136,7 +136,7 @@
       </div>
 
       <div v-show="isChartBudgetExpanded">
-        <div class="row items-center q-px-md">
+        <div class="row items-center q-mb-md">
           <div class="col text-subtitle2 text-center">{{ selectedFoodLogDayOfWeek }}</div>
           <div class="row items-center no-wrap q-gutter-xs">
             <q-btn flat dense type="button" label="<" @click="goToPreviousFoodLogDate" />

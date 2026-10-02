@@ -130,3 +130,10 @@ Use **Slim Macros** regularly to:
 > Supabase > DB > Authentication > Sign In / PRoviders > Confirm Email = Off,
 
 ## To Do List
+
+No data connection
+Your sign-on status is temporarily offline. Try again when a connection is available.
+OK
+
+Sign out?
+Are you sure you want to sign out?
