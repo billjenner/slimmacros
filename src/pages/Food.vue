@@ -286,34 +286,30 @@
                     :colspan="foodColumns.length"
                     :class="isOwnedByCurrentUser(props.row) ? 'bg-grey-2' : ''"
                   >
-                    <div class="col-12">
-                      <div class="q-mt-sm" style="height: 220px">
-                        <Pie :data="getMacroChartData(props.row)" :options="macroChartOptions" />
+                    <div class="row q-col-gutter-md q-mt-md q-mb-xl">
+                      <div class="col-6 column items-center">
+                        <div class="text-caption text-grey-7 text-center q-mb-sm">
+                          Macro Profile
+                        </div>
+                        <div style="width: 100%; max-width: 360px; height: 220px">
+                          <Pie
+                            :data="getMacroChartData(props.row)"
+                            :options="macroChartOptions"
+                          />
+                        </div>
                       </div>
-                      <div class="calorie-budget-bar text-caption text-grey-7 q-mt-lg q-mb-xs">
-                        Calories vs daily budget
+
+                      <div class="col-6 column items-center">
+                        <div class="text-caption text-grey-7 text-center q-mb-sm">
+                          Calories vs daily budget
+                        </div>
+                        <div style="width: 100%; max-width: 360px; height: 220px">
+                          <Pie
+                            :data="getCalorieBudgetChartData(props.row)"
+                            :options="macroChartOptions"
+                          />
+                        </div>
                       </div>
-                      <q-linear-progress
-                        :value="
-                          Math.min(
-                            1,
-                            (calculateFoodCalories({
-                              carbs: props.row.carb,
-                              protein: props.row.protein,
-                              fat: props.row.fat,
-                              extraCalories: props.row.calories_extra,
-                            }) || 0) /
-                              (calculateTotalCaloriesForPerson({
-                                totalDailyCalories: 2000,
-                                dailyCalorieDeficit: 0,
-                              }) || 1),
-                          )
-                        "
-                        color="accent"
-                        class="calorie-budget-bar q-mb-xl"
-                        size="8px"
-                        rounded
-                      />
                     </div>
                     <div class="row q-col-gutter-sm q-py-sm">
                       <div class="col-3">
@@ -565,6 +561,34 @@ function getMacroChartData(row) {
       {
         data: [proteinCalories, carbCalories, fatCalories],
         backgroundColor: ['#21BA45', '#F2C037', '#1976D2'],
+        borderWidth: 2,
+        borderColor: '#fff',
+      },
+    ],
+  }
+}
+
+function getCalorieBudgetChartData(row) {
+  const calories =
+    calculateFoodCalories({
+      carbs: row?.carb,
+      protein: row?.protein,
+      fat: row?.fat,
+      extraCalories: row?.calories_extra,
+    }) || 0
+  const budget =
+    calculateTotalCaloriesForPerson({
+      totalDailyCalories: 2000,
+      dailyCalorieDeficit: 0,
+    }) || 1
+  const consumedCalories = Math.max(0, calories)
+
+  return {
+    labels: ['Calories', 'Remaining'],
+    datasets: [
+      {
+        data: [Math.min(consumedCalories, budget), Math.max(0, budget - consumedCalories)],
+        backgroundColor: ['#1976D2', '#E0E0E0'],
         borderWidth: 2,
         borderColor: '#fff',
       },
