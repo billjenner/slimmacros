@@ -153,24 +153,22 @@
                 </div>
               </q-card>
 
-              <q-card flat bordered class="q-pa-md bg-grey-1">
-                <div class="text-subtitle1 q-mb-sm">Preferences</div>
-                <div class="row q-col-gutter-md">
-                  <div class="col-12 col-md-4">
-                    <q-toggle v-model="food.my_food" label="My food" />
-                  </div>
+              <div class="row items-end no-wrap q-pr-md" style="gap: 16px">
+                <div class="col">
+                  <q-card flat bordered class="q-pa-md bg-grey-1">
+                    <div class="text-subtitle1 q-mb-sm">Preferences</div>
+                    <div class="row q-col-gutter-md">
+                      <div class="col-12 col-md-4">
+                        <q-toggle v-model="food.favorite_food" label="Favorite" />
+                      </div>
 
-                  <div class="col-12 col-md-4">
-                    <q-toggle v-model="food.favorite_food" label="Favorite" />
-                  </div>
-
-                  <div class="col-12 col-md-4">
-                    <q-toggle v-model="food.share_with_others" label="Share with others" />
-                  </div>
+                      <div class="col-12 col-md-4">
+                        <q-toggle v-model="food.share_with_others" label="Share with others" />
+                      </div>
+                    </div>
+                  </q-card>
                 </div>
-              </q-card>
 
-              <div class="row justify-end q-gutter-sm q-mr-md">
                 <q-btn
                   type="submit"
                   color="primary"
