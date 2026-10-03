@@ -27,15 +27,40 @@
             <div class="col-12 col-md-6">
               <q-select
                 v-model="foodLog.food_id"
-                :options="foodOptions"
+                :options="filteredFoodOptions"
                 label="Food"
                 filled
                 dense
                 emit-value
                 map-options
+                use-input
+                hide-selected
+                fill-input
+                input-debounce="0"
                 :disable="!usersStore.currentUser"
                 :rules="[(value) => !!value || 'Food is required']"
-              />
+                @filter="filterFoodOptions"
+              >
+                <template #option="{ itemProps, opt }">
+                  <q-item v-bind="itemProps">
+                    <q-item-section>
+                      <q-item-label>
+                        <template v-for="(part, i) in highlightParts(opt.label)" :key="i">
+                          <span v-if="part.match" class="text-bold bg-yellow-3">{{
+                            part.text
+                          }}</span>
+                          <template v-else>{{ part.text }}</template>
+                        </template>
+                      </q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </template>
+                <template #no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">No matching food</q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
             </div>
 
             <div class="col-12 col-md-3">
@@ -614,6 +639,35 @@ const foodOptions = computed(() => {
     value: food.food_id,
   }))
 })
+
+const foodSearchText = ref('')
+
+const filteredFoodOptions = computed(() => {
+  const term = foodSearchText.value.trim().toLowerCase()
+  if (!term) {
+    return foodOptions.value
+  }
+  return foodOptions.value.filter((option) => option.label.toLowerCase().includes(term))
+})
+
+function filterFoodOptions(value, update) {
+  update(() => {
+    foodSearchText.value = value
+  })
+}
+
+function highlightParts(text) {
+  const term = foodSearchText.value.trim()
+  const str = text ?? ''
+  if (!term) {
+    return [{ text: str, match: false }]
+  }
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return str
+    .split(new RegExp(`(${escaped})`, 'i'))
+    .filter((part) => part !== '')
+    .map((part) => ({ text: part, match: part.toLowerCase() === term.toLowerCase() }))
+}
 
 const selectedFood = computed(() => {
   return (foodStore.food || []).find((food) => food.food_id === foodLog.food_id) || null
