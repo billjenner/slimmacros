@@ -24,6 +24,10 @@ Choose from:
 
 ### 🍽️ Manage Your Meals
 
+Create your own recipes, choose from 1,500+ foods in the database, or scan the barcode of prepackaged items for quick and easy tracking.
+
+![Foods](./public/DefineFoods.jpg)
+
 Keep a daily record of what you eat and stay aware of your nutrition throughout the day.
 
 ![Food Budget](./public/FoodBudget.jpg)

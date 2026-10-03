@@ -39,7 +39,26 @@
               class="q-gutter-md"
             >
               <q-card flat bordered class="q-pa-md bg-grey-1">
-                <div class="text-subtitle1 q-mb-sm">Food details</div>
+                <div class="row items-center q-mb-sm">
+                  <div class="text-subtitle1 q-mb-sm">Food details</div>
+                  <div class="row q-gutter-sm q-ml-auto">
+                    <q-btn
+                      type="button"
+                      color="secondary"
+                      label="Scan Bar Code"
+                      class="food-action-btn"
+                      @click="openBarcodeScanner"
+                    />
+                    <q-btn
+                      type="button"
+                      color="secondary"
+                      label="Get Food"
+                      class="food-action-btn"
+                      :disable="store.loading"
+                      @click="getFoodOpen = true"
+                    />
+                  </div>
+                </div>
                 <div class="row q-col-gutter-md">
                   <div class="col-12">
                     <q-input
@@ -65,23 +84,6 @@
                     @click="getMacrosFromAi"
                   />
                   />-->
-                  <div class="row q-gutter-sm q-ml-auto">
-                    <q-btn
-                      type="button"
-                      color="secondary"
-                      label="Scan Bar Code"
-                      class="food-action-btn"
-                      @click="openBarcodeScanner"
-                    />
-                    <q-btn
-                      type="button"
-                      color="secondary"
-                      label="Get Food"
-                      class="food-action-btn"
-                      :disable="store.loading"
-                      @click="getFoodOpen = true"
-                    />
-                  </div>
                 </div>
                 <div class="row q-col-gutter-md">
                   <div class="col-12 col-md-6">
@@ -189,10 +191,7 @@
             </q-form>
           </transition>
 
-          <FoodDatabaseDialog
-            v-model="getFoodOpen"
-            @use-food="applyDatabaseFood"
-          />
+          <FoodDatabaseDialog v-model="getFoodOpen" @use-food="applyDatabaseFood" />
 
           <BarcodeScanner v-if="scannerOpen" @detected="barcodeDetected" @close="closeScanner" />
 
