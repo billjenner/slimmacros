@@ -393,10 +393,10 @@ const hints = new Map()
 
 hints.set(DecodeHintType.POSSIBLE_FORMATS, [
   // Food product barcodes
+  BarcodeFormat.EAN_13,
+  BarcodeFormat.EAN_8,
   BarcodeFormat.UPC_A,
   BarcodeFormat.UPC_E,
-  BarcodeFormat.EAN_8,
-  BarcodeFormat.EAN_13,
 
   // Keep QR support
   BarcodeFormat.QR_CODE,
@@ -499,8 +499,6 @@ async function getCameras() {
 
 // ============================================================
 // START SCANNER
-// ============================================================
-
 async function startScanner() {
   clearMessages()
 
@@ -522,50 +520,60 @@ async function startScanner() {
 
     // Create reader
     if (!reader) {
-      reader = new BrowserMultiFormatReader(hints, {
-        delayBetweenScanAttempts: 150,
-        delayBetweenScanSuccess: 1000,
-      })
+      reader = new BrowserMultiFormatReader(hints)
     }
 
     scanning.value = true
 
     statusMessage.value = 'Scanning for a food barcode...'
-
     statusType.value = 'info'
+
+    console.log('==============================')
+    console.log('📷 STARTING SCANNER')
+    console.log('Camera ID:', selectedCameraId.value)
+    console.log('Video element:', videoRef.value)
+    console.log('==============================')
 
     // Start video decoding
     controls = await reader.decodeFromVideoDevice(
       selectedCameraId.value,
       videoRef.value,
-
       (result, error) => {
-        /*
-         * ZXing continuously reports "not found"
-         * errors while scanning. Those aren't actual
-         * application errors, so we ignore them.
-         */
-        console.log('ZXing scan result:', result, 'error:', error)
-        if (!result) {
+        // Barcode found
+        if (result) {
+          console.log('==============================')
+          console.log('✅ BARCODE DETECTED')
+          console.log('Text:', result.getText())
+          console.log('Format:', result.getBarcodeFormat())
+          console.log('error:', error)
+          console.log('==============================')
+
+          if (processingBarcode) {
+            return
+          }
+
+          const barcode = result.getText().trim()
+
+          if (!barcode) {
+            return
+          }
+
+          processBarcode(barcode, result.getBarcodeFormat())
+
           return
         }
-
-        // Don't process multiple barcodes simultaneously
-        if (processingBarcode) {
-          return
-        }
-
-        const barcode = result.getText().trim()
-
-        if (!barcode) {
-          return
-        }
-
-        processBarcode(barcode, result.getBarcodeFormat())
       },
     )
+
+    console.log('==============================')
+    console.log('📷 CAMERA STARTED')
+    console.log('Video dimensions:', {
+      width: videoRef.value?.videoWidth,
+      height: videoRef.value?.videoHeight,
+    })
+    console.log('==============================')
   } catch (error) {
-    console.error('Unable to start scanner:', error)
+    console.error('❌ Unable to start scanner:', error)
 
     scanning.value = false
 
@@ -580,6 +588,10 @@ async function startScanner() {
 // ============================================================
 
 async function processBarcode(barcode, format) {
+  console.log('🔎 LOOKING UP PRODUCT', {
+    barcode,
+    format,
+  })
   if (processingBarcode) {
     return
   }
