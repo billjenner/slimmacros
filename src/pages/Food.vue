@@ -292,16 +292,13 @@
                           Macro Profile
                         </div>
                         <div style="width: 100%; max-width: 360px; height: 220px">
-                          <Pie
-                            :data="getMacroChartData(props.row)"
-                            :options="macroChartOptions"
-                          />
+                          <Pie :data="getMacroChartData(props.row)" :options="macroChartOptions" />
                         </div>
                       </div>
 
                       <div class="col-6 column items-center">
                         <div class="text-caption text-grey-7 text-center q-mb-sm">
-                          Calories vs daily budget
+                          Calories vs Daily Budget
                         </div>
                         <div style="width: 100%; max-width: 360px; height: 220px">
                           <Pie
@@ -588,7 +585,7 @@ function getCalorieBudgetChartData(row) {
     datasets: [
       {
         data: [Math.min(consumedCalories, budget), Math.max(0, budget - consumedCalories)],
-        backgroundColor: ['#1976D2', '#E0E0E0'],
+        backgroundColor: ['#f44336', '#E0E0E0'],
         borderWidth: 2,
         borderColor: '#fff',
       },
@@ -840,5 +837,8 @@ async function submitFood() {
 .form-slide-leave-from {
   opacity: 1;
   transform: translateY(0);
+}
+.text-custom-red {
+  color: #f44336;
 }
 </style>
