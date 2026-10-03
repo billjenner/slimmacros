@@ -364,10 +364,10 @@
                         <div class="text-caption text-grey-7">Serving unit</div>
                         <div class="text-body2">{{ props.row.serving_unit || 'unit' }}</div>
                       </div>
-                      <div class="col-12 col-sm-6 col-md-3">
+                      <!-- <div class="col-12 col-sm-6 col-md-3">
                         <div class="text-caption text-grey-7">My food</div>
                         <div class="text-body2">{{ props.row.my_food ? 'Yes' : 'No' }}</div>
-                      </div>
+                      </div> -->
                       <div class="col-12 col-sm-6 col-md-3">
                         <div class="text-caption text-grey-7">Favorite</div>
                         <div class="text-body2">{{ props.row.favorite_food ? 'Yes' : 'No' }}</div>
