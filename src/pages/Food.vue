@@ -287,7 +287,12 @@
                     :class="isOwnedByCurrentUser(props.row) ? 'bg-grey-2' : ''"
                   >
                     <div class="col-12">
-                      <div class="text-caption text-grey-7 q-mb-xs">Calories vs budget</div>
+                      <div class="q-mt-sm" style="height: 220px">
+                        <Pie :data="getMacroChartData(props.row)" :options="macroChartOptions" />
+                      </div>
+                      <div class="calorie-budget-bar text-caption text-grey-7 q-mt-lg q-mb-xs">
+                        Calories vs daily budget
+                      </div>
                       <q-linear-progress
                         :value="
                           Math.min(
@@ -305,13 +310,10 @@
                           )
                         "
                         color="accent"
+                        class="calorie-budget-bar q-mb-xl"
                         size="8px"
                         rounded
                       />
-
-                      <div class="q-mt-sm" style="height: 220px">
-                        <Pie :data="getMacroChartData(props.row)" :options="macroChartOptions" />
-                      </div>
                     </div>
                     <div class="row q-col-gutter-sm q-py-sm">
                       <div class="col-3">
@@ -793,6 +795,12 @@ async function submitFood() {
 </script>
 
 <style scoped>
+.calorie-budget-bar {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .form-slide-enter-active,
 .form-slide-leave-active {
   transition: all 0.45s ease;
