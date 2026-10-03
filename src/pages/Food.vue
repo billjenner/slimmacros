@@ -309,34 +309,8 @@
                         rounded
                       />
 
-                      <div class="q-mt-sm">
-                        <div class="text-caption text-grey-7 q-mb-xs">Protein calories</div>
-                        <q-linear-progress
-                          :value="getMacroProgress(props.row, 'protein')"
-                          color="green"
-                          size="8px"
-                          rounded
-                        />
-                      </div>
-
-                      <div class="q-mt-sm">
-                        <div class="text-caption text-grey-7 q-mb-xs">Carb calories</div>
-                        <q-linear-progress
-                          :value="getMacroProgress(props.row, 'carbs')"
-                          color="yellow"
-                          size="8px"
-                          rounded
-                        />
-                      </div>
-
-                      <div class="q-mt-sm">
-                        <div class="text-caption text-grey-7 q-mb-xs">Fat calories</div>
-                        <q-linear-progress
-                          :value="getMacroProgress(props.row, 'fat')"
-                          color="blue"
-                          size="8px"
-                          rounded
-                        />
+                      <div class="q-mt-sm" style="height: 220px">
+                        <Pie :data="getMacroChartData(props.row)" :options="macroChartOptions" />
                       </div>
                     </div>
                     <div class="row q-col-gutter-sm q-py-sm">
@@ -393,12 +367,16 @@
 <script setup>
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
+import { Pie } from 'vue-chartjs'
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { useUsersStore } from 'stores/users'
 import { useFoodStore } from 'stores/food'
 import { calculateFoodCalories, calculateTotalCaloriesForPerson } from '../utils/rules'
 import { notifySuccess } from '../utils/notify'
 import BarcodeScanner from './BarcodeScanner.vue'
 import FoodDatabaseDialog from 'components/dashboard/Items/FoodDatabaseDialog.vue'
+
+ChartJS.register(ArcElement, Tooltip, Legend)
 
 defineProps({
   embedded: {
@@ -576,22 +554,33 @@ function getMacroBreakdown(row) {
   }
 }
 
-function getMacroProgress(row, macroName) {
-  const breakdown = getMacroBreakdown(row)
-  const macroCalorieMap = {
-    protein: breakdown.proteinCalories,
-    carbs: breakdown.carbCalories,
-    fat: breakdown.fatCalories,
+function getMacroChartData(row) {
+  const { proteinCalories, carbCalories, fatCalories } = getMacroBreakdown(row)
+
+  return {
+    labels: ['Protein', 'Carbs', 'Fat'],
+    datasets: [
+      {
+        data: [proteinCalories, carbCalories, fatCalories],
+        backgroundColor: ['#21BA45', '#F2C037', '#1976D2'],
+        borderWidth: 2,
+        borderColor: '#fff',
+      },
+    ],
   }
+}
 
-  const macroCalories = Number(macroCalorieMap[macroName]) || 0
-  const totalCalories = Number(breakdown.totalCalories) || 0
-
-  if (!totalCalories) {
-    return 0
-  }
-
-  return Math.min(1, Math.max(0, macroCalories / totalCalories))
+const macroChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { position: 'bottom' },
+    tooltip: {
+      callbacks: {
+        label: (context) => `${context.label}: ${context.raw} calories`,
+      },
+    },
+  },
 }
 
 function toggleExpanded(row) {
