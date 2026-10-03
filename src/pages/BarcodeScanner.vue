@@ -342,7 +342,6 @@
 
 <script setup>
 import { ref, computed, onBeforeUnmount } from 'vue'
-
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import { BarcodeFormat, DecodeHintType } from '@zxing/library'
 
@@ -351,6 +350,14 @@ import { BarcodeFormat, DecodeHintType } from '@zxing/library'
 // ============================================================
 
 const emit = defineEmits(['detected', 'product-found', 'product-not-found', 'error'])
+
+// ============================================================
+// REFS / STATE
+// ============================================================
+
+// ============================================================
+// EVENTS
+// ============================================================
 
 // ============================================================
 // REFS / STATE
@@ -393,14 +400,16 @@ const hints = new Map()
 
 hints.set(DecodeHintType.POSSIBLE_FORMATS, [
   // Food product barcodes
-  BarcodeFormat.EAN_13,
-  BarcodeFormat.EAN_8,
   BarcodeFormat.UPC_A,
+  BarcodeFormat.EAN_13,
   BarcodeFormat.UPC_E,
+  BarcodeFormat.EAN_8,
 
   // Keep QR support
-  BarcodeFormat.QR_CODE,
+  //BarcodeFormat.QR_CODE,
 ])
+
+hints.set(DecodeHintType.TRY_HARDER, true)
 
 // ============================================================
 // PRODUCT NAME
@@ -467,49 +476,58 @@ const nutrition = computed(() => {
 // CAMERA DISCOVERY
 // ============================================================
 
+// Helper function to format internal ZXing format representations into clean strings
+function formatName(format) {
+  if (format === undefined || format === null) return 'UNKNOWN'
+  return (
+    Object.keys(BarcodeFormat).find((key) => BarcodeFormat[key] === format) || format.toString()
+  )
+}
+
+function clearMessages() {
+  errorMessage.value = ''
+  statusMessage.value = ''
+  statusType.value = ''
+}
+
+// ============================================================
+// CAMERA DISCOVERY
+// ============================================================
+
 async function getCameras() {
   try {
     const devices = await BrowserMultiFormatReader.listVideoInputDevices()
-
     cameras.value = devices
 
     if (!devices.length) {
       throw new Error('No camera was found.')
     }
 
-    /*
-     * Prefer a rear/environment camera.
-     *
-     * Camera labels aren't always available until the user
-     * grants permission, so we fall back to the first camera.
-     */
     const rearCamera = devices.find((camera) => {
       const label = camera.label?.toLowerCase() || ''
-
       return label.includes('back') || label.includes('rear') || label.includes('environment')
     })
 
     selectedCameraId.value = rearCamera?.deviceId || devices[0].deviceId
   } catch (error) {
     console.error(error)
-
     throw new Error('Unable to access the camera. Please make sure camera permission is enabled.')
   }
 }
 
 // ============================================================
 // START SCANNER
+// ============================================================
+
 async function startScanner() {
   clearMessages()
 
   product.value = null
   productNotFound.value = false
   scannedBarcode.value = ''
-
   processingBarcode = false
 
   try {
-    // Discover cameras
     if (!cameras.value.length) {
       await getCameras()
     }
@@ -518,184 +536,48 @@ async function startScanner() {
       throw new Error('No camera is available.')
     }
 
-    // Create reader
     if (!reader) {
       reader = new BrowserMultiFormatReader(hints)
     }
 
     scanning.value = true
-
     statusMessage.value = 'Scanning for a food barcode...'
     statusType.value = 'info'
 
-    console.log('==============================')
-    console.log('📷 STARTING SCANNER')
-    console.log('Camera ID:', selectedCameraId.value)
-    console.log('Video element:', videoRef.value)
-    console.log('==============================')
-
-    // // Start video decoding
-    // controls = await reader.decodeFromVideoDevice(
-    //   selectedCameraId.value,
-    //   videoRef.value,
-    //   (result, error) => {
-    //     // Barcode found
-    //     if (result) {
-    //       console.log('==============================')
-    //       console.log('✅ BARCODE DETECTED')
-    //       console.log('Text:', result.getText())
-    //       console.log('Format:', result.getBarcodeFormat())
-    //       console.log('error:', error)
-    //       console.log('==============================')
-
-    //       if (processingBarcode) {
-    //         return
-    //       }
-
-    //       const barcode = result.getText().trim()
-
-    //       if (!barcode) {
-    //         return
-    //       }
-
-    //       processBarcode(barcode, result.getBarcodeFormat())
-
-    //       return
-    //     }
-    //   },
-    // )
-
-    // Start camera ourselves so we control the resolution
-    const video = videoRef.value
-
-    const stream = await navigator.mediaDevices.getUserMedia({
+    // Build optimized stream constraints tailored specifically to food barcodes
+    const constraints = {
       video: {
-        deviceId: {
-          exact: selectedCameraId.value,
-        },
-        width: {
-          ideal: 1920,
-        },
-        height: {
-          ideal: 1080,
-        },
-        frameRate: {
-          ideal: 30,
-        },
+        deviceId: { exact: selectedCameraId.value },
+        width: { min: 1280, ideal: 1920 },
+        height: { min: 720, ideal: 1080 },
+        frameRate: { ideal: 30 },
+        // Requests advanced continuous focus tracking if supported by the device browser
+        focusMode: { ideal: 'continuous' },
       },
       audio: false,
-    })
-
-    video.srcObject = stream
-
-    await video.play()
-
-    const track = stream.getVideoTracks()[0]
-
-    console.log('==============================')
-    console.log('📷 CAMERA STARTED')
-    console.log('Settings:', track.getSettings())
-    console.log('Capabilities:', track.getCapabilities())
-    console.log('Video size:', {
-      width: video.videoWidth,
-      height: video.videoHeight,
-    })
-    console.log('==============================')
-
-    // Start ZXing against the already-running video
-    controls = await reader.decodeFromVideoElement(video, (result, error) => {
-      // Barcode found
-      if (result) {
-        console.log('==============================')
-        console.log('✅ BARCODE DETECTED')
-        console.log('Text:', result.getText())
-        console.log('Format:', result.getBarcodeFormat())
-        console.log('error:', error)
-        console.log('==============================')
-
-        if (processingBarcode) {
-          return
-        }
-
-        const barcode = result.getText().trim()
-
-        if (!barcode) {
-          return
-        }
-
-        processBarcode(barcode, result.getBarcodeFormat())
-
-        return
-      }
-
-      // NotFoundException is expected while ZXing
-      // is searching frame-by-frame.
-      if (error) {
-        console.debug('No barcode yet:', error.name, error.message)
-      }
-    })
-
-    /*     const video = videoRef.value
-    const track = video?.srcObject?.getVideoTracks?.()[0]
-
-    if (track) {
-      console.log('📷 BEFORE constraints', track.getSettings())
-
-      try {
-        await track.applyConstraints({
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          frameRate: { ideal: 30 },
-        })
-
-        console.log('📷 AFTER constraints', track.getSettings())
-
-        console.log('📺 VIDEO SIZE', {
-          width: video?.videoWidth,
-          height: video?.videoHeight,
-        })
-      } catch (error) {
-        console.warn('⚠️ Could not increase camera resolution:', error)
-      }
     }
- */
-    // console.log('📷 CAMERA SETTINGS', {
-    //   width: track?.getSettings().width,
-    //   height: track?.getSettings().height,
-    //   focusMode: track?.getSettings().focusMode,
-    //   zoom: track?.getSettings().zoom,
-    //   torch: track?.getSettings().torch,
-    // })
 
-    // console.log('📷 CAMERA CAPABILITIES', {
-    //   width: track?.getCapabilities().width,
-    //   height: track?.getCapabilities().height,
-    //   focusMode: track?.getCapabilities().focusMode,
-    //   zoom: track?.getCapabilities().zoom,
-    //   torch: track?.getCapabilities().torch,
-    // })
+    /*
+     * CRITICAL FIX: Pass configurations and target element into decodeFromConstraints.
+     * This establishes the processing hook so ZXing can analyze stream frames.
+     */
+    controls = await reader.decodeFromConstraints(constraints, videoRef.value, (result, error) => {
+      if (result && !processingBarcode) {
+        const barcodeText = result.getText()
+        const barcodeFormat = result.getBarcodeFormat()
+        processBarcode(barcodeText, barcodeFormat)
+      }
+      if (error) {
+        console.error('Barcode scanning error:', error)
+      }
+      // Continuous decoding throws normal framing exceptions when no barcode is found; ignore them safely
+    })
 
-    // console.log('📷 CAMERA SETTINGS', track?.getSettings())
-    // console.log('📷 CAMERA CAPABILITIES', track?.getCapabilities())
-
-    // console.log('📺 VIDEO SIZE', {
-    //   width: video?.videoWidth,
-    //   height: video?.videoHeight,
-    // })
-    // console.log('==============================')
-    // console.log('📷 CAMERA STARTED')
-    // console.log('Video dimensions:', {
-    //   width: videoRef.value?.videoWidth,
-    //   height: videoRef.value?.videoHeight,
-    // })
-    console.log('==============================')
+    console.log('✅ Scanner initialized and actively decoding.')
   } catch (error) {
     console.error('❌ Unable to start scanner:', error)
-
     scanning.value = false
-
     errorMessage.value = error.message || 'Unable to start the camera.'
-
     emit('error', error)
   }
 }
@@ -705,16 +587,10 @@ async function startScanner() {
 // ============================================================
 
 async function processBarcode(barcode, format) {
-  console.log('🔎 LOOKING UP PRODUCT', {
-    barcode,
-    format,
-  })
-  if (processingBarcode) {
-    return
-  }
-
+  if (processingBarcode) return
   processingBarcode = true
 
+  console.log('🔎 LOOKING UP PRODUCT', { barcode, format })
   scannedBarcode.value = barcode
 
   emit('detected', {
@@ -722,13 +598,11 @@ async function processBarcode(barcode, format) {
     format: formatName(format),
   })
 
-  // Stop camera while looking up product
+  // Kill camera stream to prevent parallel background scan loops while working
   stopScanner(false)
 
   lookingUp.value = true
-
   statusMessage.value = 'Looking up product...'
-
   statusType.value = 'info'
 
   try {
@@ -737,36 +611,22 @@ async function processBarcode(barcode, format) {
     if (!result) {
       product.value = null
       productNotFound.value = true
-
       statusMessage.value = ''
       statusType.value = ''
-
       emit('product-not-found', barcode)
-
       return
     }
 
     product.value = result
-
     productNotFound.value = false
-
     statusMessage.value = 'Product found.'
-
     statusType.value = 'success'
-
     emit('product-found', result)
   } catch (error) {
-    /*
-     * AbortError is expected if the user cancels.
-     */
-    if (error.name === 'AbortError') {
-      return
-    }
+    if (error.name === 'AbortError') return
 
     console.error('Open Food Facts lookup failed:', error)
-
     errorMessage.value = 'We could not retrieve the product information. Please try again.'
-
     emit('error', error)
   } finally {
     lookingUp.value = false
@@ -781,12 +641,6 @@ async function processBarcode(barcode, format) {
 async function lookupFood(barcode) {
   lookupController = new AbortController()
 
-  /*
-   * fields keeps the response reasonably small while
-   * providing everything this component displays.
-   *
-   * Open Food Facts supports the fields query parameter.
-   */
   const fields = [
     'code',
     'product_name',
@@ -809,16 +663,8 @@ async function lookupFood(barcode) {
 
   const response = await fetch(url, {
     method: 'GET',
-
     signal: lookupController.signal,
-
     headers: {
-      /*
-       * Don't attempt to set User-Agent here.
-       *
-       * Browsers prevent web applications from setting
-       * the User-Agent header.
-       */
       Accept: 'application/json',
     },
   })
@@ -829,12 +675,6 @@ async function lookupFood(barcode) {
 
   const data = await response.json()
 
-  /*
-   * Open Food Facts uses:
-   *
-   * status === 1 -> product found
-   * status === 0 -> product not found
-   */
   if (data.status !== 1 || !data.product) {
     return null
   }
@@ -847,6 +687,7 @@ async function lookupFood(barcode) {
 // ============================================================
 
 function stopScanner(clearStatus = true) {
+  // Gracefully stop continuous scanning controls handled by ZXing
   if (controls) {
     controls.stop()
     controls = null
@@ -854,18 +695,12 @@ function stopScanner(clearStatus = true) {
 
   scanning.value = false
 
-  /*
-   * Explicitly stop camera tracks.
-   *
-   * This makes sure the browser camera light turns off.
-   */
+  // Explicitly strip remaining native video tracks to kill camera hardware activity lights
   if (videoRef.value?.srcObject) {
     const stream = videoRef.value.srcObject
-
     stream.getTracks().forEach((track) => {
       track.stop()
     })
-
     videoRef.value.srcObject = null
   }
 
@@ -887,29 +722,18 @@ function cancelLookup() {
 
   lookingUp.value = false
   processingBarcode = false
-
   statusMessage.value = ''
   statusType.value = ''
-
   scannedBarcode.value = ''
 }
 
 // ============================================================
-// SCAN ANOTHER PRODUCT
+// LIFECYCLE CLEANUP
 // ============================================================
-
-async function scanAnother() {
-  product.value = null
-  productNotFound.value = false
-
-  scannedBarcode.value = ''
-
-  clearMessages()
-
-  processingBarcode = false
-
-  await startScanner()
-}
+onBeforeUnmount(() => {
+  stopScanner(true)
+  cancelLookup()
+})
 
 // ============================================================
 // CLEAR ERROR
@@ -917,16 +741,6 @@ async function scanAnother() {
 
 function clearError() {
   errorMessage.value = ''
-}
-
-// ============================================================
-// CLEAR MESSAGES
-// ============================================================
-
-function clearMessages() {
-  errorMessage.value = ''
-  statusMessage.value = ''
-  statusType.value = ''
 }
 
 // ============================================================
@@ -955,32 +769,6 @@ function gramsToMilligrams(value) {
   }
 
   return Number(value) * 1000
-}
-
-// ============================================================
-// BARCODE FORMAT
-// ============================================================
-
-function formatName(format) {
-  switch (format) {
-    case BarcodeFormat.QR_CODE:
-      return 'QR Code'
-
-    case BarcodeFormat.UPC_A:
-      return 'UPC-A'
-
-    case BarcodeFormat.UPC_E:
-      return 'UPC-E'
-
-    case BarcodeFormat.EAN_8:
-      return 'EAN-8'
-
-    case BarcodeFormat.EAN_13:
-      return 'EAN-13'
-
-    default:
-      return String(format)
-  }
 }
 
 // ============================================================
