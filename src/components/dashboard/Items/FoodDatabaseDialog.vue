@@ -1,14 +1,8 @@
 <template>
   <q-dialog :model-value="modelValue" @update:model-value="onDialogToggle">
     <q-card style="width: 500px; max-width: 95vw">
-      <q-card-section class="row items-center justify-between">
+      <q-card-section>
         <div class="text-h6">Get Food</div>
-        <q-btn
-          type="button"
-          color="secondary"
-          label="Scan Bar Code"
-          @click="emit('scan-barcode')"
-        />
       </q-card-section>
 
       <q-card-section>
@@ -108,7 +102,7 @@ const props = defineProps({
   modelValue: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['update:modelValue', 'use-food', 'scan-barcode'])
+const emit = defineEmits(['update:modelValue', 'use-food'])
 
 const selected = ref(null)
 const options = ref([])

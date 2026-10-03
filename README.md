@@ -20,6 +20,7 @@ Choose from:
 - **Low Carb** — Reduce carbohydrate intake while focusing on nutritious foods
 - **High Protein** — Prioritize protein-rich foods to support your goals
 - **High Metabolic** — Follow a metabolism-focused nutrition approach
+- **Custom** — Build your own plan specific to your needs.
 
 ### 🍽️ Manage Your Meals
 
