@@ -1,5 +1,5 @@
 <template>
-  <q-page class="column items-center q-px-md q-py-lg">
+  <q-page class="column items-center q-px-md q-py-lg bg-blue text-white">
     <img
       src="/SlimMacros.png"
       alt="Slim Macros"
