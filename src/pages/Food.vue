@@ -45,7 +45,7 @@
                     <q-btn
                       type="button"
                       color="secondary"
-                      label="Scan Bar Code"
+                      label="Scan Code"
                       class="food-action-btn"
                       @click="openBarcodeScanner"
                     />
@@ -850,6 +850,6 @@ async function submitFood() {
   color: #f44336;
 }
 .food-action-btn {
-  width: 140px;
+  width: 110px;
 }
 </style>
