@@ -534,43 +534,160 @@ async function startScanner() {
     console.log('Video element:', videoRef.value)
     console.log('==============================')
 
-    // Start video decoding
-    controls = await reader.decodeFromVideoDevice(
-      selectedCameraId.value,
-      videoRef.value,
-      (result, error) => {
-        // Barcode found
-        if (result) {
-          console.log('==============================')
-          console.log('✅ BARCODE DETECTED')
-          console.log('Text:', result.getText())
-          console.log('Format:', result.getBarcodeFormat())
-          console.log('error:', error)
-          console.log('==============================')
+    // // Start video decoding
+    // controls = await reader.decodeFromVideoDevice(
+    //   selectedCameraId.value,
+    //   videoRef.value,
+    //   (result, error) => {
+    //     // Barcode found
+    //     if (result) {
+    //       console.log('==============================')
+    //       console.log('✅ BARCODE DETECTED')
+    //       console.log('Text:', result.getText())
+    //       console.log('Format:', result.getBarcodeFormat())
+    //       console.log('error:', error)
+    //       console.log('==============================')
 
-          if (processingBarcode) {
-            return
-          }
+    //       if (processingBarcode) {
+    //         return
+    //       }
 
-          const barcode = result.getText().trim()
+    //       const barcode = result.getText().trim()
 
-          if (!barcode) {
-            return
-          }
+    //       if (!barcode) {
+    //         return
+    //       }
 
-          processBarcode(barcode, result.getBarcodeFormat())
+    //       processBarcode(barcode, result.getBarcodeFormat())
 
-          return
-        }
+    //       return
+    //     }
+    //   },
+    // )
+
+    // Start camera ourselves so we control the resolution
+    const video = videoRef.value
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        deviceId: {
+          exact: selectedCameraId.value,
+        },
+        width: {
+          ideal: 1920,
+        },
+        height: {
+          ideal: 1080,
+        },
+        frameRate: {
+          ideal: 30,
+        },
       },
-    )
+      audio: false,
+    })
+
+    video.srcObject = stream
+
+    await video.play()
+
+    const track = stream.getVideoTracks()[0]
 
     console.log('==============================')
     console.log('📷 CAMERA STARTED')
-    console.log('Video dimensions:', {
-      width: videoRef.value?.videoWidth,
-      height: videoRef.value?.videoHeight,
+    console.log('Settings:', track.getSettings())
+    console.log('Capabilities:', track.getCapabilities())
+    console.log('Video size:', {
+      width: video.videoWidth,
+      height: video.videoHeight,
     })
+    console.log('==============================')
+
+    // Start ZXing against the already-running video
+    controls = await reader.decodeFromVideoElement(video, (result, error) => {
+      // Barcode found
+      if (result) {
+        console.log('==============================')
+        console.log('✅ BARCODE DETECTED')
+        console.log('Text:', result.getText())
+        console.log('Format:', result.getBarcodeFormat())
+        console.log('error:', error)
+        console.log('==============================')
+
+        if (processingBarcode) {
+          return
+        }
+
+        const barcode = result.getText().trim()
+
+        if (!barcode) {
+          return
+        }
+
+        processBarcode(barcode, result.getBarcodeFormat())
+
+        return
+      }
+
+      // NotFoundException is expected while ZXing
+      // is searching frame-by-frame.
+      if (error) {
+        console.debug('No barcode yet:', error.name, error.message)
+      }
+    })
+
+    /*     const video = videoRef.value
+    const track = video?.srcObject?.getVideoTracks?.()[0]
+
+    if (track) {
+      console.log('📷 BEFORE constraints', track.getSettings())
+
+      try {
+        await track.applyConstraints({
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          frameRate: { ideal: 30 },
+        })
+
+        console.log('📷 AFTER constraints', track.getSettings())
+
+        console.log('📺 VIDEO SIZE', {
+          width: video?.videoWidth,
+          height: video?.videoHeight,
+        })
+      } catch (error) {
+        console.warn('⚠️ Could not increase camera resolution:', error)
+      }
+    }
+ */
+    // console.log('📷 CAMERA SETTINGS', {
+    //   width: track?.getSettings().width,
+    //   height: track?.getSettings().height,
+    //   focusMode: track?.getSettings().focusMode,
+    //   zoom: track?.getSettings().zoom,
+    //   torch: track?.getSettings().torch,
+    // })
+
+    // console.log('📷 CAMERA CAPABILITIES', {
+    //   width: track?.getCapabilities().width,
+    //   height: track?.getCapabilities().height,
+    //   focusMode: track?.getCapabilities().focusMode,
+    //   zoom: track?.getCapabilities().zoom,
+    //   torch: track?.getCapabilities().torch,
+    // })
+
+    // console.log('📷 CAMERA SETTINGS', track?.getSettings())
+    // console.log('📷 CAMERA CAPABILITIES', track?.getCapabilities())
+
+    // console.log('📺 VIDEO SIZE', {
+    //   width: video?.videoWidth,
+    //   height: video?.videoHeight,
+    // })
+    // console.log('==============================')
+    // console.log('📷 CAMERA STARTED')
+    // console.log('Video dimensions:', {
+    //   width: videoRef.value?.videoWidth,
+    //   height: videoRef.value?.videoHeight,
+    // })
     console.log('==============================')
   } catch (error) {
     console.error('❌ Unable to start scanner:', error)
