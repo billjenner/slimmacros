@@ -64,12 +64,6 @@
                     :disable="!canGetMacros || store.loading"
                     @click="getMacrosFromAi"
                   />
-                                    <q-btn
-                    type="button"
-                    color="secondary"
-                    label="Scan Bar Code"
-                    :disable="store.loading"
-                    @click="scannerOpen = true"
                   />-->
                   <q-btn
                     type="button"
@@ -176,7 +170,7 @@
                 </div>
               </q-card>
 
-              <div class="row justify-end q-gutter-sm">
+              <div class="row justify-end q-gutter-sm q-mr-md">
                 <q-btn
                   type="submit"
                   color="primary"
@@ -187,7 +181,11 @@
             </q-form>
           </transition>
 
-          <FoodDatabaseDialog v-model="getFoodOpen" @use-food="applyDatabaseFood" />
+          <FoodDatabaseDialog
+            v-model="getFoodOpen"
+            @use-food="applyDatabaseFood"
+            @scan-barcode="openBarcodeScanner"
+          />
 
           <BarcodeScanner v-if="scannerOpen" @detected="barcodeDetected" @close="closeScanner" />
 
@@ -395,7 +393,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
 import { useFoodStore } from 'stores/food'
@@ -501,6 +499,12 @@ function applyDatabaseFood(selectedFood) {
     fat: selectedFood.fat,
     calories_extra: selectedFood.calories_extra,
   })
+}
+
+async function openBarcodeScanner() {
+  getFoodOpen.value = false
+  await nextTick()
+  scannerOpen.value = true
 }
 
 //const canGetMacros = computed(() => {
