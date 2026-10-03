@@ -1,4 +1,4 @@
-<!-- <template>
+<template>
   <div class="barcode-scanner">
     <div class="scanner-header">
       <button class="close-button" @click="close">Cancel</button>
@@ -435,4 +435,4 @@ onBeforeUnmount(() => {
 
   color: rgba(255, 255, 255, 0.9);
 }
-</style> -->
+</style>
