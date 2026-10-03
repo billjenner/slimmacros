@@ -33,6 +33,18 @@
           no-option-label="No matching food"
           @filter="filterFoods"
         >
+          <template #option="{ itemProps, opt }">
+            <q-item v-bind="itemProps">
+              <q-item-section>
+                <q-item-label>
+                  <template v-for="(part, i) in highlightParts(opt.description)" :key="i">
+                    <span v-if="part.match" class="text-bold bg-yellow-3">{{ part.text }}</span>
+                    <template v-else>{{ part.text }}</template>
+                  </template>
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
           <template #no-option>
             <q-item>
               <q-item-section class="text-grey">No matching food</q-item-section>
@@ -113,7 +125,23 @@ watch(
   },
 )
 
+const searchText = ref('')
+
+function highlightParts(text) {
+  const term = searchText.value.trim()
+  const str = text ?? ''
+  if (!term) {
+    return [{ text: str, match: false }]
+  }
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return str
+    .split(new RegExp(`(${escaped})`, 'i'))
+    .filter((part) => part !== '')
+    .map((part) => ({ text: part, match: part.toLowerCase() === term.toLowerCase() }))
+}
+
 async function filterFoods(value, update) {
+  searchText.value = value
   const results = await store.searchFoods(value)
 
   update(() => {

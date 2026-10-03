@@ -400,7 +400,7 @@ import { useFoodStore } from 'stores/food'
 import { calculateFoodCalories, calculateTotalCaloriesForPerson } from '../utils/rules'
 import { notifySuccess } from '../utils/notify'
 import BarcodeScanner from './BarcodeScanner.vue'
-import FoodDatabaseDialog from '../components/FoodDatabaseDialog.vue'
+import FoodDatabaseDialog from 'components/dashboard/Items/FoodDatabaseDialog.vue'
 
 defineProps({
   embedded: {
