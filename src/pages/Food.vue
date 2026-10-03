@@ -314,39 +314,39 @@
                       </div>
                     </div>
                     <div class="row q-col-gutter-sm q-py-sm">
-                      <div class="col-12 col-sm-6 col-md-3">
+                      <div class="col-3">
                         <div class="text-caption text-grey-7">Protein</div>
                         <div class="text-body2">{{ props.row.protein ?? 0 }}</div>
                       </div>
-                      <div class="col-12 col-sm-6 col-md-3">
+                      <div class="col-3">
                         <div class="text-caption text-grey-7">Carbs</div>
                         <div class="text-body2">{{ props.row.carb ?? 0 }}</div>
                       </div>
-                      <div class="col-12 col-sm-6 col-md-3">
+                      <div class="col-3">
                         <div class="text-caption text-grey-7">Fat</div>
                         <div class="text-body2">{{ props.row.fat ?? 0 }}</div>
                       </div>
-                      <div class="col-12 col-sm-6 col-md-3">
+                      <div class="col-3">
                         <div class="text-caption text-grey-7">Extra calories</div>
                         <div class="text-body2">{{ props.row.calories_extra ?? 0 }}</div>
                       </div>
-                      <div class="col-12 col-sm-6 col-md-3">
+                      <div class="col-3">
                         <div class="text-caption text-grey-7">Serving size</div>
                         <div class="text-body2">{{ props.row.serving_size ?? 1 }}</div>
                       </div>
-                      <div class="col-12 col-sm-6 col-md-3">
+                      <div class="col-3">
                         <div class="text-caption text-grey-7">Serving unit</div>
                         <div class="text-body2">{{ props.row.serving_unit || 'unit' }}</div>
                       </div>
-                      <!-- <div class="col-12 col-sm-6 col-md-3">
+                      <!-- <div class="col-3">
                         <div class="text-caption text-grey-7">My food</div>
                         <div class="text-body2">{{ props.row.my_food ? 'Yes' : 'No' }}</div>
                       </div> -->
-                      <div class="col-12 col-sm-6 col-md-3">
+                      <div class="col-3">
                         <div class="text-caption text-grey-7">Favorite</div>
                         <div class="text-body2">{{ props.row.favorite_food ? 'Yes' : 'No' }}</div>
                       </div>
-                      <div class="col-12 col-sm-6 col-md-3">
+                      <div class="col-3">
                         <div class="text-caption text-grey-7">Share with others</div>
                         <div class="text-body2">
                           {{ props.row.share_with_others ? 'Yes' : 'No' }}
@@ -573,6 +573,7 @@ function getMacroChartData(row) {
 const macroChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
+  animation: { duration: 3000, easing: 'easeOutQuart' },
   plugins: {
     legend: { position: 'bottom' },
     tooltip: {
