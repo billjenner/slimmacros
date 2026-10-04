@@ -297,7 +297,7 @@
                         <div class="text-caption text-grey-7 text-center q-mb-sm">
                           Macro Profile
                         </div>
-                        <div style="width: 100%; max-width: 360px; height: 220px">
+                        <div style="width: 100%; max-width: 360px; height: 300px">
                           <Pie :data="getMacroChartData(props.row)" :options="macroChartOptions" />
                         </div>
                       </div>
@@ -306,7 +306,7 @@
                         <div class="text-caption text-grey-7 text-center q-mb-sm">
                           Calories vs Daily Budget
                         </div>
-                        <div style="width: 100%; max-width: 360px; height: 220px">
+                        <div style="width: 100%; max-width: 360px; height: 300px">
                           <Pie
                             :data="getCalorieBudgetChartData(props.row)"
                             :options="macroChartOptions"
