@@ -123,7 +123,7 @@ async function startScanner() {
     }
 
     // Force strict hardware backend parameters targeting mobile environments
-    const cameraSelector = { facingMode: 'environment' }
+    const cameraSelector = selectedCameraId.value || { facingMode: 'environment' }
 
     const config = {
       fps: 20,
@@ -388,7 +388,7 @@ onBeforeUnmount(async () => {
 .scanner-container :deep(video) {
   width: 100% !important;
   height: 100% !important;
-  object-fit: cover !important;
+  object-fit: fill !important;
 }
 
 /* Overlay framework layout styling positioning masks */
