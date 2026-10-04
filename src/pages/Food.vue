@@ -193,8 +193,6 @@
 
           <FoodDatabaseDialog v-model="getFoodOpen" @use-food="applyDatabaseFood" />
 
-          <BarcodeScanner v-if="scannerOpen" @detected="barcodeDetected" @close="closeScanner" />
-
           <q-dialog v-model="confirmDeleteOpen">
             <q-card style="min-width: 320px">
               <q-card-section class="text-h6">Delete food?</q-card-section>
@@ -368,15 +366,15 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
+import { useRoute, useRouter } from 'vue-router'
 import { Pie } from 'vue-chartjs'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { useUsersStore } from 'stores/users'
 import { useFoodStore } from 'stores/food'
 import { calculateFoodCalories, calculateTotalCaloriesForPerson } from '../utils/rules'
 import { notifySuccess } from '../utils/notify'
-import BarcodeScanner from './BarcodeScanner.vue'
 import FoodDatabaseDialog from 'components/dashboard/Items/FoodDatabaseDialog.vue'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
@@ -391,6 +389,8 @@ defineProps({
 const usersStore = useUsersStore()
 const store = useFoodStore()
 const $q = useQuasar()
+const route = useRoute()
+const router = useRouter()
 
 const servingUnitOptions = [
   { label: 'Ounce', value: 'oz' },
@@ -465,7 +465,6 @@ const pendingDeleteFood = ref(null)
 const expandedFoodIds = ref([])
 const editingFoodId = ref(null)
 //const isGettingMacros = ref(false)
-const scannerOpen = ref(false)
 const getFoodOpen = ref(false)
 
 function applyDatabaseFood(selectedFood) {
@@ -480,10 +479,9 @@ function applyDatabaseFood(selectedFood) {
   })
 }
 
-async function openBarcodeScanner() {
+function openBarcodeScanner() {
   getFoodOpen.value = false
-  await nextTick()
-  scannerOpen.value = true
+  router.push('/barcode-scanner')
 }
 
 //const canGetMacros = computed(() => {
@@ -493,6 +491,24 @@ async function openBarcodeScanner() {
 
 //   return Boolean(description && Number.isFinite(servingSize) && servingSize > 0 && servingUnit)
 // })
+
+watch(
+  () => [route.query.barcode, route.query.showFoodForm],
+  ([scannedBarcode, shouldShowFoodForm]) => {
+    if (typeof scannedBarcode === 'string' && scannedBarcode.trim()) {
+      food.description = scannedBarcode.trim()
+    }
+
+    if (scannedBarcode || shouldShowFoodForm === 'true') {
+      showFoodForm.value = true
+      router.replace({
+        path: route.path,
+        query: { ...route.query, barcode: undefined, showFoodForm: undefined },
+      })
+    }
+  },
+  { immediate: true },
+)
 
 onMounted(() => {
   if (usersStore.currentUser?.user_id) {
@@ -663,15 +679,6 @@ function resetFoodForm() {
   })
 
   editingFoodId.value = null
-}
-
-function closeScanner() {
-  scannerOpen.value = false
-}
-
-function barcodeDetected(barcode) {
-  food.description = String(barcode || '').trim()
-  closeScanner()
 }
 
 // Get key from here: https://auth.openai.com/log-in/password

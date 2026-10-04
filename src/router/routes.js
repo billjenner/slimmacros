@@ -52,7 +52,6 @@ const routes = [
         component: () => import('pages/BarcodeScanner.vue'),
         meta: {
           requiresAuth: true,
-          requiresAdmin: true,
           seo: {
             title: 'Barcode Scanner',
             description: 'Scan barcodes using your device camera.',

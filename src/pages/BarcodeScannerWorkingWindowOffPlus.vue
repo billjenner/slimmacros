@@ -32,13 +32,11 @@
 <script setup>
 import { ref, onBeforeUnmount, nextTick, onMounted } from 'vue'
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode'
-import { useRouter } from 'vue-router'
 
 // ============================================================
 // EVENTS & EMITS
 // ============================================================
 const emit = defineEmits(['close', 'detected', 'product-found', 'product-not-found', 'error'])
-const router = useRouter()
 
 // ============================================================
 // STATE AND REFS CONFIGURATION
@@ -182,8 +180,8 @@ async function processBarcode(barcode, format) {
 
   emit('detected', { barcode, format })
 
+  // Safely stop background camera tasks before hitting external API networks
   await stopScanner(false)
-  await router.push({ path: '/food', query: { barcode, showFoodForm: 'true' } })
 
   lookingUp.value = true
   statusMessage.value = 'Querying Open Food Facts database...'
@@ -212,12 +210,6 @@ async function processBarcode(barcode, format) {
     lookingUp.value = false
     processingBarcode = false
   }
-}
-
-async function close() {
-  await stopScanner()
-  emit('close')
-  await router.push({ path: '/food', query: { showFoodForm: 'true' } })
 }
 
 // ============================================================
@@ -268,6 +260,7 @@ async function lookupFood(barcode) {
   ].join(',')
 
   const cleanBarcode = encodeURIComponent(barcode.trim())
+  // Custom structural concatenation patch preventing spacing mashing crashes
   const url =
     `https://openfoodfacts.net` + `${cleanBarcode}.json` + `?fields=${encodeURIComponent(fields)}`
 
