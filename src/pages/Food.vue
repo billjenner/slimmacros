@@ -494,17 +494,18 @@ function openBarcodeScanner() {
 // })
 
 async function applyScannedBarcode(barcode) {
-  food.description = barcode
+  const failMessage = `Barcode lookup failed for ${barcode}.`
   try {
     const product = await fetchOpenFoodFactsProduct(barcode)
-    if (!product) {
-      $q.notify({ type: 'warning', message: 'Product not found in Open Food Facts.' })
+    const mapped = product ? mapProductToFood(product) : null
+    if (!mapped?.description) {
+      $q.notify({ type: 'negative', message: failMessage })
       return
     }
-    Object.assign(food, mapProductToFood(product))
+    Object.assign(food, mapped)
   } catch (err) {
     console.error('Open Food Facts lookup failed:', err)
-    $q.notify({ type: 'negative', message: 'Could not look up barcode.' })
+    $q.notify({ type: 'negative', message: failMessage })
   }
 }
 

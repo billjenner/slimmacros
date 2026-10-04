@@ -96,7 +96,10 @@ export function mapProductToFood(product) {
   }
 
   const result = {
-    description: product?.product_name_en || product?.product_name || '',
+    description: [product?.brands, product?.product_name_en || product?.product_name]
+      .filter(Boolean)
+      .join(' ')
+      .trim(),
     serving_size: serving.size,
     serving_unit: serving.unit,
     protein: scale('proteins'),
