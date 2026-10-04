@@ -115,6 +115,9 @@
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/barcode-scanner')">
           <q-item-section>Barcode Scanner</q-item-section>
         </q-item>
+        <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/tst-food-facts')">
+          <q-item-section>Tst Food Facts</q-item-section>
+        </q-item>
         <q-item
           v-if="!(usersStore.currentUser && usersStore.currentUser.email)"
           clickable

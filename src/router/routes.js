@@ -60,6 +60,18 @@ const routes = [
         },
       },
       {
+        path: 'test-food-facts',
+        component: () => import('pages/tstFoodFacts.vue'),
+        meta: {
+          requiresAuth: true,
+          seo: {
+            title: 'Tst Food Facts',
+            description: 'Look up a barcode on Open Food Facts.',
+            canonicalPath: '/tst-food-facts',
+          },
+        },
+      },
+      {
         path: 'create-login',
         component: () => import('pages/CreateLogin.vue'),
         meta: {
