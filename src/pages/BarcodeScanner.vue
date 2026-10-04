@@ -123,9 +123,7 @@ async function startScanner() {
      * FIX 1: Isolate the Camera Selector to EXACTLY 1 object key
      * html5-qrcode strictly mandates that this object only holds deviceId OR facingMode.
      */
-    const cameraSelector = selectedCameraId.value
-      ? { deviceId: selectedCameraId.value }
-      : { facingMode: 'environment' }
+    const cameraSelector = 'environment'
 
     /*
      * FIX 2: Move resolution modifiers to videoConstraints
