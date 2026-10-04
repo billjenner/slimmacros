@@ -11,7 +11,7 @@
     <div v-if="lastBarcode" class="barcode-result">Last scanned barcode: {{ lastBarcode }}</div>
 
     <!-- The target video hook mount container -->
-    <div class="scanner-container">
+    <div v-show="!manualMode" class="scanner-container">
       <div id="html5-qr-video-engine" ref="scannerContainer" class="scanner-video"></div>
       <div v-if="scanning" class="scanner-overlay">
         <div class="scanner-target">
@@ -26,12 +26,46 @@
       {{ error }}
     </div>
 
-    <div class="scanner-instructions">Position the barcode inside the box</div>
+    <div v-if="!manualMode" class="scanner-instructions">Position the barcode inside the box</div>
+
+    <q-btn
+      v-if="!manualMode"
+      class="q-mt-md"
+      color="primary"
+      outline
+      no-caps
+      label="Enter Bar Code Manually"
+      @click="enterManualMode"
+    />
+
+    <div v-if="manualMode" class="manual-entry q-mt-md">
+      <q-input
+        v-model="manualBarcode"
+        label="Bar Code"
+        filled
+        dense
+        inputmode="numeric"
+        mask="#############"
+        unmask-value
+        :rules="[
+          (value) => /^\d+$/.test(value || '') || 'Numbers only',
+          (value) => (value || '').length >= 12 || 'Minimum 12 digits',
+        ]"
+        @keyup.enter="lookupManualBarcode"
+      />
+      <q-btn
+        color="primary"
+        no-caps
+        label="Lookup Bar Code"
+        :disable="!manualBarcodeValid"
+        @click="lookupManualBarcode"
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onBeforeUnmount, nextTick, onMounted } from 'vue'
+import { ref, computed, onBeforeUnmount, nextTick, onMounted } from 'vue'
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode'
 import { useRouter } from 'vue-router'
 
@@ -181,6 +215,21 @@ async function processBarcode(barcode, format) {
   processingBarcode = false
 }
 
+const manualMode = ref(false)
+const manualBarcode = ref('')
+const manualBarcodeValid = computed(() => /^\d{12,13}$/.test(manualBarcode.value || ''))
+
+async function enterManualMode() {
+  manualMode.value = true
+  error.value = ''
+  await stopScanner()
+}
+
+async function lookupManualBarcode() {
+  if (!manualBarcodeValid.value) return
+  await processBarcode(manualBarcode.value, 'MANUAL')
+}
+
 async function close() {
   await stopScanner()
   emit('close')
@@ -242,6 +291,13 @@ onBeforeUnmount(async () => {
   border-radius: 16px;
   padding: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.manual-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
 }
 
 /* Header style elements layout mapping options */
