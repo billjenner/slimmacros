@@ -128,13 +128,6 @@ async function startScanner() {
     const config = {
       fps: 20,
       useBarCodeDetectorIfSupported: true, // Swaps to ultra-fast native hardware decoding loop if device supports it
-      qrbox: (videoWidth, videoHeight) => {
-        // Matches the 85% width x 40% height aspect ratio sizing in the layout CSS overrides
-        return {
-          width: Math.floor(videoWidth * 0.85),
-          height: Math.floor(videoHeight * 0.4),
-        }
-      },
       formatsToSupport: [
         Html5QrcodeSupportedFormats.UPC_A,
         Html5QrcodeSupportedFormats.EAN_13,
@@ -388,7 +381,7 @@ onBeforeUnmount(async () => {
 .scanner-container :deep(video) {
   width: 100% !important;
   height: 100% !important;
-  object-fit: fill !important;
+  object-fit: cover !important;
 }
 
 /* Overlay framework layout styling positioning masks */
