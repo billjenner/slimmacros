@@ -11,7 +11,8 @@
     <div v-if="lastBarcode" class="barcode-result">Last scanned barcode: {{ lastBarcode }}</div>
 
     <!-- The target video hook mount container -->
-    <div id="html5-qr-video-engine" ref="scannerContainer" class="scanner-container">
+    <div class="scanner-container">
+      <div id="html5-qr-video-engine" ref="scannerContainer" class="scanner-video"></div>
       <div v-if="scanning" class="scanner-overlay">
         <div class="scanner-target">
           <!-- Animated horizontal framing line guide -->
@@ -366,6 +367,11 @@ onBeforeUnmount(async () => {
   background-color: #000000;
   border-radius: 12px;
   overflow: hidden;
+}
+
+.scanner-video {
+  position: absolute;
+  inset: 0;
 }
 
 /*

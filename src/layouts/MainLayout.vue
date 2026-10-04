@@ -132,7 +132,7 @@
     <q-page-container>
       <router-view v-slot="{ Component, route: currentRoute }">
         <transition name="screen-fade" mode="out-in">
-          <component :is="Component" :key="currentRoute.fullPath" />
+          <component :is="Component" :key="currentRoute.path" />
         </transition>
       </router-view>
     </q-page-container>
