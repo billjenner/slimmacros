@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="scanner-container">
     <!-- html5-qrcode will inject its native <video> element here -->
     <div id="qr-reader" ref="videoRef" class="video-canvas-target"></div>
@@ -65,30 +65,27 @@ let lookupController = null
 // ============================================================
 async function getCameras() {
   try {
+    // Request permissions and discover cameras
     const devices = await Html5Qrcode.getCameras()
     cameras.value = devices
 
-    if (devices && devices.length > 0) {
-      // Isolate the rear camera array for food product scanning
-      const rearCamera = devices.find((camera) => {
-        const label = camera.label?.toLowerCase() || ''
-        return label.includes('back') || label.includes('rear') || label.includes('environment')
-      })
-
-      selectedCameraId.value = rearCamera?.deviceId || devices[0].deviceId
-    } else {
-      // Explicitly reset if empty array is returned due to initial permission lockouts
-      selectedCameraId.value = ''
+    if (!devices.length) {
+      throw new Error('No camera was found on this device.')
     }
+
+    // Isolate the rear camera array for food product scanning
+    const rearCamera = devices.find((camera) => {
+      const label = camera.label?.toLowerCase() || ''
+      return label.includes('back') || label.includes('rear') || label.includes('environment')
+    })
+
+    selectedCameraId.value = rearCamera?.deviceId || devices[0].deviceId
   } catch (error) {
-    console.warn('Camera discovery fallback enabled:', error.message || error)
-    selectedCameraId.value = '' // Fall back to facingMode constraint logic below
+    console.error('Camera discovery error:', error)
+    throw new Error('Unable to access camera. Please confirm system permissions are active.')
   }
 }
 
-// ============================================================
-// START SCANNER
-// ============================================================
 // ============================================================
 // START SCANNER
 // ============================================================
@@ -104,10 +101,16 @@ async function startScanner() {
       await getCameras()
     }
 
+    if (!selectedCameraId.value) {
+      throw new Error('No valid target camera is selected.')
+    }
+
     scanning.value = true
     statusMessage.value = 'Position food barcode inside the frame...'
     statusType.value = 'info'
 
+    // html5-qrcode attaches directly to an HTML element ID container
+    // Make sure DOM has rendered the node element securely
     await nextTick()
 
     const elementId = videoRef.value?.id || 'qr-reader'
@@ -115,55 +118,58 @@ async function startScanner() {
       throw new Error('Target container wrapper element was missing an ID string attribute.')
     }
 
-    if (!html5QrcodeInstance) {
-      html5QrcodeInstance = new Html5Qrcode(elementId, { verbose: false })
-    }
+    // 1. Create a specialized instance restricted purely to food scanning formats
+    html5QrcodeInstance = new Html5Qrcode(elementId, {
+      // Passing verbose: false prevents frame dropouts due to continuous console logging log spam
+      verbose: false,
+    })
 
-    /*
-     * FIX 1: Isolate the Camera Selector to EXACTLY 1 object key
-     * html5-qrcode strictly mandates that this object only holds deviceId OR facingMode.
-     */
-    const cameraSelector = selectedCameraId.value
-      ? { deviceId: selectedCameraId.value }
-      : { facingMode: 'environment' }
-
-    /*
-     * FIX 2: Move resolution modifiers to videoConstraints
-     * Advanced hardware dimensions go inside the global config object,
-     * which safely delivers them down to the browser's getUserMedia engine.
-     */
+    // 2. High-performance engine configurations
     const config = {
-      fps: 20,
+      fps: 20, // Lower frame counts save battery and maximize CPU processing time per frame
+
+      // Crucial setting for 1D lines: restricts frame analysis to a narrow focus box
+      // instead of trying to compute full-frame graphics matrices.
       qrbox: (videoWidth, videoHeight) => {
         return {
           width: Math.floor(videoWidth * 0.8),
-          height: Math.floor(videoHeight * 0.4),
+          height: Math.floor(videoHeight * 0.4), // Rectangular shape matches food barcodes perfectly
         }
       },
+
+      // Restricting global formats optimizes underlying engine execution loops
       formatsToSupport: [
         Html5QrcodeSupportedFormats.UPC_A,
         Html5QrcodeSupportedFormats.EAN_13,
         Html5QrcodeSupportedFormats.UPC_E,
         Html5QrcodeSupportedFormats.EAN_8,
       ],
-      videoConstraints: {
-        width: { min: 1280, ideal: 1920 },
-        height: { min: 720, ideal: 1080 },
-      },
     }
 
-    // Fire up the hardware engine loop with separated inputs
+    // 3. Setup advanced hardware media track requests
+    const cameraConstraints = {
+      deviceId: { exact: selectedCameraId.value },
+      // Food lines require strong pixel depth to resolve contrast effectively
+      width: { min: 1280, ideal: 1920 },
+      height: { min: 720, ideal: 1080 },
+      facingMode: 'environment',
+    }
+
+    // 4. Fire up the hardware engine loop
     await html5QrcodeInstance.start(
-      cameraSelector, // Argument 1: Strictly selection identifiers (1 key max)
-      config, // Argument 2: All resolutions, bounds, and engine settings
+      cameraConstraints,
+      config,
       (decodedText, decodedResult) => {
+        // SUCCESS CALLBACK: Triggers automatically when a high-confidence barcode match occurs
         if (!processingBarcode) {
+          // Normalize the library format name mappings for your parent handler
           const standardFormat = decodedResult?.result?.format?.formatName || 'UNKNOWN'
           processBarcode(decodedText, standardFormat)
         }
       },
-      () => {
-        // FRAME FAILURE HANDLER: Ignored intentionally to avoid log flood
+      (errorMessage) => {
+        console.warn('Frame decode error:', errorMessage)
+        // FRAME FAILURE HANDLER: Ignored intentionally to avoid stalling stream renders when frames are empty
       },
     )
 
@@ -188,7 +194,7 @@ async function processBarcode(barcode, format) {
 
   emit('detected', { barcode, format })
 
-  // FIX 1: Safely teardown the camera state before executing remote API calls
+  // Cleanly shut down the camera processing thread while making database calls
   await stopScanner(false)
 
   lookingUp.value = true
@@ -225,33 +231,6 @@ async function processBarcode(barcode, format) {
 }
 
 // ============================================================
-// STOP SCANNER
-// ============================================================
-async function stopScanner(clearStatus = true) {
-  scanning.value = false
-
-  // FIX 2: Check the exact engine state to prevent state transition collision crashes
-  if (html5QrcodeInstance) {
-    const currentState = html5QrcodeInstance.getState()
-
-    // State 2 corresponds to 'SCANNING'. Only halt if fully initialized.
-    if (currentState === 2 || html5QrcodeInstance.isScanning) {
-      try {
-        await html5QrcodeInstance.stop()
-        html5QrcodeInstance = null
-      } catch (err) {
-        console.warn('Managed transition error bypass:', err.message || err)
-      }
-    }
-  }
-
-  if (clearStatus) {
-    statusMessage.value = ''
-    statusType.value = ''
-  }
-}
-
-// ============================================================
 // OPEN FOOD FACTS LOOKUP
 // ============================================================
 async function lookupFood(barcode) {
@@ -272,10 +251,6 @@ async function lookupFood(barcode) {
     'allergens',
   ].join(',')
 
-  /*
-   * FIX 3: Re-structured string literal sequence with mandatory slashes.
-   * This prevents your browser from misinterpreting the numbers as part of the domain name.
-   */
   const url =
     `https://openfoodfacts.net` +
     `${encodeURIComponent(barcode)}.json` +
@@ -293,6 +268,28 @@ async function lookupFood(barcode) {
 
   const data = await response.json()
   return data.status === 1 ? data.product : null
+}
+
+// ============================================================
+// STOP SCANNER
+// ============================================================
+async function stopScanner(clearStatus = true) {
+  scanning.value = false
+
+  if (html5QrcodeInstance && html5QrcodeInstance.isScanning) {
+    try {
+      // html5-qrcode stops and automatically releases hardware camera track configurations
+      await html5QrcodeInstance.stop()
+      html5QrcodeInstance = null
+    } catch (err) {
+      console.error('Error during engine release sequence:', err)
+    }
+  }
+
+  if (clearStatus) {
+    statusMessage.value = ''
+    statusType.value = ''
+  }
 }
 
 // ============================================================
@@ -434,4 +431,4 @@ onBeforeUnmount(async () => {
     top: 15%;
   }
 }
-</style>
+</style> -->
