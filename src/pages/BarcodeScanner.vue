@@ -243,7 +243,6 @@ async function stopScanner(clearStatus = true) {
 // ============================================================
 // OPEN FOOD FACTS REMOTE DATABASE DISPATCH
 // ============================================================
-// test barcode: 857111004295
 async function lookupFood(barcode) {
   lookupController = new AbortController()
 

@@ -60,7 +60,7 @@ const routes = [
         },
       },
       {
-        path: 'test-food-facts',
+        path: 'tst-food-facts',
         component: () => import('pages/tstFoodFacts.vue'),
         meta: {
           requiresAuth: true,

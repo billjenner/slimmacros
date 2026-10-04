@@ -36,7 +36,7 @@
 <script setup>
 import { ref } from 'vue'
 
-const barcode = ref('857111004295')
+const barcode = ref('857111004195')
 const product = ref(null)
 const notFound = ref(false)
 const error = ref('')
