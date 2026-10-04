@@ -28,7 +28,7 @@ Create your own recipes, choose from 1,500+ foods in the database, or scan the b
 
 ![Foods](./public/DefineFoods.jpg)
 
-Keep a daily record of what you eat and stay aware of your nutrition throughout the day.
+### Keep a daily record of what you eat and stay aware of your nutrition throughout the day.
 
 ![Food Budget](./public/FoodBudget.jpg)
 
