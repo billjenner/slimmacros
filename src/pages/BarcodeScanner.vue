@@ -361,7 +361,7 @@ onBeforeUnmount(async () => {
 .scanner-container {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
   background-color: #000000;
   border-radius: 12px;
   overflow: hidden;
@@ -381,7 +381,7 @@ onBeforeUnmount(async () => {
 .scanner-container :deep(video) {
   width: 100% !important;
   height: 100% !important;
-  object-fit: cover !important;
+  object-fit: contain !important;
 }
 
 /* Overlay framework layout styling positioning masks */
