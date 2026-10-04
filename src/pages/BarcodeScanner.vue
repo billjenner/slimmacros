@@ -50,7 +50,6 @@ const cameras = ref([])
 const selectedCameraId = ref('')
 
 const scanning = ref(false)
-const lookingUp = ref(false)
 const product = ref(null)
 const productNotFound = ref(false)
 
@@ -63,7 +62,6 @@ const statusType = ref('')
 
 let html5QrcodeInstance = null
 let processingBarcode = false
-let lookupController = null
 
 // ============================================================
 // CAMERA DISCOVERY UTILITIES
@@ -179,33 +177,8 @@ async function processBarcode(barcode, format) {
   await stopScanner(false)
   await router.push({ path: '/food', query: { barcode, showFoodForm: 'true' } })
 
-  lookingUp.value = true
-  statusMessage.value = 'Querying Open Food Facts database...'
-  statusType.value = 'info'
-
-  try {
-    const result = await lookupFood(barcode)
-
-    if (!result) {
-      product.value = null
-      productNotFound.value = true
-      emit('product-not-found', barcode)
-      return
-    }
-
-    product.value = result
-    productNotFound.value = false
-    emit('product-found', result)
-  } catch (err) {
-    if (err.name === 'AbortError') return
-
-    console.error('Open Food Facts API connection dropped:', err)
-    error.value = 'Could not pull product values. Please confirm network connection.'
-    emit('error', err)
-  } finally {
-    lookingUp.value = false
-    processingBarcode = false
-  }
+  // Food.vue performs the Open Food Facts lookup from the barcode query param
+  processingBarcode = false
 }
 
 async function close() {
@@ -241,45 +214,6 @@ async function stopScanner(clearStatus = true) {
 }
 
 // ============================================================
-// OPEN FOOD FACTS REMOTE DATABASE DISPATCH
-// ============================================================
-async function lookupFood(barcode) {
-  lookupController = new AbortController()
-
-  const fields = [
-    'code',
-    'product_name',
-    'product_name_en',
-    'generic_name',
-    'brands',
-    'image_front_url',
-    'serving_size',
-    'nutriments',
-    'nutriscore_grade',
-    'nutrition_grades',
-    'ingredients_text',
-    'allergens',
-  ].join(',')
-
-  const cleanBarcode = encodeURIComponent(barcode.trim())
-  const url =
-    `https://openfoodfacts.net` + `${cleanBarcode}.json` + `?fields=${encodeURIComponent(fields)}`
-
-  const response = await fetch(url, {
-    method: 'GET',
-    signal: lookupController.signal,
-    headers: { Accept: 'application/json' },
-  })
-
-  if (!response.ok) {
-    throw new Error(`Open Food Facts API Error HTTP: ${response.status}`)
-  }
-
-  const data = await response.json()
-  return data.status === 1 ? data.product : null
-}
-
-// ============================================================
 // LIFECYCLE MANAGEMENT HOOKS
 // ============================================================
 onMounted(async () => {
@@ -288,9 +222,6 @@ onMounted(async () => {
 
 onBeforeUnmount(async () => {
   await stopScanner(true)
-  if (lookupController) {
-    lookupController.abort()
-  }
 })
 </script>
 

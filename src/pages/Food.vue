@@ -375,6 +375,7 @@ import { useUsersStore } from 'stores/users'
 import { useFoodStore } from 'stores/food'
 import { calculateFoodCalories, calculateTotalCaloriesForPerson } from '../utils/rules'
 import { notifySuccess } from '../utils/notify'
+import { fetchOpenFoodFactsProduct, mapProductToFood } from '../utils/openFoodFacts'
 import FoodDatabaseDialog from 'components/dashboard/Items/FoodDatabaseDialog.vue'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
@@ -492,11 +493,26 @@ function openBarcodeScanner() {
 //   return Boolean(description && Number.isFinite(servingSize) && servingSize > 0 && servingUnit)
 // })
 
+async function applyScannedBarcode(barcode) {
+  food.description = barcode
+  try {
+    const product = await fetchOpenFoodFactsProduct(barcode)
+    if (!product) {
+      $q.notify({ type: 'warning', message: 'Product not found in Open Food Facts.' })
+      return
+    }
+    Object.assign(food, mapProductToFood(product))
+  } catch (err) {
+    console.error('Open Food Facts lookup failed:', err)
+    $q.notify({ type: 'negative', message: 'Could not look up barcode.' })
+  }
+}
+
 watch(
   () => [route.query.barcode, route.query.showFoodForm],
   ([scannedBarcode, shouldShowFoodForm]) => {
     if (typeof scannedBarcode === 'string' && scannedBarcode.trim()) {
-      food.description = scannedBarcode.trim()
+      applyScannedBarcode(scannedBarcode.trim())
     }
 
     if (scannedBarcode || shouldShowFoodForm === 'true') {
