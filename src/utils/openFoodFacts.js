@@ -83,6 +83,16 @@ export function parseServingSize(text) {
 
 const round1 = (value) => Math.round(value * 10) / 10
 
+// Prefix the first brand unless the product name already contains it
+function buildDescription(product) {
+  const name = String(product?.product_name_en || product?.product_name || '').trim()
+  const brand = String(product?.brands || '')
+    .split(',')[0]
+    .trim()
+  if (!brand || name.toLowerCase().includes(brand.toLowerCase())) return name
+  return `${brand} ${name}`.trim()
+}
+
 export function mapProductToFood(product) {
   const nutriments = product?.nutriments || {}
   const serving = parseServingSize(product?.serving_size)
@@ -96,10 +106,7 @@ export function mapProductToFood(product) {
   }
 
   const result = {
-    description: [product?.brands, product?.product_name_en || product?.product_name]
-      .filter(Boolean)
-      .join(' ')
-      .trim(),
+    description: buildDescription(product),
     serving_size: serving.size,
     serving_unit: serving.unit,
     protein: scale('proteins'),
