@@ -352,6 +352,11 @@ onBeforeUnmount(async () => {
   text-align: center;
 }
 
+.scanner-video {
+  position: absolute;
+  inset: 0;
+}
+
 /* Camera layer configuration settings viewport box */
 .scanner-container {
   position: relative;
@@ -360,11 +365,6 @@ onBeforeUnmount(async () => {
   background-color: #000000;
   border-radius: 12px;
   overflow: hidden;
-}
-
-.scanner-video {
-  position: absolute;
-  inset: 0;
 }
 
 /*
