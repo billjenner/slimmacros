@@ -1,22 +1,18 @@
 <template>
   <div class="scanner-container">
-    <!-- html5-qrcode will inject its native <video> element here -->
+    <!-- FIX 1: Appended the video-canvas-target class to hook up your scoped CSS deep overrides -->
     <div id="qr-reader" ref="videoRef" class="video-canvas-target"></div>
 
-    <!-- Custom Faux Laser Scanning Overlay -->
     <div v-if="scanning" class="scanner-overlay-wrapper">
       <div class="focus-window-box">
-        <!-- Corner brackets for target styling -->
         <div class="corner-bracket top-left"></div>
         <div class="corner-bracket top-right"></div>
         <div class="corner-bracket bottom-left"></div>
         <div class="corner-bracket bottom-right"></div>
 
-        <!-- Animated horizontal scanning laser beam -->
         <div class="aiming-laser-line"></div>
       </div>
 
-      <!-- Instructional guidance helper text -->
       <p class="scan-instruction-text">Align barcode horizontally within the box</p>
     </div>
   </div>
@@ -123,7 +119,7 @@ async function startScanner() {
      * FIX 1: Isolate the Camera Selector to EXACTLY 1 object key
      * html5-qrcode strictly mandates that this object only holds deviceId OR facingMode.
      */
-    const cameraSelector = 'environment'
+    const cameraSelector = { facingMode: 'environment' }
 
     /*
      * FIX 2: Move resolution modifiers to videoConstraints
@@ -147,6 +143,7 @@ async function startScanner() {
         Html5QrcodeSupportedFormats.EAN_8,
       ],
       videoConstraints: {
+        facingMode: { ideal: 'environment' },
         width: { min: 1280, ideal: 1920 },
         height: { min: 720, ideal: 1080 },
       },
@@ -326,6 +323,19 @@ onBeforeUnmount(async () => {
   overflow: hidden;
   background-color: #000000;
   aspect-ratio: 4 / 3; /* Matches standard camera video streams */
+}
+
+/*
+ * CRITICAL FIX: Hide html5-qrcode's auto-generated bounding box frames.
+ * This removes their duplicate lines, borders, and empty canvas spaces.
+ */
+.video-canvas-target :deep(#qr-reader__scan_region) {
+  border: none !important;
+  background: transparent !important;
+}
+
+.video-canvas-target :deep(canvas) {
+  display: none !important; /* Hides the library's internal drawing snapshots */
 }
 
 /* Ensure html5-qrcode video element scales fluidly to fill container walls */
