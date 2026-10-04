@@ -134,6 +134,8 @@ async function startScanner() {
      */
     const config = {
       fps: 20,
+      useBarCodeDetectorIfSupported: true,
+
       qrbox: (videoWidth, videoHeight) => {
         return {
           width: Math.floor(videoWidth * 0.8),
@@ -230,18 +232,21 @@ async function processBarcode(barcode, format) {
 async function stopScanner(clearStatus = true) {
   scanning.value = false
 
-  // FIX 2: Check the exact engine state to prevent state transition collision crashes
   if (html5QrcodeInstance) {
-    const currentState = html5QrcodeInstance.getState()
+    /*
+     * FIX 2: Defer Execution Hook
+     * Wrapping this in a small Promise delay pushes the stop action to the next event loop tick,
+     * resolving the library's internal state collision.
+     */
+    await new Promise((resolve) => setTimeout(resolve, 100))
 
-    // State 2 corresponds to 'SCANNING'. Only halt if fully initialized.
-    if (currentState === 2 || html5QrcodeInstance.isScanning) {
-      try {
+    try {
+      if (html5QrcodeInstance.isScanning) {
         await html5QrcodeInstance.stop()
-        html5QrcodeInstance = null
-      } catch (err) {
-        console.warn('Managed transition error bypass:', err.message || err)
       }
+      html5QrcodeInstance = null
+    } catch (err) {
+      console.warn('Bypassed minor state warning safely:', err.message || err)
     }
   }
 
@@ -276,10 +281,11 @@ async function lookupFood(barcode) {
    * FIX 3: Re-structured string literal sequence with mandatory slashes.
    * This prevents your browser from misinterpreting the numbers as part of the domain name.
    */
+
+  const cleanBarcode = encodeURIComponent(barcode.trim())
+
   const url =
-    `https://openfoodfacts.net` +
-    `${encodeURIComponent(barcode)}.json` +
-    `?fields=${encodeURIComponent(fields)}`
+    `https://openfoodfacts.net` + `${cleanBarcode}.json` + `?fields=${encodeURIComponent(fields)}`
 
   const response = await fetch(url, {
     method: 'GET',
