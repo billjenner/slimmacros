@@ -203,14 +203,14 @@ const routes = [
         },
       },
       {
-        path: 'food-log',
+        path: 'log',
         component: () => import('pages/Log.vue'),
         meta: {
           requiresAuth: true,
           seo: {
-            title: 'Food Log',
+            title: 'Log',
             description: 'Track food consumption and servings throughout the day.',
-            canonicalPath: '/food-log',
+            canonicalPath: '/log',
           },
         },
       },

@@ -26,11 +26,11 @@
           <q-btn
             flat
             label="Log"
-            to="/food-log"
+            to="/log"
             class="q-mx-sm"
             style="min-width: 126px"
-            :style="buttonStyle('/food-log')"
-            @mouseover="hoveredPath = '/food-log'"
+            :style="buttonStyle('/log')"
+            @mouseover="hoveredPath = '/log'"
             @mouseleave="hoveredPath = null"
           />
           <q-btn
@@ -94,7 +94,7 @@
         <q-item clickable v-ripple @click="navigateAndClose('/')">
           <q-item-section>Intro</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/food-log')">
+        <q-item clickable v-ripple @click="navigateAndClose('/log')">
           <q-item-section>Log</q-item-section>
         </q-item>
         <q-item clickable v-ripple @click="navigateAndClose('/items')">
