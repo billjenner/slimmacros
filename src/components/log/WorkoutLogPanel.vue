@@ -267,7 +267,6 @@ async function submitWorkoutLog() {
   if (saved) {
     notifySuccess($q, 'Workout added to log successfully.', { color: 'positive' })
     workoutLog.workout_time = selectedWorkout.value?.average_workout_time ?? null
-    workoutLog.date = currentDate()
     await workoutLogsStore.loadWorkoutLogs(usersStore.currentUser.user_id)
   }
 }
