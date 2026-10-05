@@ -930,7 +930,6 @@ async function submitFoodLog() {
   if (saved) {
     notifySuccess($q, 'Food added to log successfully.', { color: 'positive' })
     foodLog.servings = 1
-    foodLog.datetime = getCurrentLocalDateTime()
     await foodLogsStore.loadFoodLogs(usersStore.currentUser.user_id)
   }
 }
