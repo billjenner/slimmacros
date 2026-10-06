@@ -182,7 +182,7 @@ const supplementLog = reactive({
   serving_unit: 'other',
   date: currentDate(),
 })
-const columns = [{ name: 'summary', label: 'Summary', field: 'summary', align: 'right' }]
+const columns = [{ name: 'summary', label: 'Summary', field: 'summary', align: 'left' }]
 const servingUnitOptions = [
   { label: 'Pills', value: 'pills' },
   { label: 'Oz', value: 'oz' },
