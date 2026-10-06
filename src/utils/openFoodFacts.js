@@ -17,6 +17,7 @@ const FIELDS = [
 const VALID_UNITS = [
   'oz',
   'gram',
+  'ml',
   'cup',
   'scoop',
   'bar',
@@ -66,13 +67,13 @@ function normalizeUnit(rawUnit) {
   return VALID_UNITS.includes(unit) ? unit : 'serving'
 }
 
-// "1 bar (15 g)" -> { size: 1, unit: 'bar', grams: 15 }
+// "1 bar (15 g)" -> { size: 15, unit: 'gram', grams: 15 }
 export function parseServingSize(text) {
   const raw = String(text || '').trim()
 
-  const full = raw.match(/^([\d.]+)\s*([^\d(]*?)\s*\(\s*([\d.]+)\s*(?:g|ml)\b/i)
+  const full = raw.match(/^([\d.]+)\s*([^\d(]*?)\s*\(\s*([\d.]+)\s*(g|ml)\b\s*\)/i)
   if (full) {
-    return { size: Number(full[1]) || 1, unit: normalizeUnit(full[2]), grams: Number(full[3]) }
+    return { size: Number(full[3]) || 1, unit: normalizeUnit(full[4]), grams: Number(full[3]) }
   }
 
   const gramsOnly = raw.match(/^([\d.]+)\s*(?:g|ml)\b/i)
@@ -83,14 +84,14 @@ export function parseServingSize(text) {
 
 const round1 = (value) => Math.round(value * 10) / 10
 
-// Prefix the first brand unless the product name already contains it
+// Append the first brand unless the product name already contains it
 function buildDescription(product) {
   const name = String(product?.product_name_en || product?.product_name || '').trim()
   const brand = String(product?.brands || '')
     .split(',')[0]
     .trim()
   if (!brand || name.toLowerCase().includes(brand.toLowerCase())) return name
-  return `${brand} ${name}`.trim()
+  return `${name} (${brand})`.trim()
 }
 
 export function mapProductToFood(product) {

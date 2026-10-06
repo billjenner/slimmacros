@@ -387,6 +387,7 @@ const router = useRouter()
 const servingUnitOptions = [
   { label: 'Ounce', value: 'oz' },
   { label: 'Gram', value: 'gram' },
+  { label: 'Milliliter', value: 'ml' },
   { label: 'Cup', value: 'cup' },
   { label: 'Scoop', value: 'scoop' },
   { label: 'Bar', value: 'bar' },
