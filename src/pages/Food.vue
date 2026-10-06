@@ -771,7 +771,7 @@ async function submitFood() {
 }
 @media (max-width: 449px) {
   .food-row-summary--long {
-    flex: 0 0 calc(100% - 48px);
+    flex: 0 0 calc(100% - 16px);
   }
 }
 </style>
