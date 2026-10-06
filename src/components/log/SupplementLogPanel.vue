@@ -125,7 +125,7 @@
         </template>
         <template #body="props">
           <q-tr :props="props" :style="props.row.isSelected ? 'background-color: #D0D0D0' : ''">
-            <q-td key="summary" :props="props">
+            <q-td key="summary" :props="props" class="supplement-log-cell">
               <div class="row items-center full-width">
                 <span>{{ props.row.summary }}</span>
                 <div class="q-ml-auto">
@@ -337,3 +337,12 @@ async function confirmDelete() {
   }
 }
 </script>
+
+<style scoped>
+/* Bound the cell width so the summary wraps instead of stretching the table */
+.supplement-log-cell {
+  width: 100%;
+  max-width: 0;
+  white-space: normal;
+}
+</style>
