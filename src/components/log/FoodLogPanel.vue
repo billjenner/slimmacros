@@ -266,7 +266,7 @@
 
         <template #body="props">
           <q-tr :props="props" :style="!props.row.isToday ? 'background-color: #E8E8E8' : ''">
-            <q-td key="summary" :props="props">
+            <q-td key="summary" :props="props" class="food-log-cell">
               <div class="row items-center full-width">
                 <span>{{ props.row.summary }}</span>
                 <div class="q-ml-auto">
@@ -982,5 +982,11 @@ async function loadDataForUser(userId) {
 }
 .text-custom-red {
   color: #f44336;
+}
+/* Bound the cell width so the summary wraps instead of stretching the table */
+.food-log-cell {
+  width: 100%;
+  max-width: 0;
+  white-space: normal;
 }
 </style>
