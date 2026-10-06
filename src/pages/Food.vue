@@ -161,9 +161,9 @@
                   <q-card flat bordered class="q-pa-md bg-grey-1">
                     <div class="text-subtitle1 q-mb-sm">Preferences</div>
                     <div class="row q-col-gutter-x">
-                      <div class="col-auto">
+                      <!-- <div class="col-auto">
                         <q-toggle v-model="food.favorite_food" label="Favorite" />
-                      </div>
+                      </div> -->
 
                       <div class="col-auto">
                         <q-toggle v-model="food.share_with_others" label="Share with others" />
@@ -334,10 +334,10 @@
                         <div class="text-caption text-grey-7">My food</div>
                         <div class="text-body2">{{ props.row.my_food ? 'Yes' : 'No' }}</div>
                       </div> -->
-                      <div class="col-3">
+                      <!-- <div class="col-3">
                         <div class="text-caption text-grey-7">Favorite</div>
                         <div class="text-body2">{{ props.row.favorite_food ? 'Yes' : 'No' }}</div>
-                      </div>
+                      </div> -->
                       <div class="col-3">
                         <div class="text-caption text-grey-7">Share with others</div>
                         <div class="text-body2">
