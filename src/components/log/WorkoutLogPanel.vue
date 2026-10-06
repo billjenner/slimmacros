@@ -116,11 +116,10 @@
         </template>
         <template #body="props"
           ><q-tr :props="props" :style="props.row.isSelected ? 'background-color: #D0D0D0' : ''"
-            ><q-td key="summary" :props="props"
+            ><q-td key="summary" :props="props" class="workout-log-cell"
               ><div class="row items-end full-width no-wrap q-col-gutter-sm">
                 <div class="col text-left">
-                  <p class="q-ma-none">{{ props.row.summary.split('\n')[0] }}</p>
-                  <p class="q-ma-none">{{ props.row.summary.split('\n')[1] || '' }}</p>
+                  <span>{{ props.row.summary }}</span>
                 </div>
                 <div class="col-auto self-end">
                   <q-btn
@@ -296,3 +295,12 @@ async function confirmDelete() {
   }
 }
 </script>
+
+<style scoped>
+/* Bound the cell width so the summary wraps instead of stretching the table */
+.workout-log-cell {
+  width: 100%;
+  max-width: 0;
+  white-space: normal;
+}
+</style>
