@@ -232,7 +232,10 @@
                         @click="toggleExpanded(props.row)"
                       />
 
-                      <span class="q-ml-lg">
+                      <span
+                        class="q-ml-lg"
+                        :class="{ 'food-row-summary--long': isLongFoodRowSummary(props.row) }"
+                      >
                         {{ formatFoodRowSummary(props.row) }}
                       </span>
 
@@ -552,6 +555,10 @@ function formatFoodRowSummary(row) {
     .replace(/(\.\d)0$/, '$1')} | ${servingUnit}${favoriteMarker}`
 }
 
+function isLongFoodRowSummary(row) {
+  return formatFoodRowSummary(row).length > 48
+}
+
 function sharedRowClass(row) {
   return isOwnedByCurrentUser(row) ? '' : 'bg-info text-white'
 }
@@ -761,5 +768,10 @@ async function submitFood() {
 }
 .food-action-btn {
   width: 110px;
+}
+@media (max-width: 449px) {
+  .food-row-summary--long {
+    flex: 0 0 calc(100% - 48px);
+  }
 }
 </style>
