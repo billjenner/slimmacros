@@ -221,7 +221,7 @@
               <template #body="props">
                 <!-- Main row -->
                 <q-tr :props="props" :class="sharedRowClass(props.row)">
-                  <q-td key="description" :props="props">
+                  <q-td key="description" :props="props" class="food-row-cell">
                     <div class="row items-center full-width">
                       <q-btn
                         size="sm"
@@ -232,10 +232,7 @@
                         @click="toggleExpanded(props.row)"
                       />
 
-                      <span
-                        class="q-ml-lg"
-                        :class="{ 'food-row-summary--long': isLongFoodRowSummary(props.row) }"
-                      >
+                      <span class="q-ml-lg">
                         {{ formatFoodRowSummary(props.row) }}
                       </span>
 
@@ -555,10 +552,6 @@ function formatFoodRowSummary(row) {
     .replace(/(\.\d)0$/, '$1')} | ${servingUnit}${favoriteMarker}`
 }
 
-function isLongFoodRowSummary(row) {
-  return formatFoodRowSummary(row).length > 48
-}
-
 function sharedRowClass(row) {
   return isOwnedByCurrentUser(row) ? '' : 'bg-info text-white'
 }
@@ -769,10 +762,10 @@ async function submitFood() {
 .food-action-btn {
   width: 110px;
 }
-@media (max-width: 449px) {
-  .food-row-summary--long {
-    flex: 0 0 calc(100% - 16px);
-    color: green;
-  }
+/* Bound the cell width so the summary wraps instead of stretching the table */
+.food-row-cell {
+  width: 100%;
+  max-width: 0;
+  white-space: normal;
 }
 </style>
