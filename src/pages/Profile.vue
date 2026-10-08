@@ -183,8 +183,6 @@
               </div>
             </q-card>
 
-            <q-input v-model="profile.is_active" type="hidden" />
-
             <div class="row justify-end q-gutter-sm">
               <q-btn
                 flat

@@ -6,7 +6,6 @@
       expanded-icon="keyboard_arrow_up"
       transition-show="jump-down"
       transition-hide="jump-up"
-      @after-show="renderSupplementChart"
     >
       <q-card-section>
         <q-banner v-if="!usersStore.currentUser" class="bg-warning text-dark" rounded>
