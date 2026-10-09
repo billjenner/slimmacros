@@ -320,6 +320,13 @@ watch(
 )
 
 watch(
+  () => usersStore.offlineAttempts,
+  () => {
+    showOfflineDialog.value = true
+  },
+)
+
+watch(
   () => usersStore.isOffline || profileStore.isOffline,
   (isOffline) => {
     if (isOffline) {

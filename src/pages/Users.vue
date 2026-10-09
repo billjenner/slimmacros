@@ -67,6 +67,13 @@ function formatDate(value) {
 }
 
 watch(
+  () => store.offlineAttempts,
+  () => {
+    showOfflineDialog.value = true
+  },
+)
+
+watch(
   () => store.isOffline,
   (isOffline) => {
     if (isOffline) {

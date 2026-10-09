@@ -65,6 +65,7 @@ export const useUsersStore = defineStore('Users', {
     answers: [],
     error: null,
     isOffline: false,
+    offlineAttempts: 0,
   }),
 
   actions: {
