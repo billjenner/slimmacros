@@ -268,7 +268,7 @@
           <q-tr :props="props" :style="!props.row.isToday ? 'background-color: #E8E8E8' : ''">
             <q-td key="summary" :props="props" class="food-log-cell">
               <div class="row items-center full-width">
-                <span>{{ props.row.summary }}</span>
+                <span class="text-left">{{ props.row.summary }}</span>
                 <div class="q-ml-auto">
                   <q-btn
                     flat
