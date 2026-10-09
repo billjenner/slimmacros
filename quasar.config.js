@@ -3,6 +3,7 @@
 
 import { defineConfig } from '#q-app/wrappers'
 import { execSync } from 'child_process'
+import vueDevTools from 'vite-plugin-vue-devtools'
 
 const gitDate = execSync('git log -1 --format=%cd --date=format:%Y.%m.%d').toString().trim()
 
@@ -65,6 +66,7 @@ export default defineConfig((/* ctx */) => {
       // viteVuePluginOptions: {},
 
       vitePlugins: [
+        vueDevTools(),
         [
           'vite-plugin-checker',
           {
