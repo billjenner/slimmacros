@@ -1,34 +1,20 @@
 import { boot } from 'quasar/wrappers'
 import { useUsersStore } from 'stores/users'
 
-// Relays the offline/online status computed by the service worker (based on
-// Cache Storage, the source of truth) into the app so the UI can react to it.
+// Mirrors the browser's online/offline state into the users store so the UI
+// (OfflineConnectionCard) reacts to connection changes.
 export default boot(() => {
-  if (typeof navigator === 'undefined' || !navigator.serviceWorker) {
+  if (typeof window === 'undefined') {
     return
   }
 
-  navigator.serviceWorker.addEventListener('message', (event) => {
-    const usersStore = useUsersStore()
+  const usersStore = useUsersStore()
+  usersStore.isOffline = !navigator.onLine
 
-    if (event.data?.type === 'connectivity-status') {
-      usersStore.isOffline = Boolean(event.data.isOffline)
-      return
-    }
-
-    if (event.data?.type === 'login-status') {
-      // The service worker is the source of truth: once logged in, stay logged
-      // in until it reports a log out, even if local state was lost.
-      if (event.data.loggedIn && !usersStore.currentUser) {
-        usersStore.restoreCurrentUser(event.data.user)
-      } else if (!event.data.loggedIn && usersStore.currentUser) {
-        usersStore.currentUser = null
-      }
-    }
+  window.addEventListener('offline', () => {
+    usersStore.isOffline = true
   })
-
-  navigator.serviceWorker.ready.then((registration) => {
-    registration.active?.postMessage({ type: 'request-connectivity-status' })
-    registration.active?.postMessage({ type: 'request-login-status' })
+  window.addEventListener('online', () => {
+    usersStore.isOffline = false
   })
 })

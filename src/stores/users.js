@@ -1,7 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
 import { isConnectionError } from '../utils/connection'
-import { setServiceWorkerLoginStatus } from '../utils/serviceWorker'
 
 const CURRENT_USER_STORAGE_KEY = 'slimmacros.currentUser'
 const USERS_LOGGED_IN_FUNCTION = 'users-logged-in'
@@ -118,7 +117,6 @@ export const useUsersStore = defineStore('Users', {
       this.users.push(savedUser)
       this.currentUser = savedUser
       persistCurrentUser(savedUser)
-      setServiceWorkerLoginStatus(true, savedUser)
       await this.syncLoggedInSession(normalizedEmail, true)
       return savedUser
     },
@@ -191,7 +189,6 @@ export const useUsersStore = defineStore('Users', {
         this.users.push(savedUser)
         persistCurrentUser(savedUser)
         this.isOffline = false
-        setServiceWorkerLoginStatus(true, savedUser)
         await this.syncLoggedInSession(normalizedEmail, true)
         return savedUser
       } catch (error) {
@@ -223,7 +220,6 @@ export const useUsersStore = defineStore('Users', {
         this.users = this.users.filter((u) => u.email !== savedUser.email)
         this.users.push(savedUser)
         persistCurrentUser(savedUser)
-        setServiceWorkerLoginStatus(true, savedUser)
         return savedUser
       } catch {
         // Unable to confirm the session (e.g. offline) - leave existing
@@ -354,7 +350,6 @@ export const useUsersStore = defineStore('Users', {
 
       this.currentUser = null
       persistCurrentUser(null)
-      setServiceWorkerLoginStatus(false, null)
     },
   },
 })
