@@ -110,8 +110,10 @@ async function handleSubmit() {
 
 watch(
   () => store.offlineAttempts,
-  () => {
-    showOfflineDialog.value = true
+  (attempts, previous) => {
+    if (attempts > previous) {
+      showOfflineDialog.value = true
+    }
   },
 )
 

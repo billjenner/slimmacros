@@ -68,8 +68,10 @@ function formatDate(value) {
 
 watch(
   () => store.offlineAttempts,
-  () => {
-    showOfflineDialog.value = true
+  (attempts, previous) => {
+    if (attempts > previous) {
+      showOfflineDialog.value = true
+    }
   },
 )
 
