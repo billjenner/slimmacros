@@ -63,14 +63,5 @@ export default [
     },
   },
 
-  {
-    files: ['src-pwa/service-worker.js'],
-    languageOptions: {
-      globals: {
-        ...globals.serviceworker,
-      },
-    },
-  },
-
   prettierSkipFormatting,
 ]
