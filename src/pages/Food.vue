@@ -10,6 +10,22 @@
         >
           <div class="row items-center justify-between q-mx-md q-mb-md">
             <div class="text-h5">Food</div>
+            <q-input
+              v-model="foodSearch"
+              placeholder="Search"
+              dense
+              outlined
+              class="col q-mx-md q-mb-sm"
+            >
+              <template #append>
+                <q-icon
+                  v-if="foodSearch"
+                  name="close"
+                  class="cursor-pointer"
+                  @click="foodSearch = ''"
+                />
+              </template>
+            </q-input>
             <q-btn
               color="primary"
               class="q-mb-sm"
@@ -434,23 +450,23 @@ const foodRows = computed(() => {
   const rowsWithoutShared = showSharedFood.value
     ? allRows
     : allRows.filter((row) => row?.user_id === currentUserId)
-  const searchText = String(food.description || '')
-    .trim()
-    .toLowerCase()
+  const searchTerms = [food.description, foodSearch.value]
+    .map((value) => String(value || '').trim().toLowerCase())
+    .filter(Boolean)
 
-  const filteredRows = !searchText
+  const filteredRows = !searchTerms.length
     ? rowsWithoutShared
-    : rowsWithoutShared.filter((row) =>
-        String(row?.description || '')
-          .toLowerCase()
-          .includes(searchText),
-      )
+    : rowsWithoutShared.filter((row) => {
+        const description = String(row?.description || '').toLowerCase()
+        return searchTerms.every((term) => description.includes(term))
+      })
 
   return [...filteredRows].sort((leftRow, rightRow) => {
     return String(leftRow?.description || '').localeCompare(String(rightRow?.description || ''))
   })
 })
 
+const foodSearch = ref('')
 const showFoodForm = ref(false)
 const showSharedFood = ref(false)
 const confirmDeleteOpen = ref(false)
