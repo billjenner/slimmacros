@@ -294,18 +294,23 @@ export const useUsersStore = defineStore('Users', {
         return false
       }
 
-      const { data, error } = await supabase.functions.invoke(USERS_LOGGED_IN_FUNCTION, {
-        body: {
-          action: isLoggedIn ? 'login' : 'logout',
-          email: normalizedEmail,
-        },
-      })
+      try {
+        const { data, error } = await supabase.functions.invoke(USERS_LOGGED_IN_FUNCTION, {
+          body: {
+            action: isLoggedIn ? 'login' : 'logout',
+            email: normalizedEmail,
+          },
+        })
 
-      if (error) {
-        console.error('[users-logged-in] sync failed:', error.message, data)
+        if (error) {
+          console.error('[users-logged-in] sync failed:', error.message, data)
+        }
+
+        return !error
+      } catch (error) {
+        console.error('[users-logged-in] sync failed:', error?.message)
+        return false
       }
-
-      return !error
     },
 
     async loadUsers() {
