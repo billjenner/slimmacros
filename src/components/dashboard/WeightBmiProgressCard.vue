@@ -155,6 +155,7 @@ async function renderWeightChart() {
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           fill: false,
           tension: 0.3,
+          spanGaps: false,
           yAxisID: 'yWeight',
         },
         {
@@ -167,7 +168,7 @@ async function renderWeightChart() {
           backgroundColor: 'rgba(54, 162, 235, 0.2)',
           fill: false,
           tension: 0.3,
-          spanGaps: true,
+          spanGaps: false,
           yAxisID: 'yBMI',
         },
       ],
@@ -183,6 +184,10 @@ async function renderWeightChart() {
           title: {
             display: true,
             text: 'Weight (lbs)',
+            color: 'rgba(255, 99, 132, 1)',
+          },
+          ticks: {
+            color: 'rgba(255, 99, 132, 1)',
           },
         },
         yBMI: {
@@ -191,6 +196,10 @@ async function renderWeightChart() {
           title: {
             display: true,
             text: 'BMI',
+            color: 'rgba(54, 162, 235, 1)',
+          },
+          ticks: {
+            color: 'rgba(54, 162, 235, 1)',
           },
           grid: {
             drawOnChartArea: false,
