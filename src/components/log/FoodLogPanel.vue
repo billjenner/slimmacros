@@ -182,7 +182,7 @@
                 <q-linear-progress
                   :value="foodLogProgress"
                   color="custom-red"
-                  size="18px"
+                  size="20px"
                   rounded
                 />
               </td>
