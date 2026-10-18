@@ -23,46 +23,48 @@
         </q-toolbar-title>
 
         <template v-if="!$q.screen.lt.md">
-          <q-btn
-            flat
-            label="Log"
-            to="/log"
-            class="q-mx-sm"
-            style="min-width: 126px"
-            :style="buttonStyle('/log')"
-            @mouseover="hoveredPath = '/log'"
-            @mouseleave="hoveredPath = null"
-          />
-          <q-btn
-            flat
-            label="Items"
-            to="/items"
-            class="q-mx-sm"
-            style="min-width: 126px"
-            :style="buttonStyle('/items')"
-            @mouseover="hoveredPath = '/items'"
-            @mouseleave="hoveredPath = null"
-          />
-          <q-btn
-            flat
-            label="Dashboard"
-            to="/dashboard"
-            class="q-mx-sm"
-            style="min-width: 126px"
-            :style="buttonStyle('/dashboard')"
-            @mouseover="hoveredPath = '/dashboard'"
-            @mouseleave="hoveredPath = null"
-          />
-          <q-btn
-            flat
-            label="Docs"
-            to="/docs"
-            class="q-mx-sm"
-            style="min-width: 126px"
-            :style="buttonStyle('/docs')"
-            @mouseover="hoveredPath = '/docs'"
-            @mouseleave="hoveredPath = null"
-          />
+          <template v-if="isSignedIn">
+            <q-btn
+              flat
+              label="Log"
+              to="/log"
+              class="q-mx-sm"
+              style="min-width: 126px"
+              :style="buttonStyle('/log')"
+              @mouseover="hoveredPath = '/log'"
+              @mouseleave="hoveredPath = null"
+            />
+            <q-btn
+              flat
+              label="Items"
+              to="/items"
+              class="q-mx-sm"
+              style="min-width: 126px"
+              :style="buttonStyle('/items')"
+              @mouseover="hoveredPath = '/items'"
+              @mouseleave="hoveredPath = null"
+            />
+            <q-btn
+              flat
+              label="Dashboard"
+              to="/dashboard"
+              class="q-mx-sm"
+              style="min-width: 126px"
+              :style="buttonStyle('/dashboard')"
+              @mouseover="hoveredPath = '/dashboard'"
+              @mouseleave="hoveredPath = null"
+            />
+            <q-btn
+              flat
+              label="Docs"
+              to="/docs"
+              class="q-mx-sm"
+              style="min-width: 126px"
+              :style="buttonStyle('/docs')"
+              @mouseover="hoveredPath = '/docs'"
+              @mouseleave="hoveredPath = null"
+            />
+          </template>
           <q-btn
             v-if="!(usersStore.currentUser && usersStore.currentUser.email)"
             flat
@@ -94,16 +96,16 @@
         <q-item clickable v-ripple @click="navigateAndClose('/')">
           <q-item-section>Intro</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/log')">
+        <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/log')">
           <q-item-section>Log</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/items')">
+        <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/items')">
           <q-item-section>Items</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/dashboard')">
+        <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/dashboard')">
           <q-item-section>Dashboard</q-item-section>
         </q-item>
-        <q-item clickable v-ripple @click="navigateAndClose('/docs')">
+        <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/docs')">
           <q-item-section>Docs</q-item-section>
         </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/users')">
@@ -219,6 +221,8 @@ const userInitials = computed(() => {
 
   return `${firstInitial}${lastInitial}`.toUpperCase() || 'U'
 })
+
+const isSignedIn = computed(() => Boolean(usersStore.currentUser && usersStore.currentUser.email))
 
 const isAdmin = computed(() => {
   const adminEmail = String(import.meta.env.VITE_FORMSUBMIT_RECIPIENT || '')
