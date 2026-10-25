@@ -11,7 +11,7 @@
           <div class="text-h4">Exercise</div>
         </q-item-section>
       </template>
-      <div class="row q-col-gutter-md q-pa-md">
+      <div class="row q-py-md">
         <div class="col-12 flex justify-center">
           <q-card style="width: 100%">
             <q-card-section class="bg-secondary text-white text-center">
@@ -28,7 +28,7 @@
                 <q-chip>Weekly Schedule</q-chip>
               </template>
 
-              <q-card-section>
+              <q-card-section class="q-px-sm">
                 <div class="weekly-schedule">
                   <div class="weekly-schedule__day">
                     <div class="weekly-schedule__name">Sunday</div>
@@ -65,7 +65,7 @@
         </div>
       </div>
 
-      <div class="row q-col-gutter-md q-pa-md">
+      <div class="row q-py-md">
         <div class="col-12 flex justify-center">
           <q-card style="width: 100%">
             <q-card-section class="bg-secondary text-white text-center">
@@ -119,7 +119,7 @@
         </div>
       </div>
 
-      <div class="row q-col-gutter-md q-pa-md">
+      <div class="row q-py-md">
         <div class="col-12 flex justify-center">
           <q-card style="width: 100%">
             <q-card-section class="bg-secondary text-white text-center">

@@ -11,8 +11,8 @@
           <div class="text-h4">Nutrition</div>
         </q-item-section>
       </template>
-      <div class="row q-col-gutter-md q-pa-md">
-        <div class="col-12 col-sm-6 col-md-6 col-lg-6 flex justify-center">
+      <div class="row q-py-md">
+        <div class="col-12 flex justify-center">
           <q-card style="width: 100%">
             <q-card-section class="bg-secondary text-white text-center">
               supplements
@@ -286,8 +286,8 @@
           </q-card>
         </div>
 
-        <div class="col-12 col-md-4">
-          <q-card flat bordered style="width: 90%; max-width: 90%; margin: 0 auto">
+        <div class="col-12">
+          <q-card flat bordered style="width: 100%">
             <q-expansion-item
               expand-icon="keyboard_arrow_down"
               expanded-icon="keyboard_arrow_up"

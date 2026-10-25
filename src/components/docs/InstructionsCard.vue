@@ -11,8 +11,8 @@
           <div class="text-h4">Instructions</div>
         </q-item-section>
       </template>
-      <div class="row q-col-gutter-md q-pa-md">
-        <div class="col-12 col-sm-6 col-md-6 col-lg-6 flex justify-center">
+      <div class="row q-py-md">
+        <div class="col-12 flex justify-center">
           <q-card style="width: 100%">
             <q-card-section class="bg-secondary text-white text-center">
               Start your journey to a healthier lifestyle here.
