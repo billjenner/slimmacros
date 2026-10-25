@@ -26,5 +26,12 @@ import NutritionCard from '../components/docs/NutritionCard.vue'
 
 .docs-content {
   flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.docs-content :deep(thead tr) {
+  background-color: var(--q-accent);
 }
 </style>

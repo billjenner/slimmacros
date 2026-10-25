@@ -1,5 +1,5 @@
 <template>
-  <q-card flat bordered class="q-mb-md">
+  <q-card flat bordered>
     <q-expansion-item
       expand-icon="keyboard_arrow_down"
       expanded-icon="keyboard_arrow_up"
@@ -15,7 +15,7 @@
         <div class="col-12 flex justify-center">
           <q-card style="width: 100%">
             <q-card-section class="bg-secondary text-white text-center">
-              supplements
+              Supplements
             </q-card-section>
 
             <q-expansion-item
@@ -281,25 +281,6 @@
                   One tablespoon has approximately 120 calories, so use cautiously with in your
                   calorie budget.
                 </p>
-              </q-card-section>
-            </q-expansion-item>
-          </q-card>
-        </div>
-
-        <div class="col-12">
-          <q-card flat bordered style="width: 100%">
-            <q-expansion-item
-              expand-icon="keyboard_arrow_down"
-              expanded-icon="keyboard_arrow_up"
-              transition-show="jump-down"
-              transition-hide="jump-up"
-            >
-              <template v-slot:header>
-                <q-chip>Related Resources</q-chip>
-              </template>
-              <q-card-section>
-                <div class="text-weight-bold">More to come here</div>
-                <a href="https://google.com" target="_blank" rel="noopener noreferrer"> Google </a>
               </q-card-section>
             </q-expansion-item>
           </q-card>

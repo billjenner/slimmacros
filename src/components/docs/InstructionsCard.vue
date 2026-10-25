@@ -1,5 +1,5 @@
 <template>
-  <q-card flat bordered class="q-mb-md">
+  <q-card flat bordered>
     <q-expansion-item
       expand-icon="keyboard_arrow_down"
       expanded-icon="keyboard_arrow_up"
