@@ -21,7 +21,7 @@ import NutritionCard from '../components/docs/NutritionCard.vue'
 .docs-page {
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 2px;
 }
 
 .docs-content {

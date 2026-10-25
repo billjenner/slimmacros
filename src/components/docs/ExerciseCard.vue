@@ -13,7 +13,7 @@
       </template>
       <div class="row q-col-gutter-md q-pa-md">
         <div class="col-12 flex justify-center">
-          <q-card style="width: 95%">
+          <q-card style="width: 100%">
             <q-card-section class="bg-secondary text-white text-center">
               Beginner Schedule</q-card-section
             >
@@ -29,38 +29,36 @@
               </template>
 
               <q-card-section>
-                <q-markup-table flat bordered>
-                  <tbody>
-                    <tr>
-                      <th class="text-center">Sunday</th>
-                      <td class="text-center">-</td>
-                    </tr>
-                    <tr>
-                      <th class="text-center">Monday</th>
-                      <td class="text-center"><strong>Walk</strong> - Cardio - anaerobic</td>
-                    </tr>
-                    <tr>
-                      <th class="text-center">Tuesday</th>
-                      <td class="text-center"><strong>Warm up &amp; Stretch</strong></td>
-                    </tr>
-                    <tr>
-                      <th class="text-center">Wednesday</th>
-                      <td class="text-center"><strong>HIIT</strong> - Training Exercises</td>
-                    </tr>
-                    <tr>
-                      <th class="text-center">Thursday</th>
-                      <td class="text-center"><strong>Warm up &amp; Stretch</strong></td>
-                    </tr>
-                    <tr>
-                      <th class="text-center">Friday</th>
-                      <td class="text-center"><strong>Walk</strong> - Cardio - anaerobic</td>
-                    </tr>
-                    <tr>
-                      <th class="text-center">Saturday</th>
-                      <td class="text-center">-</td>
-                    </tr>
-                  </tbody>
-                </q-markup-table>
+                <div class="weekly-schedule">
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Sunday</div>
+                    <div>-</div>
+                  </div>
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Monday</div>
+                    <div><strong>Walk</strong> - Cardio - anaerobic</div>
+                  </div>
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Tuesday</div>
+                    <div><strong>Warm up &amp; Stretch</strong></div>
+                  </div>
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Wednesday</div>
+                    <div><strong>HIIT</strong> - Training Exercises</div>
+                  </div>
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Thursday</div>
+                    <div><strong>Warm up &amp; Stretch</strong></div>
+                  </div>
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Friday</div>
+                    <div><strong>Walk</strong> - Cardio - anaerobic</div>
+                  </div>
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Saturday</div>
+                    <div>-</div>
+                  </div>
+                </div>
               </q-card-section>
             </q-expansion-item>
           </q-card>
@@ -69,7 +67,7 @@
 
       <div class="row q-col-gutter-md q-pa-md">
         <div class="col-12 flex justify-center">
-          <q-card style="width: 95%">
+          <q-card style="width: 100%">
             <q-card-section class="bg-secondary text-white text-center">
               Full schedule
             </q-card-section>
@@ -85,42 +83,36 @@
               </template>
 
               <q-card-section>
-                <q-markup-table flat bordered>
-                  <tbody>
-                    <tr>
-                      <th class="text-center">Sunday</th>
-                      <td class="text-center">-</td>
-                    </tr>
-                    <tr>
-                      <th class="text-center">Monday</th>
-                      <td class="text-center"><strong>FB</strong> Workout 1</td>
-                    </tr>
-                    <tr>
-                      <th class="text-center">Tuesday</th>
-                      <td class="text-center">
-                        <strong>RUN</strong> - Cardio - aerobic &amp; Legs
-                      </td>
-                    </tr>
-                    <tr>
-                      <th class="text-center">Wednesday</th>
-                      <td class="text-center"><strong>Walk</strong> - Cardio - anaerobic</td>
-                    </tr>
-                    <tr>
-                      <th class="text-center">Thursday</th>
-                      <td class="text-center">
-                        <strong>RUN</strong> - Cardio - aerobic &amp; Legs
-                      </td>
-                    </tr>
-                    <tr>
-                      <th class="text-center">Friday</th>
-                      <td class="text-center"><strong>FB</strong> Workout 2</td>
-                    </tr>
-                    <tr>
-                      <th class="text-center">Saturday</th>
-                      <td class="text-center">-</td>
-                    </tr>
-                  </tbody>
-                </q-markup-table>
+                <div class="weekly-schedule">
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Sunday</div>
+                    <div>-</div>
+                  </div>
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Monday</div>
+                    <div><strong>FB</strong> - Workout Set #1</div>
+                  </div>
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Tuesday</div>
+                    <div><strong>RUN</strong> - Cardio - aerobic &amp; Legs</div>
+                  </div>
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Wednesday</div>
+                    <div><strong>Walk</strong> - Cardio - anaerobic</div>
+                  </div>
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Thursday</div>
+                    <div><strong>RUN</strong> - Cardio - aerobic &amp; Legs</div>
+                  </div>
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Friday</div>
+                    <div><strong>FB</strong> - Workout Set #2</div>
+                  </div>
+                  <div class="weekly-schedule__day">
+                    <div class="weekly-schedule__name">Saturday</div>
+                    <div>-</div>
+                  </div>
+                </div>
               </q-card-section>
             </q-expansion-item>
           </q-card>
@@ -129,7 +121,7 @@
 
       <div class="row q-col-gutter-md q-pa-md">
         <div class="col-12 flex justify-center">
-          <q-card style="width: 95%">
+          <q-card style="width: 100%">
             <q-card-section class="bg-secondary text-white text-center">
               Exercise Sets
             </q-card-section>
@@ -362,6 +354,27 @@
               transition-hide="jump-up"
             >
               <template v-slot:header>
+                <q-chip><strong>Walk</strong> - Cardio (anaerobic)</q-chip>
+              </template>
+
+              <q-card-section>
+                <div style="padding: 12px; border-bottom: 1px solid #eee">
+                  <strong>Walk 2 miles</strong><br />
+                </div>
+                <div style="padding: 12px; border-bottom: 1px solid #eee">
+                  Maintain a walking pace faster than 3 mph and complete the 2-mile course in 40
+                  minutes or less.
+                </div>
+              </q-card-section>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
                 <q-chip><strong>Run</strong> - Cardio (aerobic) & Legs</q-chip>
               </template>
 
@@ -402,30 +415,32 @@
                 </q-markup-table>
               </q-card-section>
             </q-expansion-item>
-
-            <q-expansion-item
-              expand-icon="keyboard_arrow_down"
-              expanded-icon="keyboard_arrow_up"
-              transition-show="jump-down"
-              transition-hide="jump-up"
-            >
-              <template v-slot:header>
-                <q-chip><strong>Walk</strong> - Cardio (anaerobic)</q-chip>
-              </template>
-
-              <q-card-section>
-                <div style="padding: 12px; border-bottom: 1px solid #eee">
-                  <strong>Walk 2 miles</strong><br />
-                </div>
-                <div style="padding: 12px; border-bottom: 1px solid #eee">
-                  Maintain a walking pace faster than 3 mph and complete the 2-mile course in 40
-                  minutes or less.
-                </div>
-              </q-card-section>
-            </q-expansion-item>
           </q-card>
         </div>
       </div>
     </q-expansion-item>
   </q-card>
 </template>
+
+<style scoped>
+.weekly-schedule {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+@media (min-width: 1100px) {
+  .weekly-schedule {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+.weekly-schedule__day {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  padding: 8px;
+  text-align: center;
+}
+.weekly-schedule__name {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+</style>
