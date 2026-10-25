@@ -14,7 +14,9 @@
       <div class="row q-col-gutter-md q-pa-md">
         <div class="col-12 flex justify-center">
           <q-card style="width: 95%">
-            <q-card-section class="bg-secondary text-white text-center"> Beginner </q-card-section>
+            <q-card-section class="bg-secondary text-white text-center">
+              Beginner Schedule</q-card-section
+            >
 
             <q-expansion-item
               expand-icon="keyboard_arrow_down"
@@ -28,29 +30,33 @@
 
               <q-card-section>
                 <q-markup-table flat bordered>
-                  <thead>
-                    <tr>
-                      <th class="text-center">Sunday</th>
-                      <th class="text-center">Monday</th>
-                      <th class="text-center">Tuesday</th>
-                      <th class="text-center">Wednesday</th>
-                      <th class="text-center">Thursday</th>
-                      <th class="text-center">Friday</th>
-                      <th class="text-center">Saturday</th>
-                    </tr>
-                  </thead>
                   <tbody>
                     <tr>
+                      <th class="text-center">Sunday</th>
                       <td class="text-center">-</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Monday</th>
                       <td class="text-center"><strong>Walk</strong> - Cardio - anaerobic</td>
-                      <td class="text-center">
-                        <strong>Warm up & Stretch</strong>
-                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Tuesday</th>
+                      <td class="text-center"><strong>Warm up &amp; Stretch</strong></td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Wednesday</th>
                       <td class="text-center"><strong>HIIT</strong> - Training Exercises</td>
-                      <td class="text-center">
-                        <strong>Warm up & Stretch</strong>
-                      </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Thursday</th>
+                      <td class="text-center"><strong>Warm up &amp; Stretch</strong></td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Friday</th>
                       <td class="text-center"><strong>Walk</strong> - Cardio - anaerobic</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Saturday</th>
                       <td class="text-center">-</td>
                     </tr>
                   </tbody>
@@ -65,7 +71,7 @@
         <div class="col-12 flex justify-center">
           <q-card style="width: 95%">
             <q-card-section class="bg-secondary text-white text-center">
-              Full schedule Exercises
+              Full schedule
             </q-card-section>
 
             <q-expansion-item
@@ -80,29 +86,37 @@
 
               <q-card-section>
                 <q-markup-table flat bordered>
-                  <thead>
-                    <tr>
-                      <th class="text-center">Sunday</th>
-                      <th class="text-center">Monday</th>
-                      <th class="text-center">Tuesday</th>
-                      <th class="text-center">Wednesday</th>
-                      <th class="text-center">Thursday</th>
-                      <th class="text-center">Friday</th>
-                      <th class="text-center">Saturday</th>
-                    </tr>
-                  </thead>
                   <tbody>
                     <tr>
+                      <th class="text-center">Sunday</th>
                       <td class="text-center">-</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Monday</th>
                       <td class="text-center"><strong>FB</strong> Workout 1</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Tuesday</th>
                       <td class="text-center">
                         <strong>RUN</strong> - Cardio - aerobic &amp; Legs
                       </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Wednesday</th>
                       <td class="text-center"><strong>Walk</strong> - Cardio - anaerobic</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Thursday</th>
                       <td class="text-center">
                         <strong>RUN</strong> - Cardio - aerobic &amp; Legs
                       </td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Friday</th>
                       <td class="text-center"><strong>FB</strong> Workout 2</td>
+                    </tr>
+                    <tr>
+                      <th class="text-center">Saturday</th>
                       <td class="text-center">-</td>
                     </tr>
                   </tbody>
@@ -155,6 +169,10 @@
                     <tr>
                       <td>Kneel position, one leg forward, one leg back, rock back and forth</td>
                       <td class="text-center">25 x 1</td>
+                    </tr>
+                    <tr>
+                      <td>Dead Hang</td>
+                      <td class="text-center">3 x 20 seconds</td>
                     </tr>
                     <tr>
                       <td>Alternate Legs</td>
@@ -245,7 +263,7 @@
                   </thead>
                   <tbody>
                     <tr>
-                      <td>Warm Up &amp; Stretch</td>
+                      <td>Warm Up</td>
                       <td class="text-center">-</td>
                     </tr>
                     <tr>
@@ -301,7 +319,7 @@
                   </thead>
                   <tbody>
                     <tr>
-                      <td>Warm Up &amp; Stretch</td>
+                      <td>Warm Up</td>
                       <td class="text-center">-</td>
                     </tr>
                     <tr>
