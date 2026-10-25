@@ -270,7 +270,7 @@ function buttonStyle(path) {
   }
 
   if (hoveredPath.value === path) {
-    return { backgroundColor: 'var(--q-accent)' }
+    return { backgroundColor: 'var(--q-warning)' }
   }
 
   return { backgroundColor: 'var(--q-negative)' }
