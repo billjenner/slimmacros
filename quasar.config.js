@@ -149,7 +149,15 @@ export default defineConfig((/* ctx */) => {
     pwa: {
       workboxMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       extendGenerateSWOptions(workboxOptions) {
-        workboxOptions.globIgnores = [...(workboxOptions.globIgnores || []), '**/SlimMacros.png']
+        workboxOptions.globIgnores = [
+          ...(workboxOptions.globIgnores || []),
+          '**/SlimMacros.png',
+          '**/exercise-video-sw.js',
+        ]
+        workboxOptions.importScripts = [
+          ...(workboxOptions.importScripts || []),
+          'exercise-video-sw.js',
+        ]
         workboxOptions.runtimeCaching = [
           ...(workboxOptions.runtimeCaching || []),
           {

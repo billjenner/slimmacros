@@ -465,32 +465,22 @@
 <script setup>
 import { ref } from 'vue'
 import { useQuasar } from 'quasar'
-import { supabase } from 'src/lib/supabase'
-
-const BUCKET = 'exercise-videos'
+import { getExerciseVideoUrl } from 'src/utils/exerciseVideo'
 
 const $q = useQuasar()
 const showPreview = ref(false)
 const previewUrl = ref('')
 
 async function playExercise(name) {
-  const fail = (message) => $q.notify({ type: 'negative', message })
-  if (!supabase) return fail('Supabase is not configured.')
-  const { data: row, error } = await supabase
-    .from('exercise')
-    .select('video_path')
-    .eq('name', name)
-    .maybeSingle()
-  if (error) return fail(error.message)
-  if (!row?.video_path) return fail(`No video found for ${name}.`)
-  const { data, error: urlError } = await supabase.storage
-    .from(BUCKET)
-    .createSignedUrl(row.video_path, 3600)
-  if (urlError) return fail(urlError.message)
-  previewUrl.value = data.signedUrl
-  showPreview.value = true
-}
-</script>
+  try {
+    const url = await getExerciseVideoUrl(name)
+    if (previewUrl.value.startsWith('blob:')) URL.revokeObjectURL(previewUrl.value)
+    previewUrl.value = url
+    showPreview.value = true
+  } catch (e) {
+    $q.notify({ type: 'negative', message: e.message || String(e) })
+  }
+}</script>
 
 <style scoped>
 .weekly-schedule {
