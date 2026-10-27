@@ -471,13 +471,14 @@
                 </q-markup-table>
               </q-card-section>
             </q-expansion-item>
+            <div class="exercise-version">
+              {{ exerciseVersion }}
+            </div>
           </q-card>
         </div>
       </div>
     </q-expansion-item>
-    <div class="exercise-version">
-      {{ exerciseVersion }}
-    </div>
+
     <q-dialog v-model="showPreview">
       <q-card style="width: min(100%, 560px)">
         <video v-if="previewUrl" :src="previewUrl" controls autoplay style="width: 100%" />
@@ -491,7 +492,7 @@ import { ref } from 'vue'
 import { useQuasar } from 'quasar'
 import { getExerciseVideoUrl } from 'src/utils/exerciseVideo'
 
-const exerciseVersion = 'Version 1.0'
+const exerciseVersion = 'Exercises Version 1.0'
 const $q = useQuasar()
 const showPreview = ref(false)
 const previewUrl = ref('')
