@@ -375,7 +375,7 @@
                       <td class="text-center">35 x 25 x 3</td>
                     </tr>
                     <tr>
-                      <td>Shovels</td>
+                      <td>One leg back, Shovels</td>
                       <td class="text-center">-</td>
                     </tr>
                     <tr>
@@ -475,7 +475,9 @@
         </div>
       </div>
     </q-expansion-item>
-
+    <div class="exercise-version">
+      {{ exerciseVersion }}
+    </div>
     <q-dialog v-model="showPreview">
       <q-card style="width: min(100%, 560px)">
         <video v-if="previewUrl" :src="previewUrl" controls autoplay style="width: 100%" />
@@ -489,13 +491,14 @@ import { ref } from 'vue'
 import { useQuasar } from 'quasar'
 import { getExerciseVideoUrl } from 'src/utils/exerciseVideo'
 
+const exerciseVersion = 'Version 1.0'
 const $q = useQuasar()
 const showPreview = ref(false)
 const previewUrl = ref('')
 
 async function playExercise(name) {
   try {
-    const url = await getExerciseVideoUrl(name)
+    const url = await getExerciseVideoUrl(name, exerciseVersion)
     if (previewUrl.value.startsWith('blob:')) URL.revokeObjectURL(previewUrl.value)
     previewUrl.value = url
     showPreview.value = true
@@ -525,5 +528,10 @@ async function playExercise(name) {
 .weekly-schedule__name {
   font-weight: bold;
   margin-bottom: 4px;
+}
+.exercise-version {
+  margin-top: auto;
+  padding: 24px;
+  text-align: center;
 }
 </style>

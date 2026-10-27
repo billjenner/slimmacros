@@ -1,7 +1,6 @@
 import { supabase } from 'src/lib/supabase'
 
 const BUCKET = 'exercise-videos'
-const COMMIT = process.env.APP_COMMIT || 'dev'
 const MAP_KEY = 'exercise-video-paths'
 
 function readMap() {
@@ -12,11 +11,11 @@ function readMap() {
   }
 }
 
-// The name -> video_path lookup is remembered per app commit so the same commit needs no network.
-async function resolveVideoPath(name) {
+// The name -> video_path lookup is remembered per content version so the same version needs no network.
+async function resolveVideoPath(name, version) {
   const map = readMap()
   const saved = map[name]
-  if (saved && saved.commit === COMMIT) return saved.path
+  if (saved && saved.version === version) return saved.path
 
   if (!supabase) {
     if (saved) return saved.path
@@ -32,7 +31,7 @@ async function resolveVideoPath(name) {
     throw error
   }
   if (!data?.video_path) throw new Error(`No video found for ${name}.`)
-  map[name] = { commit: COMMIT, path: data.video_path }
+  map[name] = { version, path: data.video_path }
   localStorage.setItem(MAP_KEY, JSON.stringify(map))
   return data.video_path
 }
@@ -47,10 +46,10 @@ async function createSignedUrl(path) {
   }
 }
 
-// Returns a URL playable in a <video>. Uses the service worker cache (versioned by app commit)
+// Returns a URL playable in a <video>. Uses the service worker cache (versioned by `version`)
 // when a service worker controls the page; otherwise falls back to a signed URL.
-export async function getExerciseVideoUrl(name) {
-  const path = await resolveVideoPath(name)
+export async function getExerciseVideoUrl(name, version) {
+  const path = await resolveVideoPath(name, version)
   const swReady = 'serviceWorker' in navigator && navigator.serviceWorker.controller
 
   if (!swReady) {
@@ -59,7 +58,7 @@ export async function getExerciseVideoUrl(name) {
     return signed
   }
 
-  const cacheUrl = `/exercise-video/${encodeURIComponent(path)}?v=${encodeURIComponent(COMMIT)}`
+  const cacheUrl = `/exercise-video/${encodeURIComponent(path)}?v=${encodeURIComponent(version)}`
   const toBlobUrl = async (res) => URL.createObjectURL(await res.blob())
 
   // 1) Same commit: served from cache without touching the network.

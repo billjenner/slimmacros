@@ -1,5 +1,5 @@
 // Imported by the generated service worker (see quasar.config.js importScripts).
-// Serves exercise videos from a cache that is versioned by the app commit (?v=<commit>).
+// Serves exercise videos from a cache that is versioned by the exerciseVersion (?v=<version>).
 const VIDEO_CACHE_PREFIX = 'exercise-video-'
 const VIDEO_PATH_PREFIX = '/exercise-video/'
 
@@ -15,7 +15,7 @@ async function handleVideoRequest(request, url) {
   const key = url.origin + url.pathname
   const cache = await caches.open(cacheName)
 
-  // Same commit: use the cache and never touch the network.
+  // Same version: use the cache and never touch the network.
   const hit = await cache.match(key)
   if (hit) return hit
 
@@ -29,7 +29,7 @@ async function handleVideoRequest(request, url) {
     return new Response('', { status: 404, headers: { 'X-Video-Cache': 'miss' } })
   }
 
-  // New commit (or first play): network first, fall back to an older cached copy.
+  // New version (or first play): network first, fall back to an older cached copy.
   try {
     const networkResponse = await fetch(sourceUrl)
     if (!networkResponse.ok) throw new Error(`HTTP ${networkResponse.status}`)
