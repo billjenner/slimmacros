@@ -72,6 +72,19 @@ const routes = [
         },
       },
       {
+        path: 'exercise',
+        component: () => import('pages/Exercise.vue'),
+        meta: {
+          requiresAuth: true,
+          requiresAdmin: true,
+          seo: {
+            title: 'Exercise',
+            description: 'Maintain the exercise list and videos.',
+            canonicalPath: '/exercise',
+          },
+        },
+      },
+      {
         path: 'create-login',
         component: () => import('pages/CreateLogin.vue'),
         meta: {

@@ -120,6 +120,9 @@
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/tst-food-facts')">
           <q-item-section>Tst Food Facts</q-item-section>
         </q-item>
+        <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/exercise')">
+          <q-item-section>Exercise</q-item-section>
+        </q-item>
         <q-item
           v-if="!(usersStore.currentUser && usersStore.currentUser.email)"
           clickable

@@ -15,7 +15,7 @@
         <div class="col-12 flex justify-center">
           <q-card style="width: 100%">
             <q-card-section class="bg-secondary text-white text-center">
-              Beginner Schedule</q-card-section
+              Level 1 Schedule</q-card-section
             >
 
             <q-expansion-item
@@ -69,7 +69,7 @@
         <div class="col-12 flex justify-center">
           <q-card style="width: 100%">
             <q-card-section class="bg-secondary text-white text-center">
-              Full schedule
+              Level 2 schedule
             </q-card-section>
 
             <q-expansion-item
@@ -85,31 +85,46 @@
               <q-card-section>
                 <div class="weekly-schedule">
                   <div class="weekly-schedule__day">
-                    <div class="weekly-schedule__name">Sunday</div>
+                    <div class="weekly-schedule__name">Sunday<br /><br /></div>
                     <div>-</div>
                   </div>
                   <div class="weekly-schedule__day">
-                    <div class="weekly-schedule__name">Monday</div>
-                    <div><strong>FB</strong> - Workout Set #1</div>
+                    <div class="weekly-schedule__name">Monday<br /><br /></div>
+                    <div>
+                      <strong>Warm up</strong><br /><br /><strong>FB</strong> - Workout Set #1
+                    </div>
                   </div>
                   <div class="weekly-schedule__day">
-                    <div class="weekly-schedule__name">Tuesday</div>
-                    <div><strong>RUN</strong> - Cardio - aerobic &amp; Legs</div>
+                    <div class="weekly-schedule__name">Tuesday<br /><br /></div>
+                    <div>
+                      <strong>Warm up</strong><br /><strong>Stretch</strong><br /><strong
+                        >RUN</strong
+                      >
+                      - Cardio - aerobic &amp; Legs
+                    </div>
                   </div>
                   <div class="weekly-schedule__day">
-                    <div class="weekly-schedule__name">Wednesday</div>
-                    <div><strong>Walk</strong> - Cardio - anaerobic</div>
+                    <div class="weekly-schedule__name">Wednesday<br /><br /></div>
+                    <div><br /><br /><strong>Walk</strong> - Cardio - anaerobic</div>
                   </div>
                   <div class="weekly-schedule__day">
-                    <div class="weekly-schedule__name">Thursday</div>
-                    <div><strong>RUN</strong> - Cardio - aerobic &amp; Legs</div>
+                    <div class="weekly-schedule__name">Thursday<br /><br /></div>
+                    <div>
+                      <strong>Warm up</strong><br /><strong>Stretch</strong><br /><strong
+                        >FB</strong
+                      >
+                      - Workout Set #2
+                    </div>
                   </div>
                   <div class="weekly-schedule__day">
-                    <div class="weekly-schedule__name">Friday</div>
-                    <div><strong>FB</strong> - Workout Set #2</div>
+                    <div class="weekly-schedule__name">Friday<br /><br /></div>
+                    <div>
+                      <strong>Warm up</strong><br /><br /><strong>RUN</strong> - Cardio - aerobic
+                      &amp; Legs
+                    </div>
                   </div>
                   <div class="weekly-schedule__day">
-                    <div class="weekly-schedule__name">Saturday</div>
+                    <div class="weekly-schedule__name">Saturday<br /><br /></div>
                     <div>-</div>
                   </div>
                 </div>
@@ -136,7 +151,16 @@
                 <q-chip><strong>Warm up</strong></q-chip>
               </template>
 
-              <q-card-section> Open up Lymph node movements </q-card-section>
+              <q-card-section>
+                Open up Lymph node movements
+                <q-btn
+                  flat
+                  round
+                  dense
+                  icon="play_circle"
+                  aria-label="Play Dumbbell Halo video"
+                  @click="playExercise('Warm up')"
+              /></q-card-section>
             </q-expansion-item>
 
             <q-expansion-item
@@ -209,7 +233,7 @@
 
               <q-card-section>
                 <div style="padding: 12px; border-bottom: 1px solid #eee">
-                  <strong>Beginner routine using 40 seconds work / 20 seconds rest:</strong><br />
+                  <strong>Routines using 40 seconds work / 20 seconds rest:</strong><br />
                 </div>
                 <div style="padding: 12px; border-bottom: 1px solid #eee">
                   <ul style="margin: 8px 0 0 20px; padding: 0">
@@ -271,7 +295,17 @@
                       <td class="text-center">35 x 25 x 1</td>
                     </tr>
                     <tr>
-                      <td>Halos</td>
+                      <td>
+                        Dumbbell Halo
+                        <q-btn
+                          flat
+                          round
+                          dense
+                          icon="play_circle"
+                          aria-label="Play Dumbbell Halo video"
+                          @click="playExercise('Dumbbell Halo')"
+                        />
+                      </td>
                       <td class="text-center">20 x 25 x 3</td>
                     </tr>
                     <tr>
@@ -419,8 +453,44 @@
         </div>
       </div>
     </q-expansion-item>
+
+    <q-dialog v-model="showPreview">
+      <q-card style="width: min(100%, 560px)">
+        <video v-if="previewUrl" :src="previewUrl" controls autoplay style="width: 100%" />
+      </q-card>
+    </q-dialog>
   </q-card>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+import { useQuasar } from 'quasar'
+import { supabase } from 'src/lib/supabase'
+
+const BUCKET = 'exercise-videos'
+
+const $q = useQuasar()
+const showPreview = ref(false)
+const previewUrl = ref('')
+
+async function playExercise(name) {
+  const fail = (message) => $q.notify({ type: 'negative', message })
+  if (!supabase) return fail('Supabase is not configured.')
+  const { data: row, error } = await supabase
+    .from('exercise')
+    .select('video_path')
+    .eq('name', name)
+    .maybeSingle()
+  if (error) return fail(error.message)
+  if (!row?.video_path) return fail(`No video found for ${name}.`)
+  const { data, error: urlError } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrl(row.video_path, 3600)
+  if (urlError) return fail(urlError.message)
+  previewUrl.value = data.signedUrl
+  showPreview.value = true
+}
+</script>
 
 <style scoped>
 .weekly-schedule {
