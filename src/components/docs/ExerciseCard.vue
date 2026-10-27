@@ -320,6 +320,24 @@
                       <td>KB Curl → KB overhead</td>
                       <td class="text-center">35 x 15 x 3</td>
                     </tr>
+                    <tr>
+                      <td>
+                        Windmill One Arm Swing
+                        <q-btn
+                          flat
+                          round
+                          dense
+                          icon="play_circle"
+                          aria-label="Windmill One Arm Swing"
+                          @click="playExercise('Windmill One Arm Swing')"
+                        />
+                      </td>
+                      <td class="text-center">35 x 10 x 3</td>
+                    </tr>
+                    <tr>
+                      <td>Offset Push up</td>
+                      <td class="text-center">15 x 3 (each side)</td>
+                    </tr>
                   </tbody>
                 </q-markup-table>
               </q-card-section>
@@ -375,6 +393,10 @@
                     <tr>
                       <td>KB tricepts</td>
                       <td class="text-center">35 x 15 x 3</td>
+                    </tr>
+                    <tr>
+                      <td>Balance 1 leg, offset KB raise</td>
+                      <td class="text-center">15 x 3 (each side)</td>
                     </tr>
                   </tbody>
                 </q-markup-table>
@@ -480,7 +502,8 @@ async function playExercise(name) {
   } catch (e) {
     $q.notify({ type: 'negative', message: e.message || String(e) })
   }
-}</script>
+}
+</script>
 
 <style scoped>
 .weekly-schedule {
