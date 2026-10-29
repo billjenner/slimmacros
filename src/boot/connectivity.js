@@ -25,12 +25,11 @@ export default boot(() => {
     try {
       return await originalFetch(...args)
     } catch (error) {
-      // The login-status sync is best-effort; its failure (e.g. CORS or an
-      // undeployed function) must not show the offline popup on login/logout.
       const input = args[0]
       const url = typeof input === 'string' ? input : input?.url || String(input || '')
-      const isBestEffortSync = url.includes('/functions/v1/users-logged-in')
-      if (!isBestEffortSync && (isConnectionError(error) || !navigator.onLine)) {
+      const supabaseUrl = String(import.meta.env.VITE_SUPABASE_URL || '').replace(/\/$/, '')
+      const isSupabaseRequest = supabaseUrl && url.startsWith(supabaseUrl)
+      if (isSupabaseRequest && (isConnectionError(error) || !navigator.onLine)) {
         usersStore.isOffline = true
         usersStore.offlineAttempts += 1
       }

@@ -43,12 +43,11 @@ const UNIT_ALIASES = {
 
 export async function fetchOpenFoodFactsProduct(barcode) {
   const url =
-    `https://world.openfoodfacts.net/api/v2/product/${encodeURIComponent(String(barcode).trim())}` +
+    `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(String(barcode).trim())}` +
     `?fields=${encodeURIComponent(FIELDS)}`
 
-  // The .net staging server requires basic auth (off:off)
   const response = await fetch(url, {
-    headers: { Accept: 'application/json', Authorization: 'Basic ' + btoa('off:off') },
+    headers: { Accept: 'application/json' },
   })
   if (response.status === 404) return null
   if (!response.ok) throw new Error(`Open Food Facts API Error HTTP: ${response.status}`)

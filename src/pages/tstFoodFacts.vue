@@ -35,6 +35,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { fetchOpenFoodFactsProduct } from '../utils/openFoodFacts'
 
 const barcode = ref('857111004195')
 const product = ref(null)
@@ -42,35 +43,8 @@ const notFound = ref(false)
 const error = ref('')
 const loading = ref(false)
 
-const FIELDS = [
-  'code',
-  'product_name',
-  'product_name_en',
-  'generic_name',
-  'brands',
-  'image_front_url',
-  'serving_size',
-  'nutriments',
-  'nutriscore_grade',
-  'nutrition_grades',
-  'ingredients_text',
-  'allergens',
-].join(',')
-
 async function lookupFood(code) {
-  const url =
-    `https://world.openfoodfacts.net/api/v2/product/${encodeURIComponent(code.trim())}` +
-    `?fields=${encodeURIComponent(FIELDS)}`
-
-  // The .net staging server requires basic auth (off:off)
-  const response = await fetch(url, {
-    headers: { Accept: 'application/json', Authorization: 'Basic ' + btoa('off:off') },
-  })
-  if (response.status === 404) return null
-  if (!response.ok) throw new Error(`Open Food Facts API Error HTTP: ${response.status}`)
-
-  const data = await response.json()
-  return data.status === 1 ? data.product : null
+  return fetchOpenFoodFactsProduct(code)
 }
 
 async function lookup() {
