@@ -3,13 +3,14 @@
     <q-card class="q-pa-lg" style="width: min(100%, 640px)">
       <div class="text-h5 text-center q-mb-md">Exercises</div>
 
-      <q-form class="q-gutter-md q-mb-lg" @submit.prevent="save">
+      <q-form ref="formRef" class="q-gutter-md q-mb-lg" @submit.prevent="save">
         <div class="text-subtitle1">{{ editingId ? 'Edit exercise' : 'Add exercise' }}</div>
         <q-input
           v-model="form.name"
           label="Name"
           outlined
           dense
+          lazy-rules="ondemand"
           :rules="[(v) => !!(v && v.trim()) || 'Name is required']"
         />
         <q-file
@@ -99,6 +100,7 @@ const rows = ref([])
 const loading = ref(false)
 const saving = ref(false)
 const error = ref('')
+const formRef = ref(null)
 const editingId = ref(null)
 const form = ref({ name: '', video_path: '' })
 const videoFile = ref(null)
@@ -109,6 +111,7 @@ function resetForm() {
   editingId.value = null
   form.value = { name: '', video_path: '' }
   videoFile.value = null
+  formRef.value?.resetValidation()
 }
 
 async function load() {

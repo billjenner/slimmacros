@@ -433,6 +433,45 @@
                 </q-markup-table>
               </q-card-section>
             </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip><strong>Shadow Boxing</strong> - Cardio (aerobic)</q-chip>
+              </template>
+
+              <q-card-section>
+                <q-markup-table flat bordered>
+                  <thead>
+                    <tr>
+                      <th class="text-left">Exercise</th>
+                      <th class="text-center">Reps</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        Shadow Boxing - HIIT inspired
+                        <q-btn
+                          flat
+                          round
+                          dense
+                          icon="play_circle"
+                          aria-label="Play Shadow Boxing video"
+                          @click="playExercise('Shadow Boxing')"
+                        />
+                      </td>
+
+                      <td class="text-center">40 seconds on, 20 seconds off, 20 rounds</td>
+                    </tr>
+                  </tbody>
+                </q-markup-table>
+              </q-card-section>
+            </q-expansion-item>
           </q-card>
         </div>
       </div>
