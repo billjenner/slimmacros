@@ -228,44 +228,6 @@
               transition-hide="jump-up"
             >
               <template v-slot:header>
-                <q-chip><strong>HIIT</strong> - Training Exercises</q-chip>
-              </template>
-
-              <q-card-section>
-                <div style="padding: 12px; border-bottom: 1px solid #eee">
-                  <strong>Routines using 40 seconds work / 20 seconds rest:</strong><br />
-                </div>
-                <div style="padding: 12px; border-bottom: 1px solid #eee">
-                  <ul style="margin: 8px 0 0 20px; padding: 0">
-                    <li>Bodyweight squats</li>
-                    <li>Knee push-ups</li>
-                    <li>Standing knee raises</li>
-                    <li>Glute bridges</li>
-                    <li>Mountain climbers</li>
-                    <li>Plank</li>
-                  </ul>
-                </div>
-                <div style="padding: 12px; border-bottom: 1px solid #eee">
-                  <strong>Phase & Time:</strong><br />
-                  <ul style="margin: 8px 0 0 20px; padding: 0">
-                    <li>Warm-up — 5 minutes</li>
-                    <li>HIIT Round 1 — 5 minutes</li>
-                    <li>Rest between rounds — 1–2 minutes</li>
-                    <li>HIIT Round 2 — 5 minutes</li>
-                    <li>Cool-down — 3–5 minutes</li>
-                    <li><strong>Total — 19–22 minutes</strong></li>
-                  </ul>
-                </div>
-              </q-card-section>
-            </q-expansion-item>
-
-            <q-expansion-item
-              expand-icon="keyboard_arrow_down"
-              expanded-icon="keyboard_arrow_up"
-              transition-show="jump-down"
-              transition-hide="jump-up"
-            >
-              <template v-slot:header>
                 <q-chip><strong>FB</strong> - Workout Set #1</q-chip>
               </template>
 
@@ -471,6 +433,91 @@
                 </q-markup-table>
               </q-card-section>
             </q-expansion-item>
+          </q-card>
+        </div>
+      </div>
+
+      <div class="row q-py-md">
+        <div class="col-12 flex justify-center">
+          <q-card style="width: 100%">
+            <q-card-section class="bg-secondary text-white text-center">
+              Fundamentals
+            </q-card-section>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip>What is&nbsp;<strong> HIIT</strong></q-chip>
+              </template>
+
+              <q-card-section>
+                <div class="row q-col-gutter-md items-center">
+                  <div class="col-12 col-md-6">
+                    <p>
+                      HIIT (High-Intensity Interval Training) is a workout method that alternates
+                      short periods of intense exercise with periods of rest or lower-intensity
+                      activity.
+                    </p>
+                    <p>
+                      High-intensity exercise in short bursts challenges the body to mobilize stored
+                      fat for energy and improves muscular performance, metabolic efficiency, and
+                      cardiovascular fitness.
+                    </p>
+                    <p>
+                      For example, you might perform kettlebell swings vigorously for 30 seconds,
+                      rest or walk for 30–60 seconds, and repeat for several rounds. Your heart rate
+                      should mimic something like the following.
+                    </p>
+                  </div>
+                  <div class="col-12 col-md-6 flex justify-center">
+                    <q-img src="/docs/hiit_heart_rate.png" />
+                  </div>
+                </div>
+              </q-card-section>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip><strong>HIIT</strong> - Example Training</q-chip>
+              </template>
+
+              <q-card-section>
+                <div style="padding: 12px; border-bottom: 1px solid #eee">
+                  <strong>Routines using 40 seconds work / 20 seconds rest:</strong><br />
+                </div>
+                <div style="padding: 12px; border-bottom: 1px solid #eee">
+                  <ul style="margin: 8px 0 0 20px; padding: 0">
+                    <li>Bodyweight squats</li>
+                    <li>Knee push-ups</li>
+                    <li>Standing knee raises</li>
+                    <li>Glute bridges</li>
+                    <li>Mountain climbers</li>
+                    <li>Plank</li>
+                  </ul>
+                </div>
+                <div style="padding: 12px; border-bottom: 1px solid #eee">
+                  <strong>Phase & Time:</strong><br />
+                  <ul style="margin: 8px 0 0 20px; padding: 0">
+                    <li>Warm-up — 5 minutes</li>
+                    <li>HIIT Round 1 — 5 minutes</li>
+                    <li>Rest between rounds — 1–2 minutes</li>
+                    <li>HIIT Round 2 — 5 minutes</li>
+                    <li>Cool-down — 3–5 minutes</li>
+                    <li><strong>Total — 19–22 minutes</strong></li>
+                  </ul>
+                </div>
+              </q-card-section>
+            </q-expansion-item>
+
             <div class="exercise-version">
               {{ exerciseVersion }}
             </div>
