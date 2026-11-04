@@ -386,6 +386,12 @@
               </template>
 
               <q-card-section>
+                <p>
+                  Search for foods with pre-defined macros instantly.
+                  <strong>A local database of 1500 common foods</strong> sourced from the USFDA food
+                  nutritional database with full macros included, our type-ahead search bar makes
+                  finding your food quick and easy.
+                </p>
                 <p class="text-weight-bold q-mb-sm">Steps</p>
                 > Items > Food > Add Food <br />
                 > Get Food <br />
