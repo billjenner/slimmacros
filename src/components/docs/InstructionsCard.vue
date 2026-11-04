@@ -15,7 +15,7 @@
         <div class="col-12 flex justify-center">
           <q-card style="width: 100%">
             <q-card-section class="bg-secondary text-white text-center">
-              Start your journey to a healthier lifestyle here.
+              Fundamentals of Slim-Macro
             </q-card-section>
             <q-expansion-item
               expand-icon="keyboard_arrow_down"
@@ -115,7 +115,7 @@
               transition-hide="jump-up"
             >
               <template v-slot:header>
-                <q-chip>Over All Plan</q-chip>
+                <q-chip>Comprehensive Plan</q-chip>
               </template>
 
               <q-card-section>
@@ -213,16 +213,16 @@
               transition-hide="jump-up"
             >
               <template v-slot:header>
-                <q-chip>Nutrition Budget Plan</q-chip>
+                <q-chip>Profile - Diet Types</q-chip>
               </template>
 
               <q-card-section>
                 <p>
-                  The Nutrition Budget Plan helps you allocate your daily calories across different
-                  macronutrients to support your fitness goals.
+                  These diet types helps you allocate your daily calories across different
+                  macronutrients to support your personal wellness goals.
                 </p>
                 <p>
-                  Each plan provides allocates a certain percentage of your daily calories to
+                  Each type provides allocates a certain percentage of your daily calories to
                   protein, carbohydrates, and fats. The exact distribution can be adjusted based on
                   your individual goals and dietary preferences.
                 </p>
@@ -234,7 +234,7 @@
                   <thead>
                     <tr>
                       <th style="text-align: left; padding: 10px; border-bottom: 2px solid #ddd">
-                        Plan
+                        Diet Type
                       </th>
                       <th style="text-align: left; padding: 10px; border-bottom: 2px solid #ddd">
                         Purpose
@@ -248,7 +248,7 @@
                         <strong>Balanced</strong>
                       </td>
                       <td style="padding: 10px; border-bottom: 1px solid #eee; color: #666">
-                        This plan provides a balanced distribution of macronutrients.
+                        This diet type provides a balanced distribution of macronutrients.
                       </td>
                     </tr>
 
@@ -257,7 +257,7 @@
                         <strong>Low Carb</strong>
                       </td>
                       <td style="padding: 10px; border-bottom: 1px solid #eee; color: #666">
-                        This plan reduces carbohydrate intake and increases fat and protein
+                        This diet type reduces carbohydrate intake and increases fat and protein
                         consumption.
                       </td>
                     </tr>
@@ -267,18 +267,24 @@
                         <strong>High Protein</strong>
                       </td>
                       <td style="padding: 10px; border-bottom: 1px solid #eee; color: #666">
-                        This plan increases protein intake to support muscle preservation and
+                        This diet type increases protein intake to support muscle preservation and
                         growth.
                       </td>
                     </tr>
 
                     <tr>
                       <td style="padding: 10px; border-bottom: 1px solid #eee">
-                        <strong>High Metabolic</strong>
+                        <strong>Carb Cycling</strong>
                       </td>
                       <td style="padding: 10px; border-bottom: 1px solid #eee; color: #666">
-                        This plan includes days with lower calorie intake to help with fat loss,
-                        while other days focus on higher calorie intake to boost metabolism.
+                        This diet type uses calorie cycling to protect your metabolism. By
+                        alternating lower-calorie fat-loss days with higher-calorie days, you
+                        prevent your body from entering "energy conservation mode." The
+                        higher-calorie days naturally restore your metabolic rate to keep fat
+                        burning efficient.
+                        <q-chip color="warning" text-color="white"
+                          >Recommended for max fat loss</q-chip
+                        >
                       </td>
                     </tr>
 
@@ -292,6 +298,228 @@
                     </tr>
                   </tbody>
                 </table>
+              </q-card-section>
+            </q-expansion-item>
+          </q-card>
+        </div>
+      </div>
+
+      <div class="row q-py-md">
+        <div class="col-12 flex justify-center">
+          <q-card style="width: 100%">
+            <q-card-section class="bg-secondary text-white text-center"> How to </q-card-section>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip> How do I setup my profile</q-chip>
+              </template>
+
+              <q-card-section>
+                <p class="text-weight-bold q-mb-sm">Steps</p>
+                > Items > Profile <br />
+                > FName > LName > Sex > Age <br />
+                > Start Weight > Goal Weight <br />
+                > Height > Activity Level <br />
+                > Daily calorie deficit <br />
+                > Diet Type <br />
+                > Load Template (High metabolic/carb cycling - achieves best results) <br />
+                -> Review the information <br />
+                > Save Profile
+              </q-card-section>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip> How do I add food to my list</q-chip>
+              </template>
+
+              <q-card-section>
+                <p class="text-weight-bold q-mb-sm">Steps</p>
+                > Items > Food > Add Food <br />
+                > Description <br />
+                > Serving size > Serving Unit <br />
+                > Protein > Carbs > Fat > Extra Calories <br />
+                > Save Food
+              </q-card-section>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip> How do I add food using Bar Code Scanner</q-chip>
+              </template>
+
+              <q-card-section>
+                <p class="text-weight-bold q-mb-sm">Steps</p>
+                > Items > Food > Add Food <br />
+                > Scan Code <br />
+                > Point phone camera on box or package bar code symbol <br />
+                > Allow camera to scan code and retrieve macro information <br />
+                -> Review the information <br />
+                > Change information to your liking <br />
+                > Save Food
+              </q-card-section>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip> How do I add food from the Nutrition Database</q-chip>
+              </template>
+
+              <q-card-section>
+                <p class="text-weight-bold q-mb-sm">Steps</p>
+                > Items > Food > Add Food <br />
+                > Get Food <br />
+                > Enter search criteria <br />
+                > Select food from list of options <br />
+                > Use Food Selected <br />
+                -> Review the information <br />
+                > Save Food
+              </q-card-section>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip> How do I track food I consumed</q-chip>
+              </template>
+
+              <q-card-section>
+                <p class="text-weight-bold q-mb-sm">Steps</p>
+                > Log > Food <br />
+                > Enter search criteria <br />
+                > Select food from list of options <br />
+                > Select servings (consumed) <br />
+                > Add to Log
+              </q-card-section>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip> How do I review my Daily Food Budget</q-chip>
+              </template>
+
+              <q-card-section>
+                <p class="text-weight-bold q-mb-sm">Steps</p>
+                > Log > Food <br />
+                > Expand "Daily Food Budget" <br />
+                -> Review : Calories (consumed/budget), <br />
+                Protein (consumed/budget), <br />
+                Carbs (consumed/budget), <br />
+                Fat (consumed/budget)
+              </q-card-section>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip> How do I review my Daily Food Budget (previous day)</q-chip>
+              </template>
+
+              <q-card-section>
+                <p class="text-weight-bold q-mb-sm">Steps</p>
+                > Log > Food <br />
+                > Expand "Daily Food Budget" <br />
+                > Select date of interest from calendar control
+              </q-card-section>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip> How do I see a chart of my food intake?</q-chip>
+              </template>
+
+              <q-card-section>
+                <p class="text-weight-bold q-mb-sm">Steps</p>
+                > Dashboard > Food Calories
+              </q-card-section>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip> How do I log my weight</q-chip>
+              </template>
+
+              <q-card-section>
+                <p class="text-weight-bold q-mb-sm">Steps</p>
+                > Log > Weight <br />
+                > Weight > Date <br />
+                > Add to Log
+              </q-card-section>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip> How do I see my weight log progress and project goal date?</q-chip>
+              </template>
+
+              <q-card-section>
+                <p class="text-weight-bold q-mb-sm">Steps</p>
+                > Log > Weight <br />
+                -> Review Weight Progress chart
+              </q-card-section>
+            </q-expansion-item>
+
+            <q-expansion-item
+              expand-icon="keyboard_arrow_down"
+              expanded-icon="keyboard_arrow_up"
+              transition-show="jump-down"
+              transition-hide="jump-up"
+            >
+              <template v-slot:header>
+                <q-chip> How do I review my weight progress over time</q-chip>
+              </template>
+
+              <q-card-section>
+                <p class="text-weight-bold q-mb-sm">Steps</p>
+                > Dashboard > Weight and BMI progress
               </q-card-section>
             </q-expansion-item>
           </q-card>
