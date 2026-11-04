@@ -44,7 +44,46 @@
     </h5>
 
     <div class="q-pa-md text-center" style="max-width: 720px; width: 100%">
-      <q-btn color="secondary" label="Let's Go!" to="/log" style="margin-top: 8px" />
+      <q-btn
+        color="secondary"
+        label="Let's Go!"
+        :loading="routing"
+        style="margin-top: 8px"
+        @click="letsGo"
+      />
     </div>
   </q-page>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUsersStore } from '../stores/users'
+import { useProfileStore } from '../stores/profile'
+
+const router = useRouter()
+const usersStore = useUsersStore()
+const profileStore = useProfileStore()
+const routing = ref(false)
+
+// Logged in without a profile -> docs; otherwise (profile or not logged in) -> log
+async function letsGo() {
+  routing.value = true
+  try {
+    const user = await usersStore.restoreSessionFromAuth()
+    const userId = user?.user_id || usersStore.currentUser?.user_id
+
+    if (userId) {
+      const profile = await profileStore.loadCurrentProfile(userId)
+      if (!profile && !profileStore.isOffline) {
+        await router.push('/docs')
+        return
+      }
+    }
+
+    await router.push('/log')
+  } finally {
+    routing.value = false
+  }
+}
+</script>
