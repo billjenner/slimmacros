@@ -26,6 +26,7 @@
           <template v-if="isSignedIn">
             <q-btn
               flat
+              icon="library_add"
               label="Log"
               to="/log"
               class="q-mx-sm"
@@ -36,6 +37,7 @@
             />
             <q-btn
               flat
+              icon="inventory_2"
               label="Items"
               to="/items"
               class="q-mx-sm"
@@ -46,6 +48,7 @@
             />
             <q-btn
               flat
+              icon="view_kanban"
               label="Dashboard"
               to="/dashboard"
               class="q-mx-sm"
@@ -56,6 +59,7 @@
             />
             <q-btn
               flat
+              icon="menu_book"
               label="Docs"
               to="/docs"
               class="q-mx-sm"
@@ -97,15 +101,27 @@
           <q-item-section>Intro</q-item-section>
         </q-item>
         <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/log')">
+          <q-item-section avatar>
+            <q-icon name="library_add" />
+          </q-item-section>
           <q-item-section>Log</q-item-section>
         </q-item>
         <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/items')">
+          <q-item-section avatar>
+            <q-icon name="inventory_2" />
+          </q-item-section>
           <q-item-section>Items</q-item-section>
         </q-item>
         <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/dashboard')">
+          <q-item-section avatar>
+            <q-icon name="view_kanban" />
+          </q-item-section>
           <q-item-section>Dashboard</q-item-section>
         </q-item>
         <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/docs')">
+          <q-item-section avatar>
+            <q-icon name="menu_book" />
+          </q-item-section>
           <q-item-section>Docs</q-item-section>
         </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/users')">
