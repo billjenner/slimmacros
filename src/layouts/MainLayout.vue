@@ -72,6 +72,7 @@
           <q-btn
             v-if="!(usersStore.currentUser && usersStore.currentUser.email)"
             flat
+            icon="login"
             label="LOGIN"
             to="/login"
             class="q-mx-sm"
@@ -98,6 +99,9 @@
     <q-drawer v-model="leftDrawerOpen" side="left" bordered overlay>
       <q-list padding>
         <q-item clickable v-ripple @click="navigateAndClose('/')">
+          <q-item-section avatar>
+            <q-icon name="home" />
+          </q-item-section>
           <q-item-section>Intro</q-item-section>
         </q-item>
         <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/log')">
@@ -125,18 +129,33 @@
           <q-item-section>Docs</q-item-section>
         </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/users')">
+          <q-item-section avatar>
+            <q-icon name="group" />
+          </q-item-section>
           <q-item-section>Users</q-item-section>
         </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/feedback')">
+          <q-item-section avatar>
+            <q-icon name="feedback" />
+          </q-item-section>
           <q-item-section>Feedback</q-item-section>
         </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/barcode-scanner')">
+          <q-item-section avatar>
+            <q-icon name="qr_code_scanner" />
+          </q-item-section>
           <q-item-section>Barcode Scanner</q-item-section>
         </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/tst-food-facts')">
+          <q-item-section avatar>
+            <q-icon name="science" />
+          </q-item-section>
           <q-item-section>Tst Food Facts</q-item-section>
         </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/exercise')">
+          <q-item-section avatar>
+            <q-icon name="fitness_center" />
+          </q-item-section>
           <q-item-section>Exercise</q-item-section>
         </q-item>
         <q-item
@@ -145,9 +164,15 @@
           v-ripple
           @click="navigateAndClose('/login')"
         >
+          <q-item-section avatar>
+            <q-icon name="login" />
+          </q-item-section>
           <q-item-section>Login</q-item-section>
         </q-item>
         <q-item v-else clickable v-ripple @click="signOut()">
+          <q-item-section avatar>
+            <q-icon name="logout" />
+          </q-item-section>
           <q-item-section>Sign out</q-item-section>
         </q-item>
       </q-list>
