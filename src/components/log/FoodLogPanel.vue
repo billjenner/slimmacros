@@ -268,7 +268,18 @@
           <q-tr :props="props" :style="!props.row.isToday ? 'background-color: #E8E8E8' : ''">
             <q-td key="summary" :props="props" class="food-log-cell">
               <div class="row items-center full-width">
-                <span class="text-left">{{ props.row.summary }}</span>
+                <q-btn
+                  size="sm"
+                  color="secondary"
+                  dense
+                  round
+                  :icon="props.expand ? 'remove' : 'add'"
+                  :aria-label="props.expand ? 'Collapse food details' : 'Expand food details'"
+                  :aria-expanded="props.expand"
+                  :disable="!props.row.food"
+                  @click="props.expand = !props.expand"
+                />
+                <span class="text-left q-ml-sm">{{ props.row.summary }}</span>
                 <div class="q-ml-auto">
                   <q-btn
                     flat
@@ -280,6 +291,11 @@
                   />
                 </div>
               </div>
+            </q-td>
+          </q-tr>
+          <q-tr v-if="props.expand && props.row.food" :props="props">
+            <q-td :colspan="columns.length" class="bg-grey-2">
+              <FoodDetails :food="props.row.food" />
             </q-td>
           </q-tr>
         </template>
@@ -317,6 +333,7 @@ import {
   calculateTotalDailyCalories,
 } from '../../utils/rules'
 import { notifySuccess } from '../../utils/notify'
+import FoodDetails from 'components/Items/FoodDetails.vue'
 
 const $q = useQuasar()
 
