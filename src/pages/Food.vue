@@ -383,7 +383,7 @@ import { useFoodStore } from 'stores/food'
 import { calculateFoodCalories, calculateTotalCaloriesForPerson } from '../utils/rules'
 import { notifySuccess } from '../utils/notify'
 import { fetchOpenFoodFactsProduct, mapProductToFood } from '../utils/openFoodFacts'
-import FoodDatabaseDialog from 'components/dashboard/Items/FoodDatabaseDialog.vue'
+import FoodDatabaseDialog from 'components/Items/FoodDatabaseDialog.vue'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -451,7 +451,11 @@ const foodRows = computed(() => {
     ? allRows
     : allRows.filter((row) => row?.user_id === currentUserId)
   const searchTerms = [food.description, foodSearch.value]
-    .map((value) => String(value || '').trim().toLowerCase())
+    .map((value) =>
+      String(value || '')
+        .trim()
+        .toLowerCase(),
+    )
     .filter(Boolean)
 
   const filteredRows = !searchTerms.length

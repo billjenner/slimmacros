@@ -2,7 +2,7 @@
 -- ENUM TYPES 
 -- ============================================================ 
 DROP TYPE IF EXISTS public.diet_type;
-CREATE TYPE public.diet_type AS ENUM ( 'Balanced', 'Low Carb', 'High Protein', 'High Metabolic', 'Custom'  ); 
+CREATE TYPE public.diet_type AS ENUM ( 'Balanced', 'Low Carb', 'High Protein', 'Carb Cycling', 'Custom'  ); 
 CREATE TYPE public.food_serving_unit AS ENUM ( 'oz', 'gram', 'cup', 'scoop', 'bar', 'can', 'count',
 'item', 'piece', 'pinch', 'serving', 'slice', 'tab', 'tbsp', 'tsp' ); 
 

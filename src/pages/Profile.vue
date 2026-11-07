@@ -231,7 +231,7 @@ const dietTypeOptions = [
   { label: 'Balanced', value: 'Balanced' },
   { label: 'Low Carb', value: 'Low Carb' },
   { label: 'High Protein', value: 'High Protein' },
-  { label: 'High Metabolic', value: 'High Metabolic' },
+  { label: 'Carb Cycling', value: 'Carb Cycling' },
   { label: 'Custom', value: 'Custom' },
 ]
 

@@ -17,7 +17,7 @@
 //);
 
 -- ============================================================ -- ENUM TYPES -- ============================================================ 
-CREATE TYPE public.diet_type AS ENUM ( 'Low Cal', 'Low Carb', 'Lean Muscle', 'High Metabolic' ); 
+CREATE TYPE public.diet_type AS ENUM ( 'Low Cal', 'Low Carb', 'Lean Muscle', 'Carb Cycling' ); 
 CREATE TYPE public.food_serving_unit AS ENUM ( 'cup', 'oz', 'grams', 'slice', 'bar', 'unit' ); 
 CREATE TYPE public.supplement_serving_unit AS ENUM ( 'pills', 'oz', 'other' );
 
@@ -45,7 +45,7 @@ Profile
 	profileID integer
 	userId (foreign key)
 	Daily Calorie Deficit
-	Diet Type ['Low Cal', "Low Carb', 'Lean Muscle', 'High Metobolic']
+	Diet Type ['Low Cal', "Low Carb', 'Lean Muscle', 'Carb Cycling']
 	SundayProtein percent
 	SundayCarbs percent
 	SundayFat percent

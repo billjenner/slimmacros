@@ -303,7 +303,7 @@ CREATE TYPE public.diet_type AS ENUM (
     'Balanced',
     'Low Carb',
     'High Protein',
-    'High Metabolic',
+    'Carb Cycling',
     'Custom'
 );
 
@@ -3549,7 +3549,7 @@ ALTER TABLE auth.webauthn_credentials OWNER TO supabase_auth_admin;
 --
 
 CREATE TABLE public.feedback (
-    id bigint NOT NULL,
+    id int NOT NULL,
     user_id uuid NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     feedback_type text NOT NULL,
@@ -5076,9 +5076,9 @@ COPY public.food_log_bak (food_log_id, food_id, user_id, servings, datetime) FRO
 --
 
 COPY public.profile (profile_id, user_id, start_weight, goal_weight, height, activity_level, daily_calorie_deficit, diet_type, sunday_protein, sunday_carbs, sunday_fat, monday_protein, monday_carbs, monday_fat, tuesday_protein, tuesday_carbs, tuesday_fat, wednesday_protein, wednesday_carbs, wednesday_fat, thursday_protein, thursday_carbs, thursday_fat, friday_protein, friday_carbs, friday_fat, saturday_protein, saturday_carbs, saturday_fat, is_active, created_at) FROM stdin;
-3	95f81fb6-468d-49a5-bcbc-bd0d588abcfd	153.00	152.00	68.00	ModeratelyActive	200	High Metabolic	40.00	10.00	50.00	40.00	10.00	50.00	35.00	35.00	30.00	35.00	45.00	20.00	40.00	10.00	50.00	35.00	35.00	30.00	35.00	45.00	20.00	t	2026-08-09 04:30:05.259679+00
+3	95f81fb6-468d-49a5-bcbc-bd0d588abcfd	153.00	152.00	68.00	ModeratelyActive	200	Carb Cycling	40.00	10.00	50.00	40.00	10.00	50.00	35.00	35.00	30.00	35.00	45.00	20.00	40.00	10.00	50.00	35.00	35.00	30.00	35.00	45.00	20.00	t	2026-08-09 04:30:05.259679+00
 16	e6430d4a-90fa-437d-9cae-37ca063933dc	205.00	180.00	68.00	ModeratelyActive	500	Balanced	30.00	30.00	40.00	30.00	30.00	40.00	30.00	30.00	40.00	30.00	30.00	40.00	30.00	30.00	40.00	30.00	30.00	40.00	30.00	30.00	40.00	t	2026-08-16 18:01:41.319245+00
-1	843d549d-2a3e-4d06-b974-1c59db802208	230.00	168.00	69.00	ModeratelyActive	800	High Metabolic	40.00	10.00	50.00	40.00	10.00	50.00	35.00	35.00	30.00	35.00	45.00	20.00	40.00	10.00	50.00	35.00	35.00	30.00	35.00	45.00	20.00	t	2026-08-08 18:48:06.543984+00
+1	843d549d-2a3e-4d06-b974-1c59db802208	230.00	168.00	69.00	ModeratelyActive	800	Carb Cycling	40.00	10.00	50.00	40.00	10.00	50.00	35.00	35.00	30.00	35.00	45.00	20.00	40.00	10.00	50.00	35.00	35.00	30.00	35.00	45.00	20.00	t	2026-08-08 18:48:06.543984+00
 2	7dd73c91-5396-440d-9304-3bd3b8af14cd	200.00	175.00	75.00	LightlyActive	300	Balanced	30.00	30.00	40.00	30.00	30.00	40.00	30.00	30.00	40.00	30.00	30.00	40.00	30.00	30.00	40.00	30.00	30.00	40.00	30.00	30.00	40.00	t	2026-08-09 03:29:38.354871+00
 \.
 
