@@ -96,7 +96,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" side="left" bordered overlay>
+    <q-drawer v-model="leftDrawerOpen" side="left" bordered overlay :width="172">
       <q-list padding>
         <q-item clickable v-ripple @click="navigateAndClose('/')">
           <q-item-section avatar>
