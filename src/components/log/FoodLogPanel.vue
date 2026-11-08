@@ -267,20 +267,22 @@
         <template #body="props">
           <q-tr :props="props" :style="!props.row.isToday ? 'background-color: #E8E8E8' : ''">
             <q-td key="summary" :props="props" class="food-log-cell">
-              <div class="row items-center full-width">
-                <q-btn
-                  size="sm"
-                  color="secondary"
-                  dense
-                  round
-                  :icon="props.expand ? 'remove' : 'add'"
-                  :aria-label="props.expand ? 'Collapse food details' : 'Expand food details'"
-                  :aria-expanded="props.expand"
-                  :disable="!props.row.food"
-                  @click="props.expand = !props.expand"
-                />
-                <span class="text-left q-ml-sm">{{ props.row.summary }}</span>
-                <div class="q-ml-auto">
+              <div class="row items-start no-wrap full-width">
+                <div class="row items-start no-wrap col">
+                  <q-btn
+                    size="sm"
+                    color="secondary"
+                    dense
+                    round
+                    :icon="props.expand ? 'remove' : 'add'"
+                    :aria-label="props.expand ? 'Collapse food details' : 'Expand food details'"
+                    :aria-expanded="props.expand"
+                    :disable="!props.row.food"
+                    @click="props.expand = !props.expand"
+                  />
+                  <span class="col text-left q-ml-sm">{{ props.row.summary }}</span>
+                </div>
+                <div class="q-ml-auto col-auto">
                   <q-btn
                     flat
                     dense
