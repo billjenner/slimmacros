@@ -61,6 +61,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  servings: {
+    type: Number,
+    default: 1,
+  },
 })
 
 const macroChartData = computed(() => ({
@@ -92,7 +96,11 @@ const calorieBudgetChartData = computed(() => {
       totalDailyCalories: 2000,
       dailyCalorieDeficit: 0,
     }) || 1
-  const consumedCalories = Math.max(0, calories)
+  const servings = Number(props.servings)
+  const consumedCalories = Math.max(
+    0,
+    Math.round(calories * (Number.isFinite(servings) ? servings : 1)),
+  )
 
   return {
     labels: ['Calories', 'Remaining'],

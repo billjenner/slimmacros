@@ -297,7 +297,7 @@
           </q-tr>
           <q-tr v-if="props.expand && props.row.food" :props="props">
             <q-td :colspan="columns.length" class="bg-grey-2">
-              <FoodDetails :food="props.row.food" />
+              <FoodDetails :food="props.row.food" :servings="props.row.servings" />
             </q-td>
           </q-tr>
         </template>
