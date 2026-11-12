@@ -1,7 +1,15 @@
--- Private bucket for exercise videos (video_path stores the object path in this bucket)
+-- Private bucket for exercise media (video_path and image_path store object paths in this bucket)
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-VALUES ('exercise-videos', 'exercise-videos', false, 52428800, ARRAY['video/*'])
-ON CONFLICT (id) DO NOTHING;
+VALUES (
+    'exercise-videos',
+    'exercise-videos',
+    false,
+    52428800,
+    ARRAY['video/*', 'image/png', 'image/jpeg', 'image/gif']
+)
+ON CONFLICT (id) DO UPDATE
+SET file_size_limit = EXCLUDED.file_size_limit,
+    allowed_mime_types = EXCLUDED.allowed_mime_types;
 
 DROP POLICY IF EXISTS "Authenticated can read exercise videos" ON storage.objects;
 CREATE POLICY "Authenticated can read exercise videos"
