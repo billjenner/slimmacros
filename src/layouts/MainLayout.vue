@@ -100,61 +100,61 @@
       <q-list padding>
         <q-item clickable v-ripple @click="navigateAndClose('/')">
           <q-item-section avatar>
-            <q-icon name="home" />
+            <q-icon name="home" color="secondary" />
           </q-item-section>
           <q-item-section>Intro</q-item-section>
         </q-item>
         <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/log')">
           <q-item-section avatar>
-            <q-icon name="library_add" />
+            <q-icon name="library_add" color="secondary" />
           </q-item-section>
           <q-item-section>Log</q-item-section>
         </q-item>
         <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/items')">
           <q-item-section avatar>
-            <q-icon name="inventory_2" />
+            <q-icon name="inventory_2" color="secondary" />
           </q-item-section>
           <q-item-section>Items</q-item-section>
         </q-item>
         <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/dashboard')">
           <q-item-section avatar>
-            <q-icon name="view_kanban" />
+            <q-icon name="view_kanban" color="secondary" />
           </q-item-section>
           <q-item-section>Dashboard</q-item-section>
         </q-item>
         <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/docs')">
           <q-item-section avatar>
-            <q-icon name="menu_book" />
+            <q-icon name="menu_book" color="secondary" />
           </q-item-section>
           <q-item-section>Docs</q-item-section>
         </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/users')">
           <q-item-section avatar>
-            <q-icon name="group" />
+            <q-icon name="group" color="secondary" />
           </q-item-section>
           <q-item-section>Users</q-item-section>
         </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/feedback')">
           <q-item-section avatar>
-            <q-icon name="feedback" />
+            <q-icon name="feedback" color="secondary" />
           </q-item-section>
           <q-item-section>Feedback</q-item-section>
         </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/barcode-scanner')">
           <q-item-section avatar>
-            <q-icon name="qr_code_scanner" />
+            <q-icon name="qr_code_scanner" color="secondary" />
           </q-item-section>
           <q-item-section>Barcode Scanner</q-item-section>
         </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/tst-food-facts')">
           <q-item-section avatar>
-            <q-icon name="science" />
+            <q-icon name="science" color="secondary" />
           </q-item-section>
           <q-item-section>Tst Food Facts</q-item-section>
         </q-item>
         <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/exercise')">
           <q-item-section avatar>
-            <q-icon name="fitness_center" />
+            <q-icon name="fitness_center" color="secondary" />
           </q-item-section>
           <q-item-section>Exercise</q-item-section>
         </q-item>
@@ -165,13 +165,13 @@
           @click="navigateAndClose('/login')"
         >
           <q-item-section avatar>
-            <q-icon name="login" />
+            <q-icon name="login" color="secondary" />
           </q-item-section>
           <q-item-section>Login</q-item-section>
         </q-item>
         <q-item v-else clickable v-ripple @click="signOut()">
           <q-item-section avatar>
-            <q-icon name="logout" />
+            <q-icon name="logout" color="secondary" />
           </q-item-section>
           <q-item-section>Sign out</q-item-section>
         </q-item>
