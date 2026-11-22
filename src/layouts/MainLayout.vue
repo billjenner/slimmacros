@@ -23,6 +23,17 @@
         </q-toolbar-title>
 
         <template v-if="!$q.screen.lt.md">
+          <q-btn
+            v-if="showGettingStarted"
+            flat
+            icon="checklist"
+            label="Getting Started"
+            to="/getting-started"
+            class="q-mx-sm toolbar-nav-button"
+            :style="buttonStyle('/getting-started')"
+            @mouseover="hoveredPath = '/getting-started'"
+            @mouseleave="hoveredPath = null"
+          />
           <template v-if="isSignedIn">
             <q-btn
               flat
