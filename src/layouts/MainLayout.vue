@@ -97,81 +97,136 @@
     </q-header>
 
     <q-drawer v-model="leftDrawerOpen" side="left" bordered overlay :width="172">
-      <q-list padding>
-        <q-item clickable v-ripple @click="navigateAndClose('/')">
+      <q-list padding class="drawer-navigation">
+        <q-item :active="route.path === '/'" clickable v-ripple @click="navigateAndClose('/')">
           <q-item-section avatar>
-            <q-icon name="home" color="secondary" />
+            <q-icon name="home" />
           </q-item-section>
           <q-item-section>Intro</q-item-section>
         </q-item>
-        <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/log')">
+        <q-item
+          v-if="isSignedIn"
+          :active="route.path === '/log'"
+          clickable
+          v-ripple
+          @click="navigateAndClose('/log')"
+        >
           <q-item-section avatar>
-            <q-icon name="library_add" color="secondary" />
+            <q-icon name="library_add" />
           </q-item-section>
           <q-item-section>Log</q-item-section>
         </q-item>
-        <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/items')">
+        <q-item
+          v-if="isSignedIn"
+          :active="route.path === '/items'"
+          clickable
+          v-ripple
+          @click="navigateAndClose('/items')"
+        >
           <q-item-section avatar>
-            <q-icon name="inventory_2" color="secondary" />
+            <q-icon name="inventory_2" />
           </q-item-section>
           <q-item-section>Items</q-item-section>
         </q-item>
-        <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/dashboard')">
+        <q-item
+          v-if="isSignedIn"
+          :active="route.path === '/dashboard'"
+          clickable
+          v-ripple
+          @click="navigateAndClose('/dashboard')"
+        >
           <q-item-section avatar>
-            <q-icon name="view_kanban" color="secondary" />
+            <q-icon name="view_kanban" />
           </q-item-section>
           <q-item-section>Dashboard</q-item-section>
         </q-item>
-        <q-item v-if="isSignedIn" clickable v-ripple @click="navigateAndClose('/docs')">
+        <q-item
+          v-if="isSignedIn"
+          :active="route.path === '/docs'"
+          clickable
+          v-ripple
+          @click="navigateAndClose('/docs')"
+        >
           <q-item-section avatar>
-            <q-icon name="menu_book" color="secondary" />
+            <q-icon name="menu_book" />
           </q-item-section>
           <q-item-section>Docs</q-item-section>
         </q-item>
-        <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/users')">
+        <q-item
+          v-if="isAdmin"
+          :active="route.path === '/users'"
+          clickable
+          v-ripple
+          @click="navigateAndClose('/users')"
+        >
           <q-item-section avatar>
-            <q-icon name="group" color="secondary" />
+            <q-icon name="group" />
           </q-item-section>
           <q-item-section>Users</q-item-section>
         </q-item>
-        <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/feedback')">
+        <q-item
+          v-if="isAdmin"
+          :active="route.path === '/feedback'"
+          clickable
+          v-ripple
+          @click="navigateAndClose('/feedback')"
+        >
           <q-item-section avatar>
-            <q-icon name="feedback" color="secondary" />
+            <q-icon name="feedback" />
           </q-item-section>
           <q-item-section>Feedback</q-item-section>
         </q-item>
-        <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/barcode-scanner')">
+        <q-item
+          v-if="isAdmin"
+          :active="route.path === '/barcode-scanner'"
+          clickable
+          v-ripple
+          @click="navigateAndClose('/barcode-scanner')"
+        >
           <q-item-section avatar>
-            <q-icon name="qr_code_scanner" color="secondary" />
+            <q-icon name="qr_code_scanner" />
           </q-item-section>
           <q-item-section>Barcode Scanner</q-item-section>
         </q-item>
-        <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/tst-food-facts')">
+        <q-item
+          v-if="isAdmin"
+          :active="route.path === '/tst-food-facts'"
+          clickable
+          v-ripple
+          @click="navigateAndClose('/tst-food-facts')"
+        >
           <q-item-section avatar>
-            <q-icon name="science" color="secondary" />
+            <q-icon name="science" />
           </q-item-section>
           <q-item-section>Tst Food Facts</q-item-section>
         </q-item>
-        <q-item v-if="isAdmin" clickable v-ripple @click="navigateAndClose('/exercise')">
+        <q-item
+          v-if="isAdmin"
+          :active="route.path === '/exercise'"
+          clickable
+          v-ripple
+          @click="navigateAndClose('/exercise')"
+        >
           <q-item-section avatar>
-            <q-icon name="fitness_center" color="secondary" />
+            <q-icon name="fitness_center" />
           </q-item-section>
           <q-item-section>Exercise</q-item-section>
         </q-item>
         <q-item
           v-if="!(usersStore.currentUser && usersStore.currentUser.email)"
+          :active="route.path === '/login'"
           clickable
           v-ripple
           @click="navigateAndClose('/login')"
         >
           <q-item-section avatar>
-            <q-icon name="login" color="secondary" />
+            <q-icon name="login" />
           </q-item-section>
           <q-item-section>Login</q-item-section>
         </q-item>
         <q-item v-else clickable v-ripple @click="signOut()">
           <q-item-section avatar>
-            <q-icon name="logout" color="secondary" />
+            <q-icon name="logout" />
           </q-item-section>
           <q-item-section>Sign out</q-item-section>
         </q-item>
@@ -423,5 +478,27 @@ onBeforeUnmount(() => {
   background-color: var(--q-secondary);
   min-width: 40px;
   min-height: 40px;
+}
+
+.drawer-navigation :deep(.q-item--clickable:hover) {
+  background-color: var(--q-warning);
+  color: white;
+}
+
+.drawer-navigation :deep(.q-icon) {
+  color: var(--q-secondary);
+}
+
+.drawer-navigation :deep(.q-item--active .q-icon) {
+  color: white;
+}
+
+.drawer-navigation :deep(.q-item--active) {
+  background-color: var(--q-secondary);
+  color: white;
+}
+
+.drawer-navigation :deep(.q-item--active:hover) {
+  background-color: var(--q-secondary);
 }
 </style>
