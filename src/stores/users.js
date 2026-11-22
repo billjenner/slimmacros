@@ -3,7 +3,6 @@ import { supabase } from '../lib/supabase'
 import { isConnectionError } from '../utils/connection'
 
 const CURRENT_USER_STORAGE_KEY = 'slimmacros.currentUser'
-const USERS_LOGGED_IN_FUNCTION = 'users-logged-in'
 const LIST_PROFILES_FUNCTION = 'list-profiles'
 const appUrl = import.meta.env.VITE_APP_URL
 
@@ -118,7 +117,6 @@ export const useUsersStore = defineStore('Users', {
       this.users.push(savedUser)
       this.currentUser = savedUser
       persistCurrentUser(savedUser)
-      await this.syncLoggedInSession(normalizedEmail, true)
       return savedUser
     },
 
@@ -190,7 +188,6 @@ export const useUsersStore = defineStore('Users', {
         this.users.push(savedUser)
         persistCurrentUser(savedUser)
         this.isOffline = false
-        await this.syncLoggedInSession(normalizedEmail, true)
         return savedUser
       } catch (error) {
         this.error = isConnectionError(error) ? 'Unable to connect to Supabase.' : error?.message
@@ -284,35 +281,6 @@ export const useUsersStore = defineStore('Users', {
       return null
     },
 
-    async syncLoggedInSession(email, isLoggedIn) {
-      if (!supabase) {
-        return false
-      }
-
-      const normalizedEmail = normalizeEmail(email)
-      if (!normalizedEmail) {
-        return false
-      }
-
-      try {
-        const { data, error } = await supabase.functions.invoke(USERS_LOGGED_IN_FUNCTION, {
-          body: {
-            action: isLoggedIn ? 'login' : 'logout',
-            email: normalizedEmail,
-          },
-        })
-
-        if (error) {
-          console.error('[users-logged-in] sync failed:', error.message, data)
-        }
-
-        return !error
-      } catch (error) {
-        console.error('[users-logged-in] sync failed:', error?.message)
-        return false
-      }
-    },
-
     async loadUsers() {
       this.error = null
 
@@ -349,11 +317,6 @@ export const useUsersStore = defineStore('Users', {
     },
 
     async clearCurrentUser() {
-      const currentEmail = this.currentUser?.email
-      if (currentEmail) {
-        await this.syncLoggedInSession(currentEmail, false)
-      }
-
       this.currentUser = null
       persistCurrentUser(null)
     },

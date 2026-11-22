@@ -360,10 +360,10 @@ const hasFoodLogEntry = computed(() => {
 })
 const showGettingStarted = computed(
   () =>
-    !isSignedIn.value ||
-    (foodLogCheckComplete.value &&
-      foodLogCheckedUserId.value === usersStore.currentUser?.user_id &&
-      !hasFoodLogEntry.value),
+    isSignedIn.value &&
+    foodLogCheckComplete.value &&
+    foodLogCheckedUserId.value === usersStore.currentUser?.user_id &&
+    !hasFoodLogEntry.value,
 )
 
 const isAdmin = computed(() => {
