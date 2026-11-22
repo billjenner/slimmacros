@@ -57,31 +57,43 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 import { useUsersStore } from '../stores/users'
-import { useProfileStore } from '../stores/profile'
+import { useFoodLogsStore } from '../stores/food-logs'
 
+const $q = useQuasar()
 const router = useRouter()
 const usersStore = useUsersStore()
-const profileStore = useProfileStore()
+const foodLogsStore = useFoodLogsStore()
 const routing = ref(false)
 
-// Logged in without a profile -> docs; otherwise (profile or not logged in) -> log
 async function letsGo() {
   routing.value = true
   try {
     const user = await usersStore.restoreSessionFromAuth()
     const userId = user?.user_id || usersStore.currentUser?.user_id
 
-    if (userId) {
-      const profile = await profileStore.loadCurrentProfile(userId)
-      if (!profile && !profileStore.isOffline) {
-        await router.push('/docs')
-        return
-      }
+    if (!userId) {
+      await router.push('/log')
+      return
     }
 
-    await router.push('/log')
+    let logs
+    try {
+      logs = await foodLogsStore.loadFoodLogs(userId)
+    } catch (error) {
+      console.error('Unable to check food logs:', error)
+      $q.notify({ type: 'negative', message: 'Unable to check your food log status.' })
+      return
+    }
+
+    if (foodLogsStore.error) {
+      $q.notify({ type: 'negative', message: foodLogsStore.error })
+      return
+    }
+
+    await router.push(logs.length ? '/log' : '/getting-started')
   } finally {
     routing.value = false
   }
