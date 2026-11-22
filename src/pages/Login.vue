@@ -62,6 +62,8 @@
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsersStore } from 'stores/users'
+import { useFoodLogsStore } from 'stores/food-logs'
+import { getLoginPath } from '../utils/getting-started'
 import OfflineConnectionCard from 'components/OfflineConnectionCard.vue'
 
 const email = ref('')
@@ -75,6 +77,7 @@ const showOfflineDialog = ref(false)
 const router = useRouter()
 const route = useRoute()
 const store = useUsersStore()
+const foodLogsStore = useFoodLogsStore()
 
 async function handleSubmit() {
   if (submitting.value) {
@@ -93,8 +96,18 @@ async function handleSubmit() {
   if (result) {
     message.value = `Logged in as ${store.currentUser?.email}`
     messageClass.value = 'text-positive'
-    const redirectPath = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
-    router.push(redirectPath)
+    let redirectPath
+    try {
+      const requestedPath = typeof route.query.redirect === 'string' ? route.query.redirect : null
+      redirectPath = await getLoginPath(foodLogsStore, result.user_id, requestedPath, router)
+    } catch (error) {
+      console.error('Unable to check food logs:', error)
+      message.value = 'Unable to check your food log status. Please try again.'
+      messageClass.value = 'text-negative'
+      submitting.value = false
+      return
+    }
+    await router.push(redirectPath)
   } else {
     if (store.isOffline) {
       message.value = 'No data connection.'

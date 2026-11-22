@@ -61,6 +61,7 @@ import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 import { useUsersStore } from '../stores/users'
 import { useFoodLogsStore } from '../stores/food-logs'
+import { getStartPath } from '../utils/getting-started'
 
 const $q = useQuasar()
 const router = useRouter()
@@ -75,25 +76,23 @@ async function letsGo() {
     const userId = user?.user_id || usersStore.currentUser?.user_id
 
     if (!userId) {
-      await router.push('/log')
+      await router.push('/login')
       return
     }
 
-    let logs
+    let path
     try {
-      logs = await foodLogsStore.loadFoodLogs(userId)
+      path = await getStartPath(foodLogsStore, userId)
     } catch (error) {
       console.error('Unable to check food logs:', error)
-      $q.notify({ type: 'negative', message: 'Unable to check your food log status.' })
+      $q.notify({
+        type: 'negative',
+        message: 'Unable to check your food log status. Please try again.',
+      })
       return
     }
 
-    if (foodLogsStore.error) {
-      $q.notify({ type: 'negative', message: foodLogsStore.error })
-      return
-    }
-
-    await router.push(logs.length ? '/log' : '/getting-started')
+    await router.push(path)
   } finally {
     routing.value = false
   }
