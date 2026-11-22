@@ -15,6 +15,17 @@ const routes = [
         },
       },
       {
+        path: 'getting-started',
+        component: () => import('pages/GettingStarted.vue'),
+        meta: {
+          seo: {
+            title: 'Getting Started',
+            description: 'Set up your profile, add food, and log your first meal in Slim Macros.',
+            canonicalPath: '/getting-started',
+          },
+        },
+      },
+      {
         path: 'dashboard',
         component: () => import('pages/Dashboard.vue'),
         meta: {
