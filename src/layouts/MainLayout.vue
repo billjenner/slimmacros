@@ -29,7 +29,7 @@
               icon="library_add"
               label="Log"
               to="/log"
-              class="q-mx-sm"
+              class="q-mx-sm toolbar-nav-button"
               style="min-width: 126px"
               :style="buttonStyle('/log')"
               @mouseover="hoveredPath = '/log'"
@@ -40,7 +40,7 @@
               icon="inventory_2"
               label="Items"
               to="/items"
-              class="q-mx-sm"
+              class="q-mx-sm toolbar-nav-button"
               style="min-width: 126px"
               :style="buttonStyle('/items')"
               @mouseover="hoveredPath = '/items'"
@@ -51,7 +51,7 @@
               icon="view_kanban"
               label="Dashboard"
               to="/dashboard"
-              class="q-mx-sm"
+              class="q-mx-sm toolbar-nav-button"
               style="min-width: 126px"
               :style="buttonStyle('/dashboard')"
               @mouseover="hoveredPath = '/dashboard'"
@@ -62,7 +62,7 @@
               icon="menu_book"
               label="Docs"
               to="/docs"
-              class="q-mx-sm"
+              class="q-mx-sm toolbar-nav-button"
               style="min-width: 126px"
               :style="buttonStyle('/docs')"
               @mouseover="hoveredPath = '/docs'"
@@ -75,7 +75,7 @@
             icon="login"
             label="LOGIN"
             to="/login"
-            class="q-mx-sm"
+            class="q-mx-sm toolbar-nav-button"
             style="min-width: 126px"
             :style="buttonStyle('/login')"
             @mouseover="hoveredPath = '/login'"
@@ -103,6 +103,17 @@
             <q-icon name="home" />
           </q-item-section>
           <q-item-section>Intro</q-item-section>
+        </q-item>
+        <q-item
+          :active="route.path === '/getting-started'"
+          clickable
+          v-ripple
+          @click="navigateAndClose('/getting-started')"
+        >
+          <q-item-section avatar>
+            <q-icon name="checklist" />
+          </q-item-section>
+          <q-item-section>Getting Started</q-item-section>
         </q-item>
         <q-item
           v-if="isSignedIn"
@@ -480,6 +491,10 @@ onBeforeUnmount(() => {
   min-height: 40px;
 }
 
+.toolbar-nav-button:hover :deep(.q-icon) {
+  color: var(--q-primary);
+}
+
 .drawer-navigation :deep(.q-item--clickable:hover) {
   background-color: var(--q-warning);
   color: white;
@@ -489,7 +504,12 @@ onBeforeUnmount(() => {
   color: var(--q-secondary);
 }
 
-.drawer-navigation :deep(.q-item--active .q-icon) {
+.drawer-navigation :deep(.q-item--clickable:hover .q-icon) {
+  color: var(--q-primary);
+}
+
+.drawer-navigation :deep(.q-item--active .q-icon),
+.drawer-navigation :deep(.q-item--active:hover .q-icon) {
   color: white;
 }
 
