@@ -13,6 +13,51 @@
           lazy-rules="ondemand"
           :rules="[(v) => !!(v && v.trim()) || 'Name is required']"
         />
+        <div class="row q-gutter-sm">
+          <q-toggle v-if="isAdmin" v-model="form.is_active" label="Active" />
+          <q-toggle v-if="isAdmin" v-model="form.system_defined" label="System defined" />
+          <q-toggle v-model="form.share_with_others" label="Share with others" />
+        </div>
+        <q-input
+          v-model="form.weight"
+          type="number"
+          step="1"
+          label="Weight"
+          outlined
+          dense
+          lazy-rules="ondemand"
+          :rules="[optionalIntegerRule]"
+        />
+        <q-input
+          v-model="form.reps"
+          type="number"
+          step="1"
+          label="Reps"
+          outlined
+          dense
+          lazy-rules="ondemand"
+          :rules="[optionalIntegerRule]"
+        />
+        <q-input
+          v-model="form.sets"
+          type="number"
+          step="1"
+          label="Sets"
+          outlined
+          dense
+          lazy-rules="ondemand"
+          :rules="[optionalIntegerRule]"
+        />
+        <q-input
+          v-model="form.duration"
+          type="number"
+          step="1"
+          label="Duration"
+          outlined
+          dense
+          lazy-rules="ondemand"
+          :rules="[optionalIntegerRule]"
+        />
         <q-file
           v-model="mediaFile"
           label="Video or image (PNG, JPEG, GIF)"
@@ -99,26 +144,66 @@ import { computed, onMounted, ref } from 'vue'
 import { useQuasar } from 'quasar'
 import { supabase } from 'src/lib/supabase'
 import { notifySuccess } from 'src/utils/notify'
+import { useUsersStore } from 'stores/users'
 
 const BUCKET = 'exercise-videos'
 
 const $q = useQuasar()
+const usersStore = useUsersStore()
 const rows = ref([])
 const loading = ref(false)
 const saving = ref(false)
 const error = ref('')
 const formRef = ref(null)
 const editingId = ref(null)
-const form = ref({ name: '', video_path: null, image_path: null })
+const form = ref(newForm())
 const mediaFile = ref(null)
 const showPreview = ref(false)
 const previewUrl = ref('')
 const previewType = ref('')
 const currentMediaPath = computed(() => form.value.video_path || form.value.image_path)
+const isAdmin = computed(() => {
+  const adminEmail = String(import.meta.env.VITE_FORMSUBMIT_RECIPIENT || '')
+    .trim()
+    .toLowerCase()
+  const currentEmail = String(usersStore.currentUser?.email || '')
+    .trim()
+    .toLowerCase()
+
+  return Boolean(adminEmail) && currentEmail === adminEmail
+})
+
+function newForm() {
+  return {
+    name: '',
+    video_path: null,
+    image_path: null,
+    is_active: true,
+    system_defined: false,
+    share_with_others: false,
+    weight: null,
+    reps: null,
+    sets: null,
+    duration: null,
+  }
+}
+
+function optionalIntegerRule(value) {
+  if (value === null || value === '') return true
+  const number = Number(value)
+  return (
+    (Number.isInteger(number) && number >= -2147483648 && number <= 2147483647) ||
+    'Enter a whole number between -2147483648 and 2147483647'
+  )
+}
+
+function nullableNumber(value) {
+  return value === null || value === '' ? null : Number(value)
+}
 
 function resetForm() {
   editingId.value = null
-  form.value = { name: '', video_path: null, image_path: null }
+  form.value = newForm()
   mediaFile.value = null
   formRef.value?.resetValidation()
 }
@@ -145,6 +230,13 @@ function startEdit(row) {
     name: row.name,
     video_path: row.video_path,
     image_path: row.image_path,
+    is_active: isAdmin.value ? row.is_active : true,
+    system_defined: isAdmin.value && row.system_defined,
+    share_with_others: row.share_with_others,
+    weight: row.weight,
+    reps: row.reps,
+    sets: row.sets,
+    duration: row.duration,
   }
   mediaFile.value = null
 }
@@ -173,6 +265,11 @@ async function removeMedia(path) {
 
 async function save() {
   error.value = ''
+  const userId = usersStore.currentUser?.user_id
+  if (!editingId.value && !userId) {
+    error.value = 'Please log in to add an exercise.'
+    return
+  }
   if (!editingId.value && !mediaFile.value) {
     error.value = 'Please choose a video or image to upload.'
     return
@@ -194,10 +291,21 @@ async function save() {
       }
     }
 
-    const payload = { name: form.value.name.trim(), video_path: videoPath, image_path: imagePath }
+    const payload = {
+      name: form.value.name.trim(),
+      video_path: videoPath,
+      image_path: imagePath,
+      is_active: isAdmin.value ? form.value.is_active : true,
+      system_defined: isAdmin.value && form.value.system_defined,
+      share_with_others: form.value.share_with_others,
+      weight: nullableNumber(form.value.weight),
+      reps: nullableNumber(form.value.reps),
+      sets: nullableNumber(form.value.sets),
+      duration: nullableNumber(form.value.duration),
+    }
     const query = editingId.value
       ? supabase.from('exercise').update(payload).eq('exercise_id', editingId.value)
-      : supabase.from('exercise').insert(payload)
+      : supabase.from('exercise').insert({ ...payload, user_id: userId })
     const { error: err } = await query
     if (err) {
       if (newPath) await removeMedia(newPath)
