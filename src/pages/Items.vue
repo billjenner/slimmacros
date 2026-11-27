@@ -14,6 +14,7 @@
           >
             <q-tab name="food" label="Food" />
             <q-tab name="workouts" label="Workouts" />
+            <q-tab name="exercises" label="Exercises" />
             <q-tab name="supplements" label="Supplements" />
             <q-tab name="profile" label="Profile" />
           </q-tabs>
@@ -26,6 +27,9 @@
             </q-tab-panel>
             <q-tab-panel name="workouts" class="q-pa-none">
               <workouts-page embedded />
+            </q-tab-panel>
+            <q-tab-panel name="exercises" class="q-pa-none">
+              <Exercise />
             </q-tab-panel>
             <q-tab-panel name="supplements" class="q-pa-none">
               <supplements-page embedded />
@@ -43,6 +47,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import Exercise from 'components/Items/Exercise.vue'
 import FoodPage from 'pages/Food.vue'
 import ProfilePage from 'src/pages/Profile.vue'
 import SupplementsPage from 'pages/Supplements.vue'
@@ -50,7 +55,7 @@ import WorkoutsPage from 'pages/Workouts.vue'
 
 const route = useRoute()
 const router = useRouter()
-const validTabs = ['food', 'workouts', 'supplements', 'profile']
+const validTabs = ['food', 'workouts', 'exercises', 'supplements', 'profile']
 const activeTab = ref(getTabFromQuery(route.query.tab))
 
 function getTabFromQuery(tab) {
