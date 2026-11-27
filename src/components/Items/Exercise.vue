@@ -18,80 +18,97 @@
       class="q-gutter-md q-mb-lg"
       @submit.prevent="save"
     >
-      <div class="text-subtitle1">{{ editingId ? 'Edit exercise' : 'Add exercise' }}</div>
-      <q-input
-        v-model="form.name"
-        label="Name"
-        outlined
-        dense
-        lazy-rules="ondemand"
-        :rules="[(v) => !!(v && v.trim()) || 'Name is required']"
-      />
-      <div class="row q-gutter-sm">
-        <q-toggle v-if="isAdmin" v-model="form.is_active" label="Active" />
-        <q-toggle v-if="isAdmin" v-model="form.system_defined" label="System defined" />
-        <q-toggle v-model="form.share_with_others" label="Share with others" />
-      </div>
-      <q-input
-        v-model="form.duration"
-        type="number"
-        step="1"
-        label="Duration"
-        outlined
-        dense
-        lazy-rules="ondemand"
-        :rules="[optionalIntegerRule]"
-      />
-      <div class="row q-col-gutter-sm">
-        <div class="col-4">
-          <q-input
-            v-model="form.weight"
-            type="number"
-            step="1"
-            label="Weight"
-            outlined
-            dense
-            lazy-rules="ondemand"
-            :rules="[optionalIntegerRule]"
-          />
+      <q-card flat bordered class="q-pa-md bg-grey-1">
+        <div class="text-subtitle1 q-mb-sm">Exercise details</div>
+        <div class="row q-col-gutter-md">
+          <div class="col-12">
+            <q-input
+              v-model="form.name"
+              label="Name"
+              filled
+              dense
+              lazy-rules="ondemand"
+              :rules="[(v) => !!(v && v.trim()) || 'Name is required']"
+            />
+          </div>
+          <div class="col-12">
+            <q-input
+              v-model="form.duration"
+              type="number"
+              step="1"
+              label="Duration"
+              filled
+              dense
+              lazy-rules="ondemand"
+              :rules="[optionalIntegerRule]"
+            />
+          </div>
+          <div class="col-4">
+            <q-input
+              v-model="form.weight"
+              type="number"
+              step="1"
+              label="Weight"
+              filled
+              dense
+              lazy-rules="ondemand"
+              :rules="[optionalIntegerRule]"
+            />
+          </div>
+          <div class="col-4">
+            <q-input
+              v-model="form.reps"
+              type="number"
+              step="1"
+              label="Reps"
+              filled
+              dense
+              lazy-rules="ondemand"
+              :rules="[optionalIntegerRule]"
+            />
+          </div>
+          <div class="col-4">
+            <q-input
+              v-model="form.sets"
+              type="number"
+              step="1"
+              label="Sets"
+              filled
+              dense
+              lazy-rules="ondemand"
+              :rules="[optionalIntegerRule]"
+            />
+          </div>
+          <div class="col-12">
+            <q-file
+              v-model="mediaFile"
+              label="Video or image (PNG, JPEG, GIF)"
+              accept="video/*,image/png,image/jpeg,image/gif"
+              filled
+              dense
+              clearable
+              :hint="editingId && currentMediaPath ? `Current: ${currentMediaPath}` : ''"
+            >
+              <template #prepend><q-icon name="upload" /></template>
+            </q-file>
+          </div>
         </div>
-        <div class="col-4">
-          <q-input
-            v-model="form.reps"
-            type="number"
-            step="1"
-            label="Reps"
-            outlined
-            dense
-            lazy-rules="ondemand"
-            :rules="[optionalIntegerRule]"
-          />
-        </div>
-        <div class="col-4">
-          <q-input
-            v-model="form.sets"
-            type="number"
-            step="1"
-            label="Sets"
-            outlined
-            dense
-            lazy-rules="ondemand"
-            :rules="[optionalIntegerRule]"
-          />
-        </div>
-      </div>
+      </q-card>
 
-      <q-file
-        v-model="mediaFile"
-        label="Video or image (PNG, JPEG, GIF)"
-        accept="video/*,image/png,image/jpeg,image/gif"
-        outlined
-        dense
-        clearable
-        :hint="editingId && currentMediaPath ? `Current: ${currentMediaPath}` : ''"
-      >
-        <template #prepend><q-icon name="upload" /></template>
-      </q-file>
+      <q-card flat bordered class="q-pa-md bg-grey-1">
+        <div class="text-subtitle1 q-mb-sm">Preferences</div>
+        <div class="row q-col-gutter-md">
+          <div v-if="isAdmin" class="col-12 col-md-4">
+            <q-toggle v-model="form.is_active" label="Active" />
+          </div>
+          <div v-if="isAdmin" class="col-12 col-md-4">
+            <q-toggle v-model="form.system_defined" label="System defined" />
+          </div>
+          <div class="col-12 col-md-4">
+            <q-toggle v-model="form.share_with_others" label="Share with others" />
+          </div>
+        </div>
+      </q-card>
       <div class="row q-gutter-sm">
         <q-btn
           type="submit"
