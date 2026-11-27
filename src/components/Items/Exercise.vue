@@ -31,19 +31,7 @@
               :rules="[(v) => !!(v && v.trim()) || 'Name is required']"
             />
           </div>
-          <div class="col-12">
-            <q-input
-              v-model="form.duration"
-              type="number"
-              step="1"
-              label="Duration"
-              filled
-              dense
-              lazy-rules="ondemand"
-              :rules="[optionalIntegerRule]"
-            />
-          </div>
-          <div class="col-4">
+          <div class="col-3">
             <q-input
               v-model="form.weight"
               type="number"
@@ -55,7 +43,7 @@
               :rules="[optionalIntegerRule]"
             />
           </div>
-          <div class="col-4">
+          <div class="col-3">
             <q-input
               v-model="form.reps"
               type="number"
@@ -67,12 +55,24 @@
               :rules="[optionalIntegerRule]"
             />
           </div>
-          <div class="col-4">
+          <div class="col-3">
             <q-input
               v-model="form.sets"
               type="number"
               step="1"
               label="Sets"
+              filled
+              dense
+              lazy-rules="ondemand"
+              :rules="[optionalIntegerRule]"
+            />
+          </div>
+          <div class="col-3">
+            <q-input
+              v-model="form.duration"
+              type="number"
+              step="1"
+              label="Duration"
               filled
               dense
               lazy-rules="ondemand"
@@ -98,13 +98,13 @@
       <q-card flat bordered class="q-pa-md bg-grey-1">
         <div class="text-subtitle1 q-mb-sm">Preferences</div>
         <div class="row q-col-gutter-md">
-          <div v-if="isAdmin" class="col-12 col-md-4">
+          <div v-if="isAdmin" class="col-4">
             <q-toggle v-model="form.is_active" label="Active" />
           </div>
-          <div v-if="isAdmin" class="col-12 col-md-4">
+          <div v-if="isAdmin" class="col-4">
             <q-toggle v-model="form.system_defined" label="System defined" />
           </div>
-          <div class="col-12 col-md-4">
+          <div class="col-4">
             <q-toggle v-model="form.share_with_others" label="Share with others" />
           </div>
         </div>
