@@ -22,13 +22,14 @@
           <q-banner v-if="store.error" class="bg-negative text-white q-mb-md" rounded>
             {{ store.error }}
           </q-banner>
-
-          <q-banner
-            v-else-if="!usersStore.currentUser"
-            class="bg-warning text-dark q-mb-md"
-            rounded
-          >
+          <q-banner v-if="!usersStore.currentUser" class="bg-warning text-dark q-mb-md" rounded>
             Sign in to create a workout entry.
+          </q-banner>
+          <q-banner v-if="exerciseError" class="bg-negative text-white q-mb-md" rounded>
+            {{ exerciseError }}
+            <template #action>
+              <q-btn flat label="Retry" @click="loadExercises(usersStore.currentUser?.user_id)" />
+            </template>
           </q-banner>
 
           <transition name="form-slide" mode="out-in">
@@ -78,6 +79,58 @@
               </q-card>
 
               <q-card flat bordered class="q-pa-md bg-grey-1">
+                <div class="text-subtitle1 q-mb-sm">Exercises</div>
+                <div
+                  v-for="(entry, index) in exerciseEntries"
+                  :key="entry.key"
+                  class="row q-col-gutter-sm q-mb-sm"
+                >
+                  <div class="col-12 col-md-4">
+                    <q-select
+                      v-model="entry.exercise_id"
+                      :options="exerciseOptions(entry)"
+                      :label="`Exercise ${index + 1}`"
+                      option-label="name"
+                      option-value="exercise_id"
+                      emit-value
+                      map-options
+                      use-input
+                      filled
+                      dense
+                      @filter="(value, update) => update(() => (entry.search = value))"
+                      @update:model-value="selectExercise(entry)"
+                    >
+                      <template #append>
+                        <q-btn
+                          v-if="entry.exercise_id"
+                          flat
+                          round
+                          dense
+                          icon="delete"
+                          color="negative"
+                          aria-label="Remove exercise"
+                          @click.stop="removeExercise(entry)"
+                        />
+                      </template>
+                    </q-select>
+                  </div>
+                  <div v-for="field in exerciseFields" :key="field" class="col-6 col-md-2">
+                    <q-input
+                      v-model="entry[field]"
+                      type="number"
+                      step="1"
+                      :label="field[0].toUpperCase() + field.slice(1)"
+                      :disable="!entry.exercise_id"
+                      :rules="[optionalIntegerRule]"
+                      lazy-rules="ondemand"
+                      filled
+                      dense
+                    />
+                  </div>
+                </div>
+              </q-card>
+
+              <q-card flat bordered class="q-pa-md bg-grey-1">
                 <div class="text-subtitle1 q-mb-sm">Preferences</div>
                 <div class="row q-col-gutter-md">
                   <div class="col-12 col-md-4">
@@ -92,6 +145,7 @@
                   color="primary"
                   :label="editingWorkoutId ? 'Update workout' : 'Save workout'"
                   :loading="store.loading"
+                  :disable="loadingExercises || Boolean(exerciseError)"
                 />
               </div>
             </q-form>
@@ -168,6 +222,7 @@
                           size="sm"
                           color="negative"
                           label="Edit"
+                          :disable="loadingExercises"
                           @click="editWorkout(props.row)"
                         />
 
@@ -225,7 +280,9 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
 import { useWorkoutsStore } from 'stores/workouts'
+import { supabase } from 'src/lib/supabase'
 import { notifySuccess } from '../utils/notify'
+import { availableWorkoutExercises } from '../utils/workoutExercises'
 
 defineProps({
   embedded: {
@@ -237,6 +294,13 @@ defineProps({
 const usersStore = useUsersStore()
 const store = useWorkoutsStore()
 const $q = useQuasar()
+const exerciseFields = ['weight', 'reps', 'sets', 'duration']
+let nextExerciseKey = 1
+let exerciseLoadRequest = 0
+const exercises = ref([])
+const exerciseEntries = ref([newExerciseEntry()])
+const loadingExercises = ref(false)
+const exerciseError = ref('')
 
 const workout = reactive({
   type: '',
@@ -276,19 +340,98 @@ const editingWorkoutId = ref(null)
 onMounted(() => {
   if (usersStore.currentUser?.user_id) {
     loadWorkoutsForCurrentUser(usersStore.currentUser.user_id)
+    loadExercises(usersStore.currentUser.user_id)
   }
 })
 
 watch(
   () => usersStore.currentUser?.user_id,
   (userId) => {
+    resetWorkoutForm()
+    showWorkoutForm.value = false
     if (userId) {
       loadWorkoutsForCurrentUser(userId)
+      loadExercises(userId)
     } else {
       store.workouts = []
+      exerciseLoadRequest++
+      exercises.value = []
+      loadingExercises.value = false
+      exerciseError.value = ''
     }
   },
 )
+
+function newExerciseEntry(saved = {}) {
+  return {
+    key: nextExerciseKey++,
+    exercise_id: saved.exercise_id ?? null,
+    selectedExercise: saved.exercise ?? null,
+    weight: saved.weight ?? null,
+    reps: saved.reps ?? null,
+    sets: saved.sets ?? null,
+    duration: saved.duration ?? null,
+    search: '',
+  }
+}
+
+function optionalIntegerRule(value) {
+  if (value === null || value === undefined || value === '') return true
+  const number = Number(value)
+  return (
+    (Number.isInteger(number) && number >= -2147483648 && number <= 2147483647) ||
+    'Enter a whole number between -2147483648 and 2147483647'
+  )
+}
+
+async function loadExercises(userId) {
+  const request = ++exerciseLoadRequest
+  exercises.value = []
+  exerciseError.value = ''
+  if (!supabase) {
+    exerciseError.value = 'Supabase client is not configured.'
+    return
+  }
+  loadingExercises.value = true
+  const { data, error } = await supabase
+    .from('exercise')
+    .select('*')
+    .eq('is_active', true)
+    .or(`user_id.eq.${userId},system_defined.eq.true,share_with_others.eq.true`)
+    .order('name')
+  if (request !== exerciseLoadRequest) return
+  loadingExercises.value = false
+  if (error) {
+    exerciseError.value = error.message
+    return
+  }
+  exercises.value = data || []
+}
+
+function exerciseOptions(entry) {
+  const userId = usersStore.currentUser?.user_id
+  const options = availableWorkoutExercises(exercises.value, userId, showSharedWorkouts.value)
+  if (entry.selectedExercise && !options.some((item) => item.exercise_id === entry.exercise_id)) {
+    options.push(entry.selectedExercise)
+  }
+  const search = entry.search.trim().toLowerCase()
+  return options.filter((exercise) => exercise.name.toLowerCase().includes(search))
+}
+
+function selectExercise(entry) {
+  const selected =
+    exercises.value.find((exercise) => exercise.exercise_id === entry.exercise_id) ||
+    (entry.selectedExercise?.exercise_id === entry.exercise_id ? entry.selectedExercise : null)
+  entry.selectedExercise = selected || null
+  for (const field of exerciseFields) entry[field] = selected?.[field] ?? null
+  if (exerciseEntries.value.every((item) => item.exercise_id)) {
+    exerciseEntries.value.push(newExerciseEntry())
+  }
+}
+
+function removeExercise(entry) {
+  exerciseEntries.value = exerciseEntries.value.filter((item) => item.key !== entry.key)
+}
 
 async function loadWorkoutsForCurrentUser(userId) {
   if (!userId) {
@@ -324,7 +467,27 @@ function toggleExpanded(row) {
   }
 }
 
-function editWorkout(row) {
+async function editWorkout(row) {
+  if (!supabase) {
+    store.error = 'Supabase client is not configured.'
+    return
+  }
+  loadingExercises.value = true
+  const userId = usersStore.currentUser?.user_id
+  const request = exerciseLoadRequest
+  const { data, error } = await supabase
+    .from('workout_exercise')
+    .select('*, exercise(*)')
+    .eq('workout_id', row.workout_id)
+    .order('sort_order')
+    .order('workout_exercise_id')
+  if (request !== exerciseLoadRequest || userId !== usersStore.currentUser?.user_id) return
+  loadingExercises.value = false
+  if (error) {
+    store.error = error.message
+    return
+  }
+  store.error = null
   editingWorkoutId.value = row.workout_id
 
   Object.assign(workout, {
@@ -335,6 +498,10 @@ function editWorkout(row) {
     is_active: row.is_active !== false,
   })
 
+  exerciseEntries.value = [
+    ...(data || []).map((item) => newExerciseEntry(item)),
+    newExerciseEntry(),
+  ]
   showWorkoutForm.value = true
 }
 
@@ -348,6 +515,7 @@ function resetWorkoutForm() {
   })
 
   editingWorkoutId.value = null
+  exerciseEntries.value = [newExerciseEntry()]
 }
 
 function requestDeleteWorkout(row) {
@@ -384,8 +552,13 @@ async function submitWorkout() {
   }
 
   const savedWorkout = editingWorkoutId.value
-    ? await store.updateWorkout(usersStore.currentUser.user_id, editingWorkoutId.value, workout)
-    : await store.createWorkout(usersStore.currentUser.user_id, workout)
+    ? await store.updateWorkout(
+        usersStore.currentUser.user_id,
+        editingWorkoutId.value,
+        workout,
+        exerciseEntries.value,
+      )
+    : await store.createWorkout(usersStore.currentUser.user_id, workout, exerciseEntries.value)
 
   if (savedWorkout) {
     notifySuccess(

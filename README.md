@@ -55,6 +55,7 @@ Monitor your daily food calorie consumption and compare your intake against your
 #### 🔥 Workout Calories Burned
 
 Track the calories you burn through your daily workouts and monitor your exercise activity over time.
+Workouts can include multiple exercises with workout-specific weight, reps, sets, and duration.
 
 #### 💊 Daily Supplements
 
@@ -129,6 +130,12 @@ Use **Slim Macros** regularly to:
 
 > npm run dev
 > vs code > set break points > Menu: Run > Start Debugging
+
+### Workout database setup
+
+After creating the workout, exercise, and workout_exercise tables, apply
+[save_workout_with_exercises.sql](./src/sql/schema/save_workout_with_exercises.sql) in Supabase
+to enable atomic workout saves.
 
 ### Multifactor Auth - Off / On
 

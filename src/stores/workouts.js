@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { supabase } from '../lib/supabase'
+import { workoutExercisePayload } from '../utils/workoutExercises'
 
 export const useWorkoutsStore = defineStore('Workouts', {
   state: () => ({
@@ -51,7 +52,15 @@ export const useWorkoutsStore = defineStore('Workouts', {
       }
     },
 
-    async createWorkout(userId, workout = {}) {
+    async createWorkout(userId, workout = {}, exercises = []) {
+      return this.saveWorkout(userId, null, workout, exercises)
+    },
+
+    async updateWorkout(userId, workoutId, workout = {}, exercises = []) {
+      return this.saveWorkout(userId, workoutId, workout, exercises)
+    },
+
+    async saveWorkout(userId, workoutId, workout, exercises) {
       this.error = null
       this.loading = true
 
@@ -67,7 +76,11 @@ export const useWorkoutsStore = defineStore('Workouts', {
         }
 
         const payload = this.buildWorkoutPayload(userId, workout)
-        const { data, error } = await supabase.from('workout').insert(payload).select().single()
+        const { data, error } = await supabase.rpc('save_workout_with_exercises', {
+          p_workout_id: workoutId,
+          p_workout: payload,
+          p_exercises: workoutExercisePayload(exercises),
+        })
 
         if (error) {
           this.error = error.message
@@ -75,46 +88,9 @@ export const useWorkoutsStore = defineStore('Workouts', {
         }
 
         this.currentWorkout = data
-        this.workouts = [data, ...this.workouts]
-        return data
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async updateWorkout(userId, workoutId, workout = {}) {
-      this.error = null
-      this.loading = true
-
-      try {
-        if (!supabase) {
-          this.error = 'Supabase client is not configured.'
-          return null
-        }
-
-        if (!userId || !workoutId) {
-          this.error = 'No current user is available.'
-          return null
-        }
-
-        const payload = this.buildWorkoutPayload(userId, workout)
-        delete payload.user_id
-
-        const { data, error } = await supabase
-          .from('workout')
-          .update(payload)
-          .eq('workout_id', workoutId)
-          .eq('user_id', userId)
-          .select()
-          .single()
-
-        if (error) {
-          this.error = error.message
-          return null
-        }
-
-        this.currentWorkout = data
-        this.workouts = this.workouts.map((item) => (item.workout_id === workoutId ? data : item))
+        this.workouts = workoutId
+          ? this.workouts.map((item) => (item.workout_id === workoutId ? data : item))
+          : [data, ...this.workouts]
         return data
       } finally {
         this.loading = false
