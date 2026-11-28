@@ -310,7 +310,9 @@
                         </div>
                         <div class="col-12 col-sm-4">
                           <div class="row items-center no-wrap">
-                            <div>{{ entry.exercise?.name || 'Unavailable exercise' }}</div>
+                            <div class="col">
+                              {{ entry.exercise?.name || 'Unavailable exercise' }}
+                            </div>
                             <div
                               v-if="entry.exercise?.video_path || entry.exercise?.image_path"
                               class="q-ml-xs"
