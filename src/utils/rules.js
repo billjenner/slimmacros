@@ -6,6 +6,38 @@ const ACTIVITY_LEVEL_MULTIPLIERS = {
   ExtremelyActive: 1.9,
 }
 
+export function hasValue(value) {
+  return value !== null && value !== undefined && value !== ''
+}
+
+export function hasMissingMacroFields(profile, fields) {
+  return fields.some((field) => !hasValue(profile[field.key]))
+}
+
+export function shouldHighlightLoadTemplate(profile, dayGroups) {
+  return (
+    Boolean(profile.diet_type) &&
+    dayGroups.some((day) => hasMissingMacroFields(profile, day.fields))
+  )
+}
+
+export function isValidProfileNumber(value, decimalPlaces = 0) {
+  if (!hasValue(value)) return false
+  const number = Number(value)
+  const scaled = number * 10 ** decimalPlaces
+  return Number.isFinite(number) && number >= 0 && Math.abs(scaled - Math.round(scaled)) < 1e-8
+}
+
+export function hasRequiredProfileDetails(profile) {
+  return (
+    Boolean(profile.sex && profile.activity_level) &&
+    isValidProfileNumber(profile.age) &&
+    isValidProfileNumber(profile.start_weight, 1) &&
+    isValidProfileNumber(profile.goal_weight) &&
+    isValidProfileNumber(profile.height)
+  )
+}
+
 function normalizeSex(sex) {
   return String(sex || '')
     .trim()

@@ -17,31 +17,31 @@
     </div>
     <div class="row q-col-gutter-sm q-py-sm">
       <div class="col-3">
-        <div class="text-caption text-grey-7">Protein</div>
+        <div class="text-caption text-accent">Protein</div>
         <div class="text-body2">{{ food.protein ?? 0 }}</div>
       </div>
       <div class="col-3">
-        <div class="text-caption text-grey-7">Carbs</div>
+        <div class="text-caption text-accent">Carbs</div>
         <div class="text-body2">{{ food.carb ?? 0 }}</div>
       </div>
       <div class="col-3">
-        <div class="text-caption text-grey-7">Fat</div>
+        <div class="text-caption text-accent">Fat</div>
         <div class="text-body2">{{ food.fat ?? 0 }}</div>
       </div>
       <div class="col-3">
-        <div class="text-caption text-grey-7">Extra calories</div>
+        <div class="text-caption text-accent">Extra calories</div>
         <div class="text-body2">{{ food.calories_extra ?? 0 }}</div>
       </div>
       <div class="col-3">
-        <div class="text-caption text-grey-7">Serving size</div>
+        <div class="text-caption text-accent">Serving size</div>
         <div class="text-body2">{{ food.serving_size ?? 1 }}</div>
       </div>
       <div class="col-3">
-        <div class="text-caption text-grey-7">Serving unit</div>
+        <div class="text-caption text-accent">Serving unit</div>
         <div class="text-body2">{{ food.serving_unit || 'unit' }}</div>
       </div>
       <div class="col-3">
-        <div class="text-caption text-grey-7">Share with others</div>
+        <div class="text-caption text-accent">Share with others</div>
         <div class="text-body2">{{ food.share_with_others ? 'Yes' : 'No' }}</div>
       </div>
     </div>

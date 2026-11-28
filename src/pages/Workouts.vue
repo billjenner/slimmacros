@@ -257,15 +257,15 @@
                   >
                     <div class="row q-col-gutter-sm q-py-sm q-mb-md">
                       <div class="col-12 col-sm-6 col-md-4">
-                        <div class="text-caption text-grey-7">Average workout time</div>
+                        <div class="text-caption text-accent">Average workout time</div>
                         <div class="text-body2">{{ props.row.average_workout_time ?? 'N/A' }}</div>
                       </div>
                       <div class="col-12 col-sm-6 col-md-4">
-                        <div class="text-caption text-grey-7">Calories burned</div>
+                        <div class="text-caption text-accent">Calories burned</div>
                         <div class="text-body2">{{ props.row.calories_burned ?? 0 }}</div>
                       </div>
                       <div class="col-12 col-sm-6 col-md-4">
-                        <div class="text-caption text-grey-7">Share with others</div>
+                        <div class="text-caption text-accent">Share with others</div>
                         <div class="text-body2">
                           {{ props.row.share_with_others ? 'Yes' : 'No' }}
                         </div>
@@ -289,11 +289,11 @@
                       </div>
                       <template v-else>
                         <div class="row q-col-gutter-x-sm q-col-gutter-y-xs">
-                          <div class="col-12 col-sm-4 text-caption text-weight-bold">Exercise</div>
+                          <div class="col-12 col-sm-4 text-caption text-accent">Exercise</div>
                           <div
                             v-for="field in exerciseFields"
                             :key="field"
-                            class="col-6 col-sm-2 text-caption text-weight-bold"
+                            class="col-6 col-sm-2 text-caption text-accent"
                           >
                             {{ field[0].toUpperCase() + field.slice(1) }}
                           </div>
@@ -325,7 +325,9 @@
                           </div>
                         </div>
                         <div v-for="field in exerciseFields" :key="field" class="col-6 col-sm-2">
-                          <div class="text-weight-bold">{{ entry[field] ?? '-' }}</div>
+                          <div class="text-caption text-grey-7">
+                            {{ entry[field] ?? '-' }}
+                          </div>
                         </div>
                       </div>
                     </template>

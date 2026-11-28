@@ -193,19 +193,19 @@
                   >
                     <div class="row q-col-gutter-sm q-py-sm">
                       <div class="col-12 col-sm-6 col-md-4">
-                        <div class="text-caption text-grey-7">supplement</div>
+                        <div class="text-caption text-accent">supplement</div>
                         <div class="text-body2">{{ props.row.description }}</div>
                       </div>
                       <div class="col-12 col-sm-6 col-md-4">
-                        <div class="text-caption text-grey-7">Serving size</div>
+                        <div class="text-caption text-accent">Serving size</div>
                         <div class="text-body2">{{ props.row.servingSizeLabel }}</div>
                       </div>
                       <div class="col-12 col-sm-6 col-md-4">
-                        <div class="text-caption text-grey-7">Serving type</div>
+                        <div class="text-caption text-accent">Serving type</div>
                         <div class="text-body2">{{ props.row.servingUnitLabel }}</div>
                       </div>
                       <div class="col-12 col-sm-6 col-md-4">
-                        <div class="text-caption text-grey-7">Share with others</div>
+                        <div class="text-caption text-accent">Share with others</div>
                         <div class="text-body2">
                           {{ props.row.share_with_others ? 'Yes' : 'No' }}
                         </div>

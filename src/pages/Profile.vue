@@ -41,6 +41,9 @@
                     v-model="profile.sex"
                     label="Sex"
                     :options="sexOptions"
+                    :class="{ 'required-field-warning': !profile.sex }"
+                    :rules="[(value) => !!value || 'Sex is required']"
+                    lazy-rules="ondemand"
                     emit-value
                     map-options
                     filled
@@ -49,7 +52,20 @@
                 </div>
 
                 <div class="col-12 col-md-4">
-                  <q-input v-model="profile.age" type="number" label="Age" min="0" filled dense />
+                  <q-input
+                    v-model="profile.age"
+                    type="number"
+                    label="Age"
+                    min="0"
+                    :class="{ 'required-field-warning': !isValidProfileNumber(profile.age) }"
+                    :rules="[
+                      (value) => hasValue(value) || 'Age is required',
+                      (value) => isValidProfileNumber(value) || 'Enter a non-negative whole number',
+                    ]"
+                    lazy-rules="ondemand"
+                    filled
+                    dense
+                  />
                 </div>
               </div>
             </q-card>
@@ -64,6 +80,16 @@
                     label="Start weight (lbs)"
                     min="0"
                     step="0.1"
+                    :class="{
+                      'required-field-warning': !isValidProfileNumber(profile.start_weight, 1),
+                    }"
+                    :rules="[
+                      (value) => hasValue(value) || 'Start weight is required',
+                      (value) =>
+                        isValidProfileNumber(value, 1) ||
+                        'Enter a non-negative number in 0.1 increments',
+                    ]"
+                    lazy-rules="ondemand"
                     filled
                     dense
                   />
@@ -76,6 +102,14 @@
                     label="Goal weight (lbs)"
                     min="0"
                     step="1.0"
+                    :class="{
+                      'required-field-warning': !isValidProfileNumber(profile.goal_weight),
+                    }"
+                    :rules="[
+                      (value) => hasValue(value) || 'Goal weight is required',
+                      (value) => isValidProfileNumber(value) || 'Enter a non-negative whole number',
+                    ]"
+                    lazy-rules="ondemand"
                     filled
                     dense
                   />
@@ -88,6 +122,12 @@
                     label="Height (inches)"
                     min="0"
                     step="1.0"
+                    :class="{ 'required-field-warning': !isValidProfileNumber(profile.height) }"
+                    :rules="[
+                      (value) => hasValue(value) || 'Height is required',
+                      (value) => isValidProfileNumber(value) || 'Enter a non-negative whole number',
+                    ]"
+                    lazy-rules="ondemand"
                     filled
                     dense
                   />
@@ -98,6 +138,9 @@
                     v-model="profile.activity_level"
                     :options="activityLevelOptions"
                     label="Activity level"
+                    :class="{ 'required-field-warning': !profile.activity_level }"
+                    :rules="[(value) => !!value || 'Activity level is required']"
+                    lazy-rules="ondemand"
                     filled
                     dense
                     emit-value
@@ -110,6 +153,9 @@
 
             <q-card flat bordered class="q-pa-md bg-grey-1">
               <div class="text-subtitle1 q-mb-sm">Nutrition targets</div>
+              <div v-if="!nutritionEnabled && !loading" class="text-caption q-mb-sm">
+                Complete the required User details and Body fields to edit nutrition.
+              </div>
               <div class="row q-col-gutter-md">
                 <div class="col-12 col-md-6">
                   <q-input
@@ -127,13 +173,23 @@
 
                 <div class="col-12 col-md-6">
                   <q-input
+                    ref="dailyCalorieDeficitInput"
                     v-model="profile.daily_calorie_deficit"
                     type="number"
                     label="Daily calorie deficit"
                     min="0"
+                    :class="{
+                      'required-field-warning':
+                        nutritionEnabled && !isValidProfileNumber(profile.daily_calorie_deficit),
+                    }"
+                    :rules="[
+                      (value) => hasValue(value) || 'Daily calorie deficit is required',
+                      (value) => isValidProfileNumber(value) || 'Enter a non-negative whole number',
+                    ]"
+                    lazy-rules="ondemand"
                     filled
                     dense
-                    :rules="[(value) => value !== '' || 'Daily calorie deficit is required']"
+                    :disable="!nutritionEnabled"
                   />
                 </div>
 
@@ -142,11 +198,16 @@
                     v-model="profile.diet_type"
                     :options="dietTypeOptions"
                     label="Diet type"
+                    :class="{ 'required-field-warning': nutritionEnabled && !profile.diet_type }"
+                    :rules="[(value) => !!value || 'Diet type is required']"
+                    lazy-rules="ondemand"
                     filled
                     dense
                     emit-value
                     map-options
                     clearable
+                    :disable="!nutritionEnabled"
+                    @update:model-value="onDietTypeChange"
                   />
                 </div>
               </div>
@@ -154,12 +215,15 @@
 
             <q-card flat bordered class="q-pa-md bg-grey-1">
               <div class="row items-center justify-between q-mb-sm">
-                <div class="text-subtitle1">Nutrition Budget Plan - Macros split by day</div>
+                <div class="text-subtitle1">
+                  Nutrition Budget Plan - Macros split by day of the week
+                </div>
                 <q-btn
                   label="Load template"
-                  color="secondary"
-                  flat
-                  :disable="!profile.diet_type"
+                  :color="highlightLoadTemplate ? 'warning' : 'secondary'"
+                  :text-color="highlightLoadTemplate ? 'primary' : undefined"
+                  :flat="!highlightLoadTemplate"
+                  :disable="!nutritionEnabled || !profile.diet_type"
                   @click="loadMacroTemplate"
                 />
               </div>
@@ -177,6 +241,7 @@
                       filled
                       dense
                       hint="0 to 100"
+                      :disable="!nutritionEnabled"
                     />
                   </div>
                 </div>
@@ -194,12 +259,28 @@
               <q-btn
                 type="submit"
                 color="primary"
+                class="q-mr-md q-mb-md"
                 label="Save profile"
                 :loading="loading"
                 :disable="!usersStore.currentUser"
               />
             </div>
           </q-form>
+          <q-dialog v-model="showDietTypeDialog">
+            <q-card>
+              <q-card-section class="text-h6">Load Template</q-card-section>
+              <q-card-section>
+                <div>
+                  <strong>Load Template</strong> will update your macro values for each day of the
+                  week based on "{{ selectedDietType }}".
+                </div>
+                <div class="q-mt-md">You can always adjust the values manually if needed.</div>
+              </q-card-section>
+              <q-card-actions align="right">
+                <q-btn v-close-popup flat label="OK" color="primary" />
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
         </component>
       </div>
     </div>
@@ -207,11 +288,19 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { useUsersStore } from 'stores/users'
 import { useProfileStore } from 'stores/profile'
-import { calculateBodyMassIndex, calculateTotalDailyCalories } from '../utils/rules'
+import {
+  calculateBodyMassIndex,
+  calculateTotalDailyCalories,
+  hasMissingMacroFields,
+  hasRequiredProfileDetails,
+  hasValue,
+  isValidProfileNumber,
+  shouldHighlightLoadTemplate,
+} from '../utils/rules'
 import { notifySuccess } from '../utils/notify'
 import macroTemplates from '../components/macros.json'
 
@@ -226,6 +315,9 @@ const usersStore = useUsersStore()
 const store = useProfileStore()
 const $q = useQuasar()
 const loading = ref(false)
+const dailyCalorieDeficitInput = ref(null)
+const showDietTypeDialog = ref(false)
+const selectedDietType = ref('')
 
 const dietTypeOptions = [
   { label: 'Balanced', value: 'Balanced' },
@@ -350,6 +442,20 @@ const profile = reactive({
 })
 
 const currentUserId = computed(() => usersStore.currentUser?.user_id || null)
+const nutritionEnabled = computed(
+  () => Boolean(currentUserId.value) && !loading.value && hasRequiredProfileDetails(profile),
+)
+const highlightLoadTemplate = computed(() => shouldHighlightLoadTemplate(profile, dayGroups))
+
+watch(
+  () => hasRequiredProfileDetails(profile),
+  async (complete, wasComplete) => {
+    if (!complete || wasComplete || !nutritionEnabled.value) return
+    await nextTick()
+    if (nutritionEnabled.value) dailyCalorieDeficitInput.value?.focus()
+  },
+  { flush: 'sync' },
+)
 
 const totalDailyCalories = computed(() => {
   const calories = calculateTotalDailyCalories({
@@ -371,6 +477,13 @@ const bodyMassIndex = computed(() => {
 
   return bmi ?? ''
 })
+
+function onDietTypeChange(value) {
+  if (value) {
+    selectedDietType.value = value
+    showDietTypeDialog.value = true
+  }
+}
 
 function loadMacroTemplate() {
   const selectedTemplate = macroTemplates[profile.diet_type]
@@ -403,6 +516,7 @@ function syncUserDetails() {
 }
 
 async function loadProfile() {
+  if (currentUserId.value) loading.value = true
   syncUserDetails()
 
   if (!currentUserId.value) {
@@ -423,7 +537,6 @@ async function loadProfile() {
     return
   }
 
-  loading.value = true
   const data = await store.loadCurrentProfile(currentUserId.value)
   profile.fname = data?.fname ?? ''
   profile.lname = data?.lname ?? ''
@@ -433,7 +546,7 @@ async function loadProfile() {
   profile.goal_weight = data?.goal_weight ?? null
   profile.height = data?.height ?? null
   profile.activity_level = data?.activity_level ?? null
-  profile.daily_calorie_deficit = data?.daily_calorie_deficit ?? 0
+  profile.daily_calorie_deficit = data ? data.daily_calorie_deficit : 0
   profile.diet_type = data?.diet_type ?? null
   dayGroups.forEach((day) => {
     day.fields.forEach((field) => {
@@ -450,14 +563,7 @@ function validateDailyMacros() {
     const carbs = profile[carbsKey]
     const fat = profile[fatKey]
 
-    if (
-      protein === null ||
-      protein === '' ||
-      carbs === null ||
-      carbs === '' ||
-      fat === null ||
-      fat === ''
-    ) {
+    if (hasMissingMacroFields(profile, day.fields)) {
       return `${day.label}: protein, carbs, and fat are required.`
     }
 
@@ -471,7 +577,8 @@ function validateDailyMacros() {
 }
 
 async function saveProfile() {
-  if (!currentUserId.value) {
+  const userId = currentUserId.value
+  if (!userId) {
     return
   }
 
@@ -479,13 +586,29 @@ async function saveProfile() {
   if (validationError) {
     store.error = validationError
     notifySuccess($q, validationError, { color: 'negative' })
-    notifySuccess($q, 'If necessary - LOAD TEMPLATE', { color: 'warning' })
+    notifySuccess($q, 'If necessary - LOAD TEMPLATE', { color: 'warning', textColor: 'primary' })
     return
+  }
+
+  if (Number(profile.daily_calorie_deficit) === 0) {
+    const confirmed = await new Promise((resolve) => {
+      $q.dialog({
+        title: 'Zero calorie deficit',
+        message: 'Your daily calorie deficit is 0. Are you sure you want to save?',
+        cancel: true,
+        ok: { label: 'Save profile', color: 'warning', unelevated: true },
+        persistent: true,
+      })
+        .onOk(() => resolve(true))
+        .onCancel(() => resolve(false))
+        .onDismiss(() => resolve(false))
+    })
+    if (!confirmed || currentUserId.value !== userId) return
   }
 
   store.error = null
   loading.value = true
-  const savedProfile = await store.saveProfile(currentUserId.value, {
+  const savedProfile = await store.saveProfile(userId, {
     fname: profile.fname,
     lname: profile.lname,
     sex: profile.sex,
@@ -539,3 +662,10 @@ onMounted(() => {
   loadProfile()
 })
 </script>
+
+<style scoped>
+.required-field-warning :deep(.q-field__control) {
+  outline: 2px solid var(--q-warning);
+  outline-offset: -2px;
+}
+</style>
