@@ -17,7 +17,7 @@ create table public.exercise (
 
   constraint exercise_pkey primary key (exercise_id),
   constraint exercise_name_key unique (name)
-) TABLESPACE pg_default;
+)
 
 ALTER TABLE public.exercise
 ADD COLUMN user_id uuid NOT NULL
