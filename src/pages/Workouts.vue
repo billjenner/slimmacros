@@ -287,6 +287,19 @@
                       <div v-if="!workoutExerciseDetails[props.row.workout_id].rows.length">
                         No individual exercises in this workout.
                       </div>
+                      <template v-else>
+                        <div class="row q-col-gutter-x-sm q-col-gutter-y-xs">
+                          <div class="col-12 col-sm-4 text-caption text-weight-bold">Exercise</div>
+                          <div
+                            v-for="field in exerciseFields"
+                            :key="field"
+                            class="col-6 col-sm-2 text-caption text-weight-bold"
+                          >
+                            {{ field[0].toUpperCase() + field.slice(1) }}
+                          </div>
+                        </div>
+                        <q-separator class="q-mt-xs" />
+                      </template>
                       <div
                         v-for="(entry, index) in workoutExerciseDetails[props.row.workout_id].rows"
                         :key="entry.workout_exercise_id"
@@ -296,15 +309,20 @@
                           <q-separator />
                         </div>
                         <div class="col-12 col-sm-4">
-                          <div v-if="index === 0" class="text-caption text-weight-bold">
-                            Exercise
+                          <div class="row items-center no-wrap">
+                            <div>{{ entry.exercise?.name || 'Unavailable exercise' }}</div>
+                            <div
+                              v-if="entry.exercise?.video_path || entry.exercise?.image_path"
+                              class="q-ml-xs"
+                            >
+                              <ExerciseMediaPreview
+                                :exercise="entry.exercise"
+                                @error="store.error = $event"
+                              />
+                            </div>
                           </div>
-                          <div>{{ entry.exercise?.name || 'Unavailable exercise' }}</div>
                         </div>
                         <div v-for="field in exerciseFields" :key="field" class="col-6 col-sm-2">
-                          <div v-if="index === 0" class="text-caption text-weight-bold">
-                            {{ field[0].toUpperCase() + field.slice(1) }}
-                          </div>
                           <div class="text-weight-bold">{{ entry[field] ?? '-' }}</div>
                         </div>
                       </div>
