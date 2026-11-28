@@ -143,15 +143,7 @@
         </q-item-section>
         <q-item-section side>
           <div class="row q-gutter-xs">
-            <q-btn
-              v-if="row.video_path || row.image_path"
-              flat
-              round
-              dense
-              :icon="row.video_path ? 'play_circle' : 'image'"
-              :aria-label="row.video_path ? 'Preview video' : 'Preview image'"
-              @click="preview(row)"
-            />
+            <ExerciseMediaPreview :exercise="row" @error="error = $event" />
             <q-btn
               v-if="isOwnedByCurrentUser(row)"
               flat
@@ -175,19 +167,6 @@
         </q-item-section>
       </q-item>
     </q-list>
-
-    <q-dialog v-model="showPreview">
-      <q-card style="width: min(100%, 560px)">
-        <video
-          v-if="previewType === 'video'"
-          :src="previewUrl"
-          controls
-          autoplay
-          style="width: 100%"
-        />
-        <q-img v-else-if="previewUrl" :src="previewUrl" fit="contain" />
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
@@ -197,6 +176,7 @@ import { useQuasar } from 'quasar'
 import { supabase } from 'src/lib/supabase'
 import { notifySuccess } from 'src/utils/notify'
 import { useUsersStore } from 'stores/users'
+import ExerciseMediaPreview from './ExerciseMediaPreview.vue'
 
 const BUCKET = 'exercise-videos'
 
@@ -212,9 +192,6 @@ const formRef = ref(null)
 const editingId = ref(null)
 const form = ref(newForm())
 const mediaFile = ref(null)
-const showPreview = ref(false)
-const previewUrl = ref('')
-const previewType = ref('')
 let loadRequestId = 0
 const currentMediaPath = computed(() => form.value.video_path || form.value.image_path)
 const isAdmin = computed(() => {
@@ -422,19 +399,6 @@ function confirmDelete(row) {
     notifySuccess($q, 'Exercise deleted')
     await load()
   })
-}
-
-async function preview(row) {
-  const path = row.video_path || row.image_path
-  const isVideo = !!row.video_path
-  const { data, error: err } = await supabase.storage.from(BUCKET).createSignedUrl(path, 3600)
-  if (err) {
-    error.value = err.message
-    return
-  }
-  previewUrl.value = data.signedUrl
-  previewType.value = isVideo ? 'video' : 'image'
-  showPreview.value = true
 }
 
 watch(

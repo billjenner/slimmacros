@@ -1,6 +1,54 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { availableWorkoutExercises, workoutExercisePayload } from '../src/utils/workoutExercises.js'
+import {
+  availableWorkoutExercises,
+  loadWorkoutExercises,
+  optionalNonNegativeIntegerRule,
+  workoutExercisePayload,
+} from '../src/utils/workoutExercises.js'
+
+test('loads workout exercises with their names in saved order and propagates errors', async () => {
+  const calls = []
+  const result = { data: null, error: { message: 'Load failed' } }
+  const query = {
+    select(value) {
+      calls.push(['select', value])
+      return this
+    },
+    eq(field, value) {
+      calls.push(['eq', field, value])
+      return this
+    },
+    order(field) {
+      calls.push(['order', field])
+      return field === 'workout_exercise_id' ? Promise.resolve(result) : this
+    },
+  }
+  const client = {
+    from(table) {
+      calls.push(['from', table])
+      return query
+    },
+  }
+
+  assert.equal(await loadWorkoutExercises(client, 42), result)
+  assert.deepEqual(calls, [
+    ['from', 'workout_exercise'],
+    ['select', '*, exercise(*)'],
+    ['eq', 'workout_id', 42],
+    ['order', 'sort_order'],
+    ['order', 'workout_exercise_id'],
+  ])
+})
+
+test('accepts blank or non-negative integers and rejects negative exercise values', () => {
+  for (const value of [null, undefined, '', 0, '0', '12', 2147483647]) {
+    assert.equal(optionalNonNegativeIntegerRule(value), true)
+  }
+  for (const value of [-1, '-1', '-0.5', '1.5', '2147483648']) {
+    assert.notEqual(optionalNonNegativeIntegerRule(value), true)
+  }
+})
 
 test('offers active own and system exercises, plus shared exercises when enabled', () => {
   const exercises = [
