@@ -6,11 +6,15 @@
           <div class="q-pa-md">
             <div class="text-h5">Getting Started</div>
             <div class="text-body2 text-grey-7 q-mt-sm">
-              Follow these three steps to get started with Slim Macros.
+              Follow these steps to get started with Slim Macros.
             </div>
           </div>
 
-          <q-banner v-if="!loading && !currentUserId" class="bg-info text-white q-mx-md q-mb-md" rounded>
+          <q-banner
+            v-if="!loading && !currentUserId"
+            class="bg-info text-white q-mx-md q-mb-md"
+            rounded
+          >
             Sign in to save your progress and see which steps are complete.
             <template #action>
               <q-btn
@@ -22,15 +26,15 @@
             </template>
           </q-banner>
 
-          <q-banner
-            v-if="progressError"
-            class="bg-negative text-white q-mx-md q-mb-md"
-            rounded
-          >
+          <q-banner v-if="progressError" class="bg-negative text-white q-mx-md q-mb-md" rounded>
             We couldn't load all of your setup progress. {{ progressError }}
             <template #action>
               <q-btn flat color="white" label="Retry" :loading="loading" @click="loadProgress" />
             </template>
+          </q-banner>
+
+          <q-banner v-if="completionError" class="bg-negative text-white q-mx-md q-mb-md" rounded>
+            {{ completionError }}
           </q-banner>
 
           <q-list separator aria-label="Getting started steps">
@@ -90,21 +94,56 @@
               <q-item-section>
                 <q-item-label class="text-weight-medium">3. Log food consumption</q-item-label>
                 <q-item-label caption>
-                  Log &gt; Food &gt; Select a Food Item &gt; enter number of servings &gt; Add to Log
+                  Log &gt; Food &gt; Select a Food Item &gt; enter number of servings &gt; Add to
+                  Log
                 </q-item-label>
               </q-item-section>
               <q-item-section side>
                 <q-icon name="chevron_right" color="grey-6" />
               </q-item-section>
             </q-item>
+
+            <q-item>
+              <q-item-section avatar>
+                <q-spinner v-if="loading" color="primary" size="24px" />
+                <q-icon
+                  v-else
+                  :name="statusIcon(finalStepComplete)"
+                  :color="statusColor(finalStepComplete)"
+                  size="sm"
+                />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label class="text-weight-medium">4. Explore more</q-item-label>
+                <q-item-label caption>
+                  <template v-if="basicStepsComplete">
+                    You've completed the basic steps to log and track food.
+                  </template>
+                  <template v-else>
+                    Complete the first three steps to get started logging and tracking food.
+                  </template>
+                  You can similarly track workouts and exercises, supplements, and weight. Review
+                  feedback and progress on the Dashboard.
+                </q-item-label>
+                <q-item-label v-if="finalStepComplete" caption class="text-positive">
+                  Completed
+                </q-item-label>
+                <div class="row q-gutter-sm q-mt-sm">
+                  <q-btn
+                    label="Done"
+                    color="primary"
+                    :loading="savingCompletion"
+                    :disable="!basicStepsComplete || finalStepComplete !== false || loading"
+                    @click="completeFinalStep"
+                  />
+                  <q-btn flat color="primary" label="View dashboard" to="/dashboard" />
+                </div>
+              </q-item-section>
+            </q-item>
           </q-list>
 
           <div v-if="foodLogComplete" class="q-pa-md">
-            <q-banner
-              v-if="workoutLogComplete === false"
-              rounded
-              class="bg-grey-2 q-mb-sm"
-            >
+            <q-banner v-if="workoutLogComplete === false" rounded class="bg-grey-2 q-mb-sm">
               <template #avatar>
                 <q-icon name="fitness_center" color="primary" />
               </template>
@@ -114,11 +153,7 @@
               </template>
             </q-banner>
 
-            <q-banner
-              v-if="supplementLogComplete === false"
-              rounded
-              class="bg-grey-2"
-            >
+            <q-banner v-if="supplementLogComplete === false" rounded class="bg-grey-2">
               <template #avatar>
                 <q-icon name="medication" color="primary" />
               </template>
@@ -136,13 +171,15 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useUsersStore } from 'stores/users'
 import { useProfileStore } from 'stores/profile'
 import { useFoodStore } from 'stores/food'
 import { useFoodLogsStore } from 'stores/food-logs'
 import { useWorkoutLogsStore } from 'stores/workout-logs'
 import { usesupplementsLogStore } from 'stores/supplements_log'
+import { supabase } from 'src/lib/supabase'
+import { hasCompletedFoodSetup, saveGettingStartedCompletion } from '../utils/getting-started'
 
 const usersStore = useUsersStore()
 const profileStore = useProfileStore()
@@ -159,6 +196,12 @@ const foodComplete = ref(null)
 const foodLogComplete = ref(null)
 const workoutLogComplete = ref(null)
 const supplementLogComplete = ref(null)
+const finalStepComplete = ref(null)
+const savingCompletion = ref(false)
+const completionError = ref('')
+const basicStepsComplete = computed(() =>
+  hasCompletedFoodSetup(profileComplete.value, foodComplete.value, foodLogComplete.value),
+)
 
 function statusIcon(isComplete) {
   if (isComplete === null) {
@@ -179,11 +222,13 @@ function statusColor(isComplete) {
 async function loadProgress() {
   loading.value = true
   progressError.value = ''
+  completionError.value = ''
   profileComplete.value = null
   foodComplete.value = null
   foodLogComplete.value = null
   workoutLogComplete.value = null
   supplementLogComplete.value = null
+  finalStepComplete.value = null
 
   try {
     const user = await usersStore.restoreSessionFromAuth()
@@ -204,6 +249,12 @@ async function loadProgress() {
 
     if (!profileStore.error) {
       profileComplete.value = Boolean(profile?.diet_type)
+      if (profile && !Object.hasOwn(profile, 'getting_started_completed')) {
+        completionError.value =
+          'Getting Started completion is not configured. Apply the profile schema update and retry.'
+      } else {
+        finalStepComplete.value = Boolean(profile?.getting_started_completed)
+      }
     }
 
     if (!foodStore.error) {
@@ -235,6 +286,43 @@ async function loadProgress() {
     progressError.value = error?.message || 'Unable to load setup progress.'
   } finally {
     loading.value = false
+  }
+}
+
+async function completeFinalStep() {
+  if (
+    !currentUserId.value ||
+    !basicStepsComplete.value ||
+    finalStepComplete.value !== false ||
+    savingCompletion.value
+  ) {
+    return
+  }
+  if (usersStore.currentUser?.user_id !== currentUserId.value) {
+    completionError.value =
+      'Your session changed. Reload your progress before completing this step.'
+    return
+  }
+  if (!supabase) {
+    completionError.value = 'Supabase client is not configured.'
+    return
+  }
+
+  const userId = currentUserId.value
+  completionError.value = ''
+  savingCompletion.value = true
+  try {
+    await saveGettingStartedCompletion(supabase, userId)
+    if (currentUserId.value === userId && usersStore.currentUser?.user_id === userId) {
+      finalStepComplete.value = true
+      if (profileStore.currentProfile?.user_id === userId) {
+        profileStore.currentProfile.getting_started_completed = true
+      }
+    }
+  } catch (error) {
+    completionError.value = error?.message || 'Unable to save getting started completion.'
+  } finally {
+    savingCompletion.value = false
   }
 }
 

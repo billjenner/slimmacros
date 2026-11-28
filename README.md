@@ -139,8 +139,13 @@ to enable atomic workout saves.
 
 ### Getting Started database setup
 
-Apply [getting_started_completion.sql](./src/sql/schema/getting_started_completion.sql) in Supabase
-to save completion of the final Getting Started step across devices.
+For an existing profile table, add the completion column in Supabase to save the final
+Getting Started step across devices:
+
+```sql
+alter table public.profile
+  add column if not exists getting_started_completed boolean not null default false;
+```
 
 ### Multifactor Auth - Off / On
 

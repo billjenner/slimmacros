@@ -5,6 +5,7 @@ import {
   getLoginPath,
   getStartPath,
   hasCompletedFoodSetup,
+  hasCompletedGettingStarted,
   saveGettingStartedCompletion,
 } from '../src/utils/getting-started.js'
 
@@ -14,6 +15,23 @@ const router = createRouter({
     { path: '/log', component: {} },
     { path: '/items', component: {} },
   ],
+})
+
+test('only hides Getting Started when the current account has completed the final step', () => {
+  assert.equal(hasCompletedGettingStarted('user-1', null), false)
+  assert.equal(hasCompletedGettingStarted('user-1', { user_id: 'user-1' }), false)
+  assert.equal(
+    hasCompletedGettingStarted('user-1', { user_id: 'user-1', getting_started_completed: false }),
+    false,
+  )
+  assert.equal(
+    hasCompletedGettingStarted('user-1', { user_id: 'user-2', getting_started_completed: true }),
+    false,
+  )
+  assert.equal(
+    hasCompletedGettingStarted('user-1', { user_id: 'user-1', getting_started_completed: true }),
+    true,
+  )
 })
 
 test('only celebrates food setup when all three steps are complete', () => {

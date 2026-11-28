@@ -316,23 +316,20 @@ import { useQuasar } from 'quasar'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsersStore } from 'stores/users'
 import { useProfileStore } from 'stores/profile'
-import { useFoodLogsStore } from 'stores/food-logs'
 import OfflineConnectionCard from 'components/OfflineConnectionCard.vue'
+import { hasCompletedGettingStarted } from '../utils/getting-started'
 
 const $q = useQuasar()
 const route = useRoute()
 const hoveredPath = ref(null)
 const usersStore = useUsersStore()
 const profileStore = useProfileStore()
-const foodLogsStore = useFoodLogsStore()
 const router = useRouter()
 const leftDrawerOpen = ref(false)
 const deferredInstallPrompt = ref(null)
 const showInstallDialog = ref(false)
 const showSignOutDialog = ref(false)
 const showOfflineDialog = ref(false)
-const foodLogCheckComplete = ref(false)
-const foodLogCheckedUserId = ref(null)
 
 const appVersion = process.env.APP_VERSION
 const appCommit = process.env.APP_COMMIT
@@ -349,21 +346,10 @@ const userInitials = computed(() => {
 })
 
 const isSignedIn = computed(() => Boolean(usersStore.currentUser && usersStore.currentUser.email))
-const hasFoodLogEntry = computed(() => {
-  const userId = usersStore.currentUser?.user_id
-
-  return (
-    foodLogCheckComplete.value &&
-    foodLogCheckedUserId.value === userId &&
-    foodLogsStore.logs.some((log) => String(log.user_id) === String(userId))
-  )
-})
 const showGettingStarted = computed(
   () =>
     isSignedIn.value &&
-    foodLogCheckComplete.value &&
-    foodLogCheckedUserId.value === usersStore.currentUser?.user_id &&
-    !hasFoodLogEntry.value,
+    !hasCompletedGettingStarted(usersStore.currentUser?.user_id, profileStore.currentProfile),
 )
 
 const isAdmin = computed(() => {
@@ -463,50 +449,6 @@ watch(
       profileStore.currentProfile = null
     }
   },
-)
-
-watch(
-  () => usersStore.currentUser?.user_id,
-  async (userId) => {
-    foodLogCheckComplete.value = false
-    foodLogCheckedUserId.value = null
-
-    if (!userId) {
-      foodLogCheckComplete.value = true
-      return
-    }
-
-    try {
-      await foodLogsStore.loadFoodLogs(userId)
-
-      if (usersStore.currentUser?.user_id !== userId) {
-        return
-      }
-
-      if (foodLogsStore.error) {
-        console.error('Unable to check whether the user has food logs:', foodLogsStore.error)
-        $q.notify({
-          type: 'negative',
-          message: 'Unable to check your food log status.',
-        })
-        return
-      }
-
-      foodLogCheckedUserId.value = userId
-      foodLogCheckComplete.value = true
-    } catch (error) {
-      if (usersStore.currentUser?.user_id !== userId) {
-        return
-      }
-
-      console.error('Unable to check whether the user has food logs:', error)
-      $q.notify({
-        type: 'negative',
-        message: 'Unable to check your food log status.',
-      })
-    }
-  },
-  { immediate: true },
 )
 
 watch(
