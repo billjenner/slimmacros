@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import { getLoginPath, getStartPath } from '../src/utils/getting-started.js'
+import {
+  getLoginPath,
+  getStartPath,
+  hasCompletedFoodSetup,
+  saveGettingStartedCompletion,
+} from '../src/utils/getting-started.js'
 
 const router = createRouter({
   history: createMemoryHistory(),
@@ -9,6 +14,68 @@ const router = createRouter({
     { path: '/log', component: {} },
     { path: '/items', component: {} },
   ],
+})
+
+test('only celebrates food setup when all three steps are complete', () => {
+  assert.equal(hasCompletedFoodSetup(true, true, true), true)
+  assert.equal(hasCompletedFoodSetup(false, true, true), false)
+  assert.equal(hasCompletedFoodSetup(true, false, true), false)
+  assert.equal(hasCompletedFoodSetup(true, true, false), false)
+  assert.equal(hasCompletedFoodSetup(null, true, true), false)
+})
+
+test('saves completion for the selected account', async () => {
+  const calls = []
+  const query = {
+    update(value) {
+      calls.push(['update', value])
+      return this
+    },
+    eq(field, value) {
+      calls.push(['eq', field, value])
+      return this
+    },
+    select(value) {
+      calls.push(['select', value])
+      return this
+    },
+    async single() {
+      return { data: { getting_started_completed: true }, error: null }
+    },
+  }
+  const client = {
+    from(table) {
+      calls.push(['from', table])
+      return query
+    },
+  }
+
+  await saveGettingStartedCompletion(client, 'user-1')
+  assert.deepEqual(calls, [
+    ['from', 'profile'],
+    ['update', { getting_started_completed: true }],
+    ['eq', 'user_id', 'user-1'],
+    ['select', 'getting_started_completed'],
+  ])
+})
+
+test('does not report completion when the database update fails', async () => {
+  const failure = new Error('Database unavailable')
+  const query = {
+    update() {
+      return this
+    },
+    eq() {
+      return this
+    },
+    select() {
+      return this
+    },
+    async single() {
+      return { data: null, error: failure }
+    },
+  }
+  await assert.rejects(saveGettingStartedCompletion({ from: () => query }, 'user-1'), failure)
 })
 
 test('chooses a start page from the current user food logs', async () => {

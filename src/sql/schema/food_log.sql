@@ -9,3 +9,61 @@ create table public.food_log (
   constraint food_log_user_id_fkey1 foreign KEY (user_id) references auth.users (id) on delete CASCADE,
   constraint food_log_servings_check1 check ((servings > (0)::numeric))
 )
+
+-- ============================================================
+-- RLS - food_log (all authenticated users)
+-- ============================================================
+
+ALTER TABLE public.food_log ENABLE ROW LEVEL SECURITY;
+
+-- SELECT
+DROP POLICY IF EXISTS "Authenticated users can view all food_log"
+ON public.food_log;
+
+CREATE POLICY "Authenticated users can view all food_log"
+ON public.food_log
+FOR SELECT
+TO authenticated
+USING (true);
+
+-- INSERT
+DROP POLICY IF EXISTS "Authenticated users can insert all food_log"
+ON public.food_log;
+
+CREATE POLICY "Authenticated users can insert all food_log"
+ON public.food_log
+FOR INSERT
+TO authenticated
+WITH CHECK (true);
+
+-- UPDATE
+DROP POLICY IF EXISTS "Authenticated users can update all food_log"
+ON public.food_log;
+
+CREATE POLICY "Authenticated users can update all food_log"
+ON public.food_log
+FOR UPDATE
+TO authenticated
+USING (true)
+WITH CHECK (true);
+
+-- DELETE
+DROP POLICY IF EXISTS "Authenticated users can delete all food_log"
+ON public.food_log;
+
+CREATE POLICY "Authenticated users can delete all food_log"
+ON public.food_log
+FOR DELETE
+TO authenticated
+USING (true);
+
+-- GRANTS
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON public.food_log
+TO authenticated;
+
+-- GRANT IDENTITY SEQUENCE ACCESS
+GRANT USAGE, SELECT
+ON SEQUENCE public.food_log_food_log_id_seq
+TO authenticated;
+

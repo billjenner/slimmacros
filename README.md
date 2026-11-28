@@ -137,6 +137,11 @@ After creating the workout, exercise, and workout_exercise tables, apply
 [save_workout_with_exercises.sql](./src/sql/schema/save_workout_with_exercises.sql) in Supabase
 to enable atomic workout saves.
 
+### Getting Started database setup
+
+Apply [getting_started_completion.sql](./src/sql/schema/getting_started_completion.sql) in Supabase
+to save completion of the final Getting Started step across devices.
+
 ### Multifactor Auth - Off / On
 
 > Supabase > DB > Authentication > Sign In / PRoviders > Confirm Email = Off,

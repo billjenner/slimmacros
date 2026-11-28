@@ -13,3 +13,60 @@ create table public.food_database (
   date date not null default CURRENT_DATE,
   constraint food_database_pkey primary key (food_db_id)
 )
+
+-- ============================================================
+-- RLS - food_database (all authenticated users)
+-- ============================================================
+
+ALTER TABLE public.food_database ENABLE ROW LEVEL SECURITY;
+
+-- SELECT
+DROP POLICY IF EXISTS "Authenticated users can view all food_database"
+ON public.food_database;
+
+CREATE POLICY "Authenticated users can view all food_database"
+ON public.food_database
+FOR SELECT
+TO authenticated
+USING (true);
+
+-- INSERT
+DROP POLICY IF EXISTS "Authenticated users can insert all food_database"
+ON public.food_database;
+
+CREATE POLICY "Authenticated users can insert all food_database"
+ON public.food_database
+FOR INSERT
+TO authenticated
+WITH CHECK (true);
+
+-- UPDATE
+DROP POLICY IF EXISTS "Authenticated users can update all food_database"
+ON public.food_database;
+
+CREATE POLICY "Authenticated users can update all food_database"
+ON public.food_database
+FOR UPDATE
+TO authenticated
+USING (true)
+WITH CHECK (true);
+
+-- DELETE
+DROP POLICY IF EXISTS "Authenticated users can delete all food_database"
+ON public.food_database;
+
+CREATE POLICY "Authenticated users can delete all food_database"
+ON public.food_database
+FOR DELETE
+TO authenticated
+USING (true);
+
+-- GRANTS
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON public.food_database
+TO authenticated;
+
+-- GRANT IDENTITY SEQUENCE ACCESS
+GRANT USAGE, SELECT
+ON SEQUENCE public.food_database_food_db_id_seq
+TO authenticated;

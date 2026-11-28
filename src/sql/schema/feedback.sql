@@ -11,3 +11,60 @@ create table public.feedback (
   constraint feedback_pkey primary key (feedback_id),
   constraint feedback_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE
 )
+
+-- ============================================================
+-- RLS - feedback (all authenticated users)
+-- ============================================================
+
+ALTER TABLE public.feedback ENABLE ROW LEVEL SECURITY;
+
+-- SELECT
+DROP POLICY IF EXISTS "Authenticated users can view all feedback"
+ON public.feedback;
+
+CREATE POLICY "Authenticated users can view all feedback"
+ON public.feedback
+FOR SELECT
+TO authenticated
+USING (true);
+
+-- INSERT
+DROP POLICY IF EXISTS "Authenticated users can insert all feedback"
+ON public.feedback;
+
+CREATE POLICY "Authenticated users can insert all feedback"
+ON public.feedback
+FOR INSERT
+TO authenticated
+WITH CHECK (true);
+
+-- UPDATE
+DROP POLICY IF EXISTS "Authenticated users can update all feedback"
+ON public.feedback;
+
+CREATE POLICY "Authenticated users can update all feedback"
+ON public.feedback
+FOR UPDATE
+TO authenticated
+USING (true)
+WITH CHECK (true);
+
+-- DELETE
+DROP POLICY IF EXISTS "Authenticated users can delete all feedback"
+ON public.feedback;
+
+CREATE POLICY "Authenticated users can delete all feedback"
+ON public.feedback
+FOR DELETE
+TO authenticated
+USING (true);
+
+-- GRANTS
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON public.feedback
+TO authenticated;
+
+-- GRANT IDENTITY SEQUENCE ACCESS
+GRANT USAGE, SELECT
+ON SEQUENCE public.feedback_feedback_id_seq
+TO authenticated;
