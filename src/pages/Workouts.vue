@@ -255,7 +255,7 @@
                     :class="isOwnedByCurrentUser(props.row) ? 'bg-grey-2' : ''"
                     style="white-space: normal"
                   >
-                    <div class="row q-col-gutter-sm q-py-sm">
+                    <div class="row q-col-gutter-sm q-py-sm q-mb-md">
                       <div class="col-12 col-sm-6 col-md-4">
                         <div class="text-caption text-grey-7">Average workout time</div>
                         <div class="text-body2">{{ props.row.average_workout_time ?? 'N/A' }}</div>
