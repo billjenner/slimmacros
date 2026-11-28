@@ -29,6 +29,7 @@ const routes = [
         path: 'dashboard',
         component: () => import('pages/Dashboard.vue'),
         meta: {
+          requiresAuth: true,
           seo: {
             title: 'Dashboard',
             description: 'Overview of your Slim Macros activities.',
