@@ -271,7 +271,6 @@
                         </div>
                       </div>
                     </div>
-                    <div class="text-subtitle2 q-mt-sm">Exercises</div>
                     <div v-if="workoutExerciseDetails[props.row.workout_id]?.loading">
                       Loading exercises...
                     </div>
@@ -289,18 +288,24 @@
                         No individual exercises in this workout.
                       </div>
                       <div
-                        v-for="entry in workoutExerciseDetails[props.row.workout_id].rows"
+                        v-for="(entry, index) in workoutExerciseDetails[props.row.workout_id].rows"
                         :key="entry.workout_exercise_id"
-                        class="row q-col-gutter-sm q-py-sm"
+                        class="row q-col-gutter-x-sm q-col-gutter-y-xs"
                       >
+                        <div v-if="index > 0" class="col-12">
+                          <q-separator />
+                        </div>
                         <div class="col-12 col-sm-4">
-                          {{ entry.exercise?.name || 'Unavailable exercise' }}
+                          <div v-if="index === 0" class="text-caption text-weight-bold">
+                            Exercise
+                          </div>
+                          <div>{{ entry.exercise?.name || 'Unavailable exercise' }}</div>
                         </div>
                         <div v-for="field in exerciseFields" :key="field" class="col-6 col-sm-2">
-                          <div class="text-caption">
+                          <div v-if="index === 0" class="text-caption text-weight-bold">
                             {{ field[0].toUpperCase() + field.slice(1) }}
                           </div>
-                          <div>{{ entry[field] ?? '-' }}</div>
+                          <div class="text-weight-bold">{{ entry[field] ?? '-' }}</div>
                         </div>
                       </div>
                     </template>
